@@ -25,7 +25,9 @@ public:
 
 private:
 	Coord			position;
+
 	Color			color;
+
 	double			ambient;
 	double			diffuse;
 	double			specular;

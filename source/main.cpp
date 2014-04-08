@@ -41,7 +41,7 @@ static void AddCuboid (Geometry& geometry, double xSize, double ySize, double zS
 
 static void ConstructGeometry (Geometry& geometry)
 {
-	geometry.AddMaterial (Material (Color (1.0, 0.0, 0.0), 0.2, 0.8, 1.0, 0.4));
+	geometry.AddMaterial (Material (Color (1.0, 0.0, 0.0), 0.2, 0.8, 1.0, 0.2));
 	geometry.AddMaterial (Material (Color (0.0, 1.0, 0.0), 0.2, 0.8, 1.0, 0.0));
 	geometry.AddMaterial (Material (Color (0.0, 0.0, 1.0), 0.2, 0.8, 1.0, 0.0));
 	geometry.AddMaterial (Material (Color (1.0, 1.0, 1.0), 0.2, 0.8, 1.0, 0.0));
@@ -57,7 +57,7 @@ int main ()
 	Geometry geometry;
 	ConstructGeometry (geometry);
 
-	Camera camera (Coord (5.0, 3.0, 4.0), Coord (0.0, 0.0, 0.5), Coord (0.0, 0.0, 1.0), 45.0, 45.0);
+	Camera camera (Coord (5.0, 3.0, 4.0), Coord (0.0, 0.0, 0.5), Coord (0.0, 0.0, 1.0), 45.0, 45.0); 
 	Light light (Coord (3.0, 3.5, 5.5), Color (1.0, 1.0, 1.0), 1.0, 1.0, 0.0);
 	
 	RayTracer rayTracer (geometry, camera, light);
