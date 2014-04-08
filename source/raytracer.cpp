@@ -103,10 +103,10 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 	return true;
 }
 
-static Coord GetReflectedDirection (const Coord& originalDirection, const Coord& triangleNormal)
+static Coord GetReflectedDirection (const Coord& originalDirection, const Coord& normal)
 {
-	double dotProduct = -(triangleNormal * originalDirection);
-	return originalDirection + (triangleNormal * 2.0 * dotProduct);
+	double dotProduct = -(normal * originalDirection);
+	return originalDirection + (normal * 2.0 * dotProduct);
 }
 
 Color RayTracer::ProcessOneRay (const Ray& ray, int depth)
@@ -125,15 +125,15 @@ Color RayTracer::ProcessOneRay (const Ray& ray, int depth)
 
 	const Triangle& triangle = geometry.GetTriangle (intersection.triangle);
 	const Material& material = geometry.GetMaterial (triangle.mat);
-	Coord triangleNormal = geometry.GetTriangleNormal (intersection.triangle);
+	const Coord& normal = geometry.GetNormal (intersection.triangle);
 	
-	Color currentColor = GetPhongShading (material, light, intersection.position, triangleNormal);
+	Color currentColor = GetPhongShading (material, light, intersection.position, normal);
 	if (depth > 10) {
 		return currentColor;
 	}
 
 	if (material.IsReflective ()) {
-		Coord reflectedDirection = GetReflectedDirection (ray.GetDirection (), triangleNormal);
+		Coord reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 		Color reflectedColor = ProcessOneRay (reflectedRay, depth + 1);
 		double reflection = material.GetReflection ();

@@ -5,6 +5,6 @@
 #include "material.hpp"
 #include "light.hpp"
 
-Color GetPhongShading (const Material& material, const Light& light, const Coord& coordinate, const Coord& triangleNormal);
+Color GetPhongShading (const Material& material, const Light& light, const Coord& coordinate, const Coord& normal);
 
 #endif

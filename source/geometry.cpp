@@ -41,6 +41,7 @@ int Geometry::AddVertex (const Coord& coord)
 int Geometry::AddTriangle (const Triangle& triangle)
 {
 	triangles.push_back (triangle);
+	normals.push_back (CalculateNormal (triangles.size () - 1));
 	return triangles.size () - 1;
 }
 
@@ -75,12 +76,17 @@ const Triangle& Geometry::GetTriangle (int index) const
 	return triangles[index];
 }
 
+const Coord& Geometry::GetNormal (int index) const
+{
+	return normals[index];
+}
+
 const Material& Geometry::GetMaterial (int index) const
 {
 	return materials[index];
 }
 
-Coord Geometry::GetTriangleNormal (int index) const
+Coord Geometry::CalculateNormal (int index)
 {
 	const Triangle& triangle = GetTriangle (index);
 	const Coord& v0 = GetVertex (triangle.v0);
@@ -89,6 +95,5 @@ Coord Geometry::GetTriangleNormal (int index) const
 
 	Coord edgeDir1 = v1 - v0;
 	Coord edgeDir2 = v2 - v0;
-	Coord triangleNormal = Normalize (edgeDir1 ^ edgeDir2);
-	return triangleNormal;
+	return Normalize (edgeDir1 ^ edgeDir2);
 }
