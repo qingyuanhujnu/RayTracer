@@ -1,0 +1,9 @@
+project/Debug/*
+project/Release/*
+project/RayTracer/Debug/*
+project/RayTracer/Release/*
+*.opensdf
+*.sdf
+*.suo
+*.ipch
+*.vcxproj.user
