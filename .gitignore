@@ -2,6 +2,7 @@ project/Debug/*
 project/Release/*
 project/RayTracer/Debug/*
 project/RayTracer/Release/*
+project/RayTracer/*.png
 *.opensdf
 *.sdf
 *.suo
