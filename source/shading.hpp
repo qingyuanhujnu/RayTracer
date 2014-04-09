@@ -7,4 +7,6 @@
 
 Color GetPhongShading (const Material& material, const Light& light, const Coord& coordinate, const Coord& normal);
 
+Color GetBRDFShading (const Material& material, const Light& light, const Coord& cameraPos, const Coord& coordinate, const Coord& normal);
+
 #endif
