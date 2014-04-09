@@ -18,7 +18,7 @@
     <ClCompile Include="..\..\source\coord.cpp" />
     <ClCompile Include="..\..\source\export.cpp" />
     <ClCompile Include="..\..\source\generator.cpp" />
-    <ClCompile Include="..\..\source\geometry.cpp" />
+    <ClCompile Include="..\..\source\mesh.cpp" />
     <ClCompile Include="..\..\source\image.cpp" />
     <ClCompile Include="..\..\source\light.cpp" />
     <ClCompile Include="..\..\source\main.cpp" />
@@ -35,7 +35,7 @@
     <ClInclude Include="..\..\source\coord.hpp" />
     <ClInclude Include="..\..\source\export.hpp" />
     <ClInclude Include="..\..\source\generator.hpp" />
-    <ClInclude Include="..\..\source\geometry.hpp" />
+    <ClInclude Include="..\..\source\mesh.hpp" />
     <ClInclude Include="..\..\source\image.hpp" />
     <ClInclude Include="..\..\source\light.hpp" />
     <ClInclude Include="..\..\source\material.hpp" />

@@ -5,12 +5,12 @@
 
 #include "camera.hpp"
 #include "light.hpp"
-#include "geometry.hpp"
+#include "mesh.hpp"
 
 class ConfigFile
 {
 public:
-	static bool Read (const std::wstring& fileName, Camera& camera, Light& light, Geometry& geometry);
+	static bool Read (const std::wstring& fileName, Camera& camera, Light& light, Mesh& mesh);
 };
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef GEOMETRY_HPP
-#define GEOMETRY_HPP
+#ifndef MESH_HPP
+#define MESH_HPP
 
 #include "coord.hpp"
 #include "material.hpp"
@@ -18,11 +18,11 @@ public:
 	int		mat;
 };
 
-class Geometry
+class Mesh
 {
 public:
-	Geometry ();
-	~Geometry ();
+	Mesh ();
+	~Mesh ();
 
 	int						AddVertex (const Coord& coord);
 	int						AddTriangle (const Triangle& triangle);

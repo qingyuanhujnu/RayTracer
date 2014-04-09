@@ -1,4 +1,4 @@
-#include "geometry.hpp"
+#include "mesh.hpp"
 
 Triangle::Triangle () :
 	v0 (-1),
@@ -22,71 +22,71 @@ Triangle::~Triangle ()
 
 }
 
-Geometry::Geometry ()
+Mesh::Mesh ()
 {
 
 }
 
-Geometry::~Geometry ()
+Mesh::~Mesh ()
 {
 
 }
 
-int Geometry::AddVertex (const Coord& coord)
+int Mesh::AddVertex (const Coord& coord)
 {
 	vertices.push_back (coord);
 	return vertices.size () - 1;
 }
 
-int Geometry::AddTriangle (const Triangle& triangle)
+int Mesh::AddTriangle (const Triangle& triangle)
 {
 	triangles.push_back (triangle);
 	normals.push_back (CalculateNormal (triangles.size () - 1));
 	return triangles.size () - 1;
 }
 
-int Geometry::AddMaterial (const Material& material)
+int Mesh::AddMaterial (const Material& material)
 {
 	materials.push_back (material);
 	return materials.size () - 1;
 }
 
-int Geometry::VertexCount () const
+int Mesh::VertexCount () const
 {
 	return vertices.size ();
 }
 
-int Geometry::TriangleCount () const
+int Mesh::TriangleCount () const
 {
 	return triangles.size ();
 }
 
-int Geometry::MaterialCount () const
+int Mesh::MaterialCount () const
 {
 	return materials.size ();
 }
 
-const Coord& Geometry::GetVertex (int index) const
+const Coord& Mesh::GetVertex (int index) const
 {
 	return vertices[index];
 }
 
-const Triangle& Geometry::GetTriangle (int index) const
+const Triangle& Mesh::GetTriangle (int index) const
 {
 	return triangles[index];
 }
 
-const Coord& Geometry::GetNormal (int index) const
+const Coord& Mesh::GetNormal (int index) const
 {
 	return normals[index];
 }
 
-const Material& Geometry::GetMaterial (int index) const
+const Material& Mesh::GetMaterial (int index) const
 {
 	return materials[index];
 }
 
-Coord Geometry::CalculateNormal (int index)
+Coord Mesh::CalculateNormal (int index)
 {
 	const Triangle& triangle = GetTriangle (index);
 	const Coord& v0 = GetVertex (triangle.v0);

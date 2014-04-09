@@ -1,7 +1,7 @@
 #ifndef RAY_HPP
 #define RAY_HPP
 
-#include "geometry.hpp"
+#include "mesh.hpp"
 
 class Ray
 {
@@ -18,7 +18,7 @@ public:
 
 	const Coord&	GetDirection () const;
 	bool			TriangleIntersection (const Coord& v0, const Coord& v1, const Coord& v2, Coord* intersection) const;
-	bool			GeometryIntersection (const Geometry& geometry, Intersection* intersection) const;
+	bool			GeometryIntersection (const Mesh& mesh, Intersection* intersection) const;
 
 protected:
 	virtual bool	IsLengthReached (double currentLength) const = 0;

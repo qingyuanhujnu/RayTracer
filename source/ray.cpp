@@ -59,16 +59,16 @@ bool Ray::TriangleIntersection (const Coord& v0, const Coord& v1, const Coord& v
 	return true;
 }
 
-bool Ray::GeometryIntersection (const Geometry& geometry, Intersection* intersection) const
+bool Ray::GeometryIntersection (const Mesh& mesh, Intersection* intersection) const
 {
 	bool found = false;
 	Intersection minIntersection;
 
-	for (int i = 0; i < geometry.TriangleCount (); i++) {
-		const Triangle& triangle = geometry.GetTriangle (i);
-		const Coord& v0 = geometry.GetVertex (triangle.v0);
-		const Coord& v1 = geometry.GetVertex (triangle.v1);
-		const Coord& v2 = geometry.GetVertex (triangle.v2);
+	for (int i = 0; i < mesh.TriangleCount (); i++) {
+		const Triangle& triangle = mesh.GetTriangle (i);
+		const Coord& v0 = mesh.GetVertex (triangle.v0);
+		const Coord& v1 = mesh.GetVertex (triangle.v1);
+		const Coord& v2 = mesh.GetVertex (triangle.v2);
 		
 		if (intersection == NULL) {
 			if (TriangleIntersection (v0, v1, v2, NULL)) {

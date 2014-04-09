@@ -74,8 +74,8 @@ const Color& RayTracer::ResultImage::GetColor (int x, int y) const
 	return image[y * resolutionX + x];
 }
 
-RayTracer::RayTracer (const Geometry& geometry, const Camera& camera, const Light& light) :
-	geometry (geometry),
+RayTracer::RayTracer (const Mesh& mesh, const Camera& camera, const Light& light) :
+	mesh (mesh),
 	camera (camera),
 	light (light)
 {
@@ -112,18 +112,18 @@ static Coord GetReflectedDirection (const Coord& originalDirection, const Coord&
 Color RayTracer::ProcessOneRay (const Ray& ray, int depth)
 {
 	Ray::Intersection intersection;
-	if (ray.GeometryIntersection (geometry, &intersection)) {
+	if (ray.GeometryIntersection (mesh, &intersection)) {
 		SectorRay shadowRay (intersection.position, light.GetPosition ());
-		if (shadowRay.GeometryIntersection (geometry, NULL)) {
+		if (shadowRay.GeometryIntersection (mesh, NULL)) {
 			return Color (0.0, 0.0, 0.0);
 		}
 	} else {
 		return Color (0.0, 0.0, 0.0);
 	}
 
-	const Triangle& triangle = geometry.GetTriangle (intersection.triangle);
-	const Material& material = geometry.GetMaterial (triangle.mat);
-	const Coord& normal = geometry.GetNormal (intersection.triangle);
+	const Triangle& triangle = mesh.GetTriangle (intersection.triangle);
+	const Material& material = mesh.GetMaterial (triangle.mat);
+	const Coord& normal = mesh.GetNormal (intersection.triangle);
 	
 	Color currentColor = GetPhongShading (material, light, intersection.position, normal);
 	if (depth > 10) {
