@@ -1,6 +1,12 @@
 #include "ray.hpp"
 #include "common.hpp"
 
+Ray::Ray (const Coord& startPoint, const Coord& rayDirection) :
+	origin (startPoint),
+	direction (Normalize (rayDirection))
+{
+}
+
 Ray::Intersection::Intersection () :
 	distance (INF),
 	triangle (-1)
@@ -95,11 +101,10 @@ bool Ray::GeometryIntersection (const Mesh& mesh, Intersection* intersection) co
 	return found;
 }
 
-SectorRay::SectorRay (const Coord& startPoint, const Coord& endPoint)
+SectorRay::SectorRay (const Coord& startPoint, const Coord& endPoint) :
+	Ray (startPoint, endPoint - startPoint),
+	length (Distance (startPoint, endPoint))
 {
-	origin = startPoint;
-	direction = Normalize (endPoint - startPoint);
-	length = Distance (startPoint, endPoint);
 }
 
 bool SectorRay::IsLengthReached (double currentLength) const
@@ -107,10 +112,9 @@ bool SectorRay::IsLengthReached (double currentLength) const
 	return IsGreater (currentLength, length);
 }
 
-InfiniteRay::InfiniteRay (const Coord& startPoint, const Coord& rayDirection)
+InfiniteRay::InfiniteRay (const Coord& startPoint, const Coord& rayDirection) :
+	Ray (startPoint, rayDirection)
 {
-	origin = startPoint;
-	direction = Normalize (rayDirection);
 }
 
 bool InfiniteRay::IsLengthReached (double /*currentLength*/) const

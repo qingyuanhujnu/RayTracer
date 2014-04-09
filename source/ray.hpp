@@ -6,6 +6,8 @@
 class Ray
 {
 public:
+	Ray (const Coord& startPoint, const Coord& rayDirection);
+
 	struct Intersection
 	{
 		Intersection ();
