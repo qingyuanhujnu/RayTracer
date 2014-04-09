@@ -2,7 +2,7 @@
 #define LIGHT_HPP
 
 #include "coord.hpp"
-#include "material.hpp"
+#include "color.hpp"
 
 class Light
 {
