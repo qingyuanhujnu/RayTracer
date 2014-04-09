@@ -58,6 +58,9 @@
     <ClCompile Include="..\..\source\configfile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\generator.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\coord.hpp">
@@ -98,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\configfile.hpp">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\generator.hpp">
+      <Filter>Geometry</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
