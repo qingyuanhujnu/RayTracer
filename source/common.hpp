@@ -3,6 +3,7 @@
 
 #define EPS		0.000001
 #define INF		9999999999
+#define PI		3.14159265359
 #define DEGRAD	0.017453292519943295
 
 #ifdef DEBUG
