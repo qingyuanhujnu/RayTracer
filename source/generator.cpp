@@ -22,13 +22,14 @@ static void AddQuadrangle (Mesh& mesh, int a, int b, int c, int d, int mat, bool
 	AddPolygon (mesh, indices, mat, invert);
 }
 
-void Generator::GenerateCuboid (Mesh& mesh, double xSize, double ySize, double zSize, const Coord& offset, int material, bool inverted)
+void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, int material, bool inverted)
 {
+	Mesh mesh;
+
 	double x = xSize / 2.0;
 	double y = ySize / 2.0;
 	double z = zSize / 2.0;
 
-	int vertexCount = mesh.VertexCount ();
 	mesh.AddVertex (offset + Coord (-x, -y, -z));
 	mesh.AddVertex (offset + Coord (x, -y, -z));
 	mesh.AddVertex (offset + Coord (x, -y, z));
@@ -38,10 +39,12 @@ void Generator::GenerateCuboid (Mesh& mesh, double xSize, double ySize, double z
 	mesh.AddVertex (offset + Coord (x, y, z));
 	mesh.AddVertex (offset + Coord (-x, y, z));
 
-	AddQuadrangle (mesh, vertexCount + 0, vertexCount + 1, vertexCount + 2, vertexCount + 3, material, inverted);
-	AddQuadrangle (mesh, vertexCount + 1, vertexCount + 5, vertexCount + 6, vertexCount + 2, material, inverted);
-	AddQuadrangle (mesh, vertexCount + 5, vertexCount + 4, vertexCount + 7, vertexCount + 6, material, inverted);
-	AddQuadrangle (mesh, vertexCount + 4, vertexCount + 0, vertexCount + 3, vertexCount + 7, material, inverted);
-	AddQuadrangle (mesh, vertexCount + 0, vertexCount + 4, vertexCount + 5, vertexCount + 1, material, inverted);
-	AddQuadrangle (mesh, vertexCount + 3, vertexCount + 2, vertexCount + 6, vertexCount + 7, material, inverted);
+	AddQuadrangle (mesh, 0, 1, 2, 3, material, inverted);
+	AddQuadrangle (mesh, 1, 5, 6, 2, material, inverted);
+	AddQuadrangle (mesh, 5, 4, 7, 6, material, inverted);
+	AddQuadrangle (mesh, 4, 0, 3, 7, material, inverted);
+	AddQuadrangle (mesh, 0, 4, 5, 1, material, inverted);
+	AddQuadrangle (mesh, 3, 2, 6, 7, material, inverted);
+
+	model.AddMesh (mesh);
 }

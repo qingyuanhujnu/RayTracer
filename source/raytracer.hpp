@@ -1,7 +1,7 @@
 #ifndef RAYTRACER_HPP
 #define RAYTRACER_HPP
 
-#include "mesh.hpp"
+#include "model.hpp"
 #include "camera.hpp"
 #include "light.hpp"
 #include "ray.hpp"
@@ -44,7 +44,7 @@ public:
 		std::vector<Color>	image;
 	};
 
-	RayTracer (const Mesh& mesh, const Camera& camera, const Light& light);
+	RayTracer (const Model& model, const Camera& camera, const Light& light);
 	~RayTracer ();
 
 	bool		Do (const Parameters& parameters, ResultImage& result);
@@ -52,7 +52,7 @@ public:
 private:
 	Color		ProcessOneRay (const Ray& ray, int depth);
 
-	Mesh		mesh;
+	Model		model;
 	Camera		camera;
 	Light		light;
 };

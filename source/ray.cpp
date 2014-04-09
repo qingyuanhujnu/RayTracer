@@ -7,13 +7,20 @@ Ray::Ray (const Coord& startPoint, const Coord& rayDirection) :
 {
 }
 
-Ray::Intersection::Intersection () :
-	distance (INF),
+Ray::TriangleIntersection::TriangleIntersection () :
+	distance (INF)
+{
+}
+
+Ray::MeshIntersection::MeshIntersection () :
+	TriangleIntersection (),
 	triangle (-1)
 {
 }
 
-Ray::Intersection::~Intersection ()
+Ray::ModelIntersection::ModelIntersection () :
+	MeshIntersection (),
+	mesh (-1)
 {
 }
 
@@ -22,7 +29,7 @@ const Coord& Ray::GetDirection () const
 	return direction;
 }
 
-bool Ray::TriangleIntersection (const Coord& v0, const Coord& v1, const Coord& v2, Coord* intersection) const
+bool Ray::GetTriangleIntersection (const Coord& v0, const Coord& v1, const Coord& v2, TriangleIntersection* intersection) const
 {
 	// Moller–Trumbore algorithm
 
@@ -59,16 +66,17 @@ bool Ray::TriangleIntersection (const Coord& v0, const Coord& v1, const Coord& v
 	}
 
 	if (intersection != NULL) {
-		*intersection = origin + direction * distance;
+		intersection->position = origin + direction * distance;
+		intersection->distance = distance;
 	}
 
 	return true;
 }
 
-bool Ray::GeometryIntersection (const Mesh& mesh, Intersection* intersection) const
+bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const
 {
 	bool found = false;
-	Intersection minIntersection;
+	MeshIntersection minIntersection;
 
 	for (int i = 0; i < mesh.TriangleCount (); i++) {
 		const Triangle& triangle = mesh.GetTriangle (i);
@@ -77,18 +85,46 @@ bool Ray::GeometryIntersection (const Mesh& mesh, Intersection* intersection) co
 		const Coord& v2 = mesh.GetVertex (triangle.v2);
 		
 		if (intersection == NULL) {
-			if (TriangleIntersection (v0, v1, v2, NULL)) {
+			if (GetTriangleIntersection (v0, v1, v2, NULL)) {
 				found = true;
 				break;
 			}
 		} else {
-			Coord currentIntersection;
-			if (TriangleIntersection (v0, v1, v2, &currentIntersection)) {
-				double currentDistance = Distance (origin, currentIntersection);
-				if (IsLower (currentDistance, minIntersection.distance)) {
-					minIntersection.position = currentIntersection;
-					minIntersection.distance = currentDistance;
+			Ray::MeshIntersection currentIntersection;
+			if (GetTriangleIntersection (v0, v1, v2, &currentIntersection)) {
+				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
+					minIntersection = currentIntersection;
 					minIntersection.triangle = i;
+					found = true;
+				}
+			}
+		}
+	}
+
+	if (found && intersection != NULL) {
+		*intersection = minIntersection;
+	}
+	return found;
+}
+
+bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersection) const
+{
+	bool found = false;
+	ModelIntersection minIntersection;
+
+	for (int i = 0; i < model.MeshCount (); i++) {
+		const Mesh& mesh = model.GetMesh (i);
+		if (intersection == NULL) {
+			if (GetMeshIntersection (mesh, NULL)) {
+				found = true;
+				break;
+			}
+		} else {
+			ModelIntersection currentIntersection;
+			if (GetMeshIntersection (mesh, &currentIntersection)) {
+				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
+					minIntersection = currentIntersection;
+					minIntersection.mesh = i;
 					found = true;
 				}
 			}

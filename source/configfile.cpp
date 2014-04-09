@@ -81,7 +81,7 @@ static bool ReadMaterial (std::wifstream& inputStream, Material& material)
 	return true;
 }
 
-bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& light, Mesh& mesh)
+bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& light, Model& model)
 {
 	std::wifstream inputStream (fileName.c_str ());
 	if (!inputStream) {
@@ -103,7 +103,7 @@ bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& ligh
 			if (!ReadMaterial (inputStream, material)) {
 				return false;
 			}
-			mesh.AddMaterial (material);
+			model.AddMaterial (material);
 		}
 	}
 

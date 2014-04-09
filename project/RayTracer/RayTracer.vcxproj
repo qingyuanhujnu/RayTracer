@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\source\light.cpp" />
     <ClCompile Include="..\..\source\main.cpp" />
     <ClCompile Include="..\..\source\material.cpp" />
+    <ClCompile Include="..\..\source\model.cpp" />
     <ClCompile Include="..\..\source\ray.cpp" />
     <ClCompile Include="..\..\source\raytracer.cpp" />
     <ClCompile Include="..\..\source\shading.cpp" />
@@ -39,6 +40,7 @@
     <ClInclude Include="..\..\source\image.hpp" />
     <ClInclude Include="..\..\source\light.hpp" />
     <ClInclude Include="..\..\source\material.hpp" />
+    <ClInclude Include="..\..\source\model.hpp" />
     <ClInclude Include="..\..\source\ray.hpp" />
     <ClInclude Include="..\..\source\raytracer.hpp" />
     <ClInclude Include="..\..\source\shading.hpp" />

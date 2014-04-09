@@ -61,6 +61,9 @@
     <ClCompile Include="..\..\source\mesh.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\model.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\coord.hpp">
@@ -103,6 +106,9 @@
       <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\mesh.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\model.hpp">
       <Filter>Geometry</Filter>
     </ClInclude>
   </ItemGroup>

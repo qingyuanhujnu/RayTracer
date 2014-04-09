@@ -45,12 +45,6 @@ int Mesh::AddTriangle (const Triangle& triangle)
 	return triangles.size () - 1;
 }
 
-int Mesh::AddMaterial (const Material& material)
-{
-	materials.push_back (material);
-	return materials.size () - 1;
-}
-
 int Mesh::VertexCount () const
 {
 	return vertices.size ();
@@ -59,11 +53,6 @@ int Mesh::VertexCount () const
 int Mesh::TriangleCount () const
 {
 	return triangles.size ();
-}
-
-int Mesh::MaterialCount () const
-{
-	return materials.size ();
 }
 
 const Coord& Mesh::GetVertex (int index) const
@@ -79,11 +68,6 @@ const Triangle& Mesh::GetTriangle (int index) const
 const Coord& Mesh::GetNormal (int index) const
 {
 	return normals[index];
-}
-
-const Material& Mesh::GetMaterial (int index) const
-{
-	return materials[index];
 }
 
 Coord Mesh::CalculateNormal (int index)
