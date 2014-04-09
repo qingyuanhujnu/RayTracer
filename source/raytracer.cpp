@@ -112,22 +112,23 @@ static Coord GetReflectedDirection (const Coord& originalDirection, const Coord&
 Color RayTracer::ProcessOneRay (const Ray& ray, int depth)
 {
 	Ray::ModelIntersection intersection;
-	if (ray.GetModelIntersection (model, &intersection)) {
-		SectorRay shadowRay (intersection.position, light.GetPosition ());
-		if (shadowRay.GetModelIntersection (model, NULL)) {
-			return Color (0.0, 0.0, 0.0);
-		}
-	} else {
+	if (!ray.GetModelIntersection (model, &intersection)) {
 		return Color (0.0, 0.0, 0.0);
 	}
+
+	Color currentColor (0.0, 0.0, 0.0);
 
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 	const Material& material = model.GetMaterial (triangle.mat);
 	const Coord& normal = mesh.GetNormal (intersection.triangle);
-	
-	//Color currentColor = GetPhongShading (material, light, intersection.position, normal);
-	Color currentColor = GetBRDFShading (material, light, camera.GetEye (), intersection.position, normal);
+
+	SectorRay shadowRay (intersection.position, light.GetPosition ());
+	if (!shadowRay.GetModelIntersection (model, NULL)) {
+		//Color currentColor = GetPhongShading (material, light, intersection.position, normal);
+		currentColor = GetBRDFShading (material, light, camera.GetEye (), intersection.position, normal);
+	}
+
 	if (depth > 10) {
 		return currentColor;
 	}
