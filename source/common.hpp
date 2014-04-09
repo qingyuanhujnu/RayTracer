@@ -6,6 +6,8 @@
 #define PI		3.14159265359
 #define DEGRAD	0.017453292519943295
 
+typedef unsigned int	UIndex;
+
 #ifdef DEBUG
 	#include <crtdbg.h>
 

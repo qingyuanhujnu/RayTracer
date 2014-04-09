@@ -10,34 +10,34 @@ Model::~Model ()
 
 }
 
-int Model::AddMesh (const Mesh& mesh)
+UIndex Model::AddMesh (const Mesh& mesh)
 {
 	meshes.push_back (mesh);
 	return meshes.size () - 1;
 }
 
-int Model::AddMaterial (const Material& material)
+UIndex Model::AddMaterial (const Material& material)
 {
 	materials.push_back (material);
 	return materials.size () - 1;
 }
 
-int Model::MeshCount () const
+UIndex Model::MeshCount () const
 {
 	return meshes.size ();
 }
 
-int Model::MaterialCount () const
+UIndex Model::MaterialCount () const
 {
 	return materials.size ();
 }
 
-const Mesh& Model::GetMesh (int index) const
+const Mesh& Model::GetMesh (UIndex index) const
 {
 	return meshes[index];
 }
 
-const Material& Model::GetMaterial (int index) const
+const Material& Model::GetMaterial (UIndex index) const
 {
 	return materials[index];
 }

@@ -78,7 +78,7 @@ bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection)
 	bool found = false;
 	MeshIntersection minIntersection;
 
-	for (int i = 0; i < mesh.TriangleCount (); i++) {
+	for (UIndex i = 0; i < mesh.TriangleCount (); i++) {
 		const Triangle& triangle = mesh.GetTriangle (i);
 		const Coord& v0 = mesh.GetVertex (triangle.v0);
 		const Coord& v1 = mesh.GetVertex (triangle.v1);
@@ -112,7 +112,7 @@ bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersect
 	bool found = false;
 	ModelIntersection minIntersection;
 
-	for (int i = 0; i < model.MeshCount (); i++) {
+	for (UIndex i = 0; i < model.MeshCount (); i++) {
 		const Mesh& mesh = model.GetMesh (i);
 		if (intersection == NULL) {
 			if (GetMeshIntersection (mesh, NULL)) {

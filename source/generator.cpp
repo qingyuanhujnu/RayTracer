@@ -1,9 +1,9 @@
 #include "generator.hpp"
 #include "common.hpp"
 
-static void AddPolygon (Mesh& mesh, const std::vector<int>& indices, int mat, bool invert)
+static void AddPolygon (Mesh& mesh, const std::vector<UIndex>& indices, UIndex mat, bool invert)
 {
-	unsigned int count = indices.size ();
+	UIndex count = indices.size ();
 	for (unsigned int i = 0; i < count - 2; i++) {
 		if (!invert) {
 			mesh.AddTriangle (Triangle (indices[0], indices[(i + 1) % count], indices[(i + 2) % count], mat));
@@ -13,9 +13,9 @@ static void AddPolygon (Mesh& mesh, const std::vector<int>& indices, int mat, bo
 	}
 }
 
-static void AddQuadrangle (Mesh& mesh, int a, int b, int c, int d, int mat, bool invert)
+static void AddQuadrangle (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex d, UIndex mat, bool invert)
 {
-	std::vector<int> indices;
+	std::vector<UIndex> indices;
 	indices.push_back (a);
 	indices.push_back (b);
 	indices.push_back (c);
@@ -23,7 +23,7 @@ static void AddQuadrangle (Mesh& mesh, int a, int b, int c, int d, int mat, bool
 	AddPolygon (mesh, indices, mat, invert);
 }
 
-void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, int material, bool invert)
+void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material, bool invert)
 {
 	Mesh mesh;
 
@@ -59,7 +59,7 @@ static Coord CylindricalToCartesian (double radius, double height, double theta)
 	return result;
 };
 
-void Generator::GenerateCylinder (Model& model, double radius, double height, int segmentation, const Coord& offset, int material, bool invert)
+void Generator::GenerateCylinder (Model& model, double radius, double height, int segmentation, const Coord& offset, UIndex material, bool invert)
 {
 	Mesh mesh;
 
@@ -81,8 +81,8 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 		AddQuadrangle (mesh, current, next, next + 1, current + 1, material, invert);
 	}
 
-	std::vector<int> topPolygon;
-	std::vector<int> bottomPolygon;
+	std::vector<UIndex> topPolygon;
+	std::vector<UIndex> bottomPolygon;
 	for (int i = 0; i < segmentation; i++) {
 		topPolygon.push_back (2 * (segmentation - i - 1));
 		bottomPolygon.push_back (2 * i + 1);

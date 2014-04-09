@@ -8,7 +8,7 @@ Triangle::Triangle () :
 
 }
 
-Triangle::Triangle (int v0, int v1, int v2, int mat) :
+Triangle::Triangle (UIndex v0, UIndex v1, UIndex v2, UIndex mat) :
 	v0 (v0),
 	v1 (v1),
 	v2 (v2),
@@ -32,45 +32,45 @@ Mesh::~Mesh ()
 
 }
 
-int Mesh::AddVertex (const Coord& coord)
+UIndex Mesh::AddVertex (const Coord& coord)
 {
 	vertices.push_back (coord);
 	return vertices.size () - 1;
 }
 
-int Mesh::AddTriangle (const Triangle& triangle)
+UIndex Mesh::AddTriangle (const Triangle& triangle)
 {
 	triangles.push_back (triangle);
 	normals.push_back (CalculateNormal (triangles.size () - 1));
 	return triangles.size () - 1;
 }
 
-int Mesh::VertexCount () const
+UIndex Mesh::VertexCount () const
 {
 	return vertices.size ();
 }
 
-int Mesh::TriangleCount () const
+UIndex Mesh::TriangleCount () const
 {
 	return triangles.size ();
 }
 
-const Coord& Mesh::GetVertex (int index) const
+const Coord& Mesh::GetVertex (UIndex index) const
 {
 	return vertices[index];
 }
 
-const Triangle& Mesh::GetTriangle (int index) const
+const Triangle& Mesh::GetTriangle (UIndex index) const
 {
 	return triangles[index];
 }
 
-const Coord& Mesh::GetNormal (int index) const
+const Coord& Mesh::GetNormal (UIndex index) const
 {
 	return normals[index];
 }
 
-Coord Mesh::CalculateNormal (int index)
+Coord Mesh::CalculateNormal (UIndex index)
 {
 	const Triangle& triangle = GetTriangle (index);
 	const Coord& v0 = GetVertex (triangle.v0);

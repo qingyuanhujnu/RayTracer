@@ -12,14 +12,14 @@ public:
 	Model ();
 	~Model ();
 
-	int						AddMesh (const Mesh& mesh);
-	int						AddMaterial (const Material& material);
+	UIndex					AddMesh (const Mesh& mesh);
+	UIndex					AddMaterial (const Material& material);
 
-	int						MeshCount () const;
-	int						MaterialCount () const;
+	UIndex					MeshCount () const;
+	UIndex					MaterialCount () const;
 
-	const Mesh&				GetMesh (int index) const;
-	const Material&			GetMaterial (int index) const;
+	const Mesh&				GetMesh (UIndex index) const;
+	const Material&			GetMaterial (UIndex index) const;
 
 private:
 	std::vector<Mesh>		meshes;
