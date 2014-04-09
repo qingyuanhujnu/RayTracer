@@ -1,5 +1,6 @@
 #include "shading.hpp"
 
+#include <algorithm>
 #include <vector>
 
 Color GetPhongShading (const Material& material, const Light& light, const Coord& coordinate, const Coord& normal)
