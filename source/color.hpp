@@ -8,8 +8,6 @@ public:
 	Color (double r, double g, double b);
 	~Color ();
 
-	void	Set (double inR, double inG, double inB);
-
 	Color	operator+ (const Color& color) const;
 	Color	operator- (const Color& color) const;
 	Color	operator* (const Color& color) const;

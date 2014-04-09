@@ -34,7 +34,7 @@ static bool GetEncoderClassId (const wchar_t* format, CLSID* classId)
 	return false;
 }
 
-bool ExportImage (const RayTracer::ResultImage& image, const wchar_t* mimeType)
+bool Export::ExportImage (const RayTracer::ResultImage& image, const wchar_t* mimeType)
 {
 	Gdiplus::GdiplusStartupInput	input;
 	Gdiplus::GdiplusStartupOutput	output;

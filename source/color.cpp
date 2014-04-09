@@ -18,13 +18,6 @@ Color::~Color ()
 {
 }
 
-void Color::Set (double inR, double inG, double inB)
-{
-	r = inR;
-	g = inG;
-	b = inB;
-}
-
 Color Color::operator+ (const Color& color) const
 {
 	Color result;

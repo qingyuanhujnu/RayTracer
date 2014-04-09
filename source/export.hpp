@@ -3,6 +3,10 @@
 
 #include "raytracer.hpp"
 
-bool ExportImage (const RayTracer::ResultImage& image, const wchar_t* mimeType);
+class Export
+{
+public:
+	static bool ExportImage (const RayTracer::ResultImage& image, const wchar_t* mimeType);
+};
 
 #endif

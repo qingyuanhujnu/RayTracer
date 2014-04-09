@@ -4,17 +4,22 @@ Light::Light ()
 {
 }
 
-Light::Light (const Coord& position, const Color& color, double ambient, double diffuse, double specular) :
-	position (position),
-	color (color),
-	ambient (ambient),
-	diffuse (diffuse),
-	specular (specular)
+Light::Light (const Coord& position, const Color& color, double ambient, double diffuse, double specular)
 {
+	Set (position, color, ambient, diffuse, specular);
 }
 
 Light::~Light ()
 {
+}
+
+void Light::Set (const Coord& position, const Color& color, double ambient, double diffuse, double specular)
+{
+	this->position = position;
+	this->color = color;
+	this->ambient = ambient;
+	this->diffuse = diffuse;
+	this->specular = specular;
 }
 
 const Coord& Light::GetPosition () const

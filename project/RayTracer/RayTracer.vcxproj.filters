@@ -55,6 +55,9 @@
     <ClCompile Include="..\..\source\export.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\configfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\coord.hpp">
@@ -91,6 +94,9 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\export.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\configfile.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

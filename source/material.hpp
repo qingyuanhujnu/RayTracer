@@ -10,6 +10,8 @@ public:
 	Material (const Color& color, double ambient, double diffuse, double specular, double reflection);
 	~Material ();
 
+	void			Set (const Color& color, double ambient, double diffuse, double specular, double reflection);
+
 	const Color&	GetColor () const;
 	
 	double			GetAmbient () const;

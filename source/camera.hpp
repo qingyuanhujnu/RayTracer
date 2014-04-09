@@ -10,6 +10,8 @@ public:
 	Camera (const Coord& eye, const Coord& center, const Coord& up, double xFov, double yFov);
 	~Camera ();
 
+	void			Set (const Coord& eye, const Coord& center, const Coord& up, double xFov, double yFov);
+
 	const Coord&	GetEye () const;
 	const Coord&	GetCenter () const;
 	const Coord&	GetUp () const;
@@ -21,6 +23,7 @@ private:
 	Coord	eye;
 	Coord	center;
 	Coord	up;
+	
 	double	xFov;
 	double	yFov;
 };

@@ -5,17 +5,22 @@ Material::Material ()
 {
 }
 
-Material::Material (const Color& color, double ambient, double diffuse, double specular, double reflection) :
-	color (color),
-	ambient (ambient),
-	diffuse (diffuse),
-	specular (specular),
-	reflection (reflection)
+Material::Material (const Color& color, double ambient, double diffuse, double specular, double reflection)
 {
+	Set (color, ambient, diffuse, specular, reflection);
 }
 
 Material::~Material ()
 {
+}
+
+void Material::Set (const Color& color, double ambient, double diffuse, double specular, double reflection)
+{
+	this->color = color;
+	this->ambient = ambient;
+	this->diffuse = diffuse;
+	this->specular = specular;
+	this->reflection = reflection;
 }
 
 const Color& Material::GetColor () const

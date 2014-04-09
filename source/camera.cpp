@@ -5,19 +5,23 @@ Camera::Camera ()
 
 }
 
-Camera::Camera (const Coord& eye, const Coord& center, const Coord& up, double xFov, double yFov) :
-	eye (eye),
-	center (center),
-	up (up),
-	xFov (xFov),
-	yFov (yFov)
+Camera::Camera (const Coord& eye, const Coord& center, const Coord& up, double xFov, double yFov)
 {
-
+	Set (eye, center, up, xFov, yFov);
 }
 
 Camera::~Camera ()
 {
 
+}
+
+void Camera::Set (const Coord& eye, const Coord& center, const Coord& up, double xFov, double yFov)
+{
+	this->eye = eye;
+	this->center = center;
+	this->up = up;
+	this->xFov = xFov;
+	this->yFov = yFov;
 }
 
 const Coord& Camera::GetEye () const

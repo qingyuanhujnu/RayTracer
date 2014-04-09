@@ -42,9 +42,9 @@ static void AddCuboid (Geometry& geometry, double xSize, double ySize, double zS
 static void ConstructGeometry (Geometry& geometry)
 {
 	geometry.AddMaterial (Material (Color (1.0, 0.0, 0.0), 0.2, 0.8, 1.0, 0.2));
-	geometry.AddMaterial (Material (Color (0.0, 1.0, 0.0), 0.2, 0.8, 1.0, 0.0));
-	geometry.AddMaterial (Material (Color (0.0, 0.0, 1.0), 0.2, 0.8, 1.0, 0.0));
-	geometry.AddMaterial (Material (Color (1.0, 1.0, 1.0), 0.2, 0.8, 1.0, 0.0));
+	geometry.AddMaterial (Material (Color (0.0, 1.0, 0.0), 0.2, 0.8, 0.0, 0.0));
+	geometry.AddMaterial (Material (Color (0.0, 0.0, 1.0), 0.2, 0.8, 0.0, 0.0));
+	geometry.AddMaterial (Material (Color (1.0, 1.0, 1.0), 0.2, 0.8, 0.0, 0.0));
 
 	AddCuboid (geometry, 4.0, 0.1, 3.0, Coord (0.5, -0.6, 1.5), 0, false);
 	AddCuboid (geometry, 1.2, 1.2, 1.8, Coord (-1.0, 1.4, 0.9), 1, false);
@@ -54,6 +54,13 @@ static void ConstructGeometry (Geometry& geometry)
 
 int main ()
 {
+	// TODO list:
+	// - Generate refraction rays.
+	// - Handle vertex normals for curved surfaces.
+	// - Create input text file format.
+	// - Speed up intersection (first with cached bounding sphere intersection check).
+	// - Create user interface.
+
 	Geometry geometry;
 	ConstructGeometry (geometry);
 
@@ -65,6 +72,6 @@ int main ()
 	RayTracer::ResultImage result;
 	rayTracer.Do (parameters, result);
 	
-	ExportImage (result, L"image/png");
+	Export::ExportImage (result, L"image/png");
 	return 0;
 }

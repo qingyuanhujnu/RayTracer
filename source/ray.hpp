@@ -21,29 +21,30 @@ public:
 	bool			GeometryIntersection (const Geometry& geometry, Intersection* intersection) const;
 
 protected:
-	enum Type
-	{
-		Undefined	= 0,
-		Infinite	= 1,
-		Sector		= 2
-	};
+	virtual bool	IsLengthReached (double currentLength) const = 0;
 
-	Type	type;
-	Coord	origin;
-	Coord	direction;
-	double	length;
+	Coord			origin;
+	Coord			direction;
 };
 
 class SectorRay : public Ray
 {
 public:
 	SectorRay (const Coord& startPoint, const Coord& endPoint);
+
+private:
+	virtual bool	IsLengthReached (double currentLength) const override;
+
+	double	length;
 };
 
 class InfiniteRay : public Ray
 {
 public:
 	InfiniteRay (const Coord& startPoint, const Coord& rayDirection);
+
+private:
+	virtual bool	IsLengthReached (double currentLength) const override;
 };
 
 #endif

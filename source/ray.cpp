@@ -43,17 +43,17 @@ bool Ray::TriangleIntersection (const Coord& v0, const Coord& v1, const Coord& v
 		return false;
 	}
  
-	double t = (edgeDir2 * q) * invDeterminant;
-	if (!IsPositive (t)) {
+	double distance = (edgeDir2 * q) * invDeterminant;
+	if (!IsPositive (distance)) {
 		return false;
 	}
 
-	if (type == Sector && IsGreater (t, length)) {
+	if (IsLengthReached (distance)) {
 		return false;
 	}
 
 	if (intersection != NULL) {
-		*intersection = origin + direction * t;
+		*intersection = origin + direction * distance;
 	}
 
 	return true;
@@ -97,16 +97,23 @@ bool Ray::GeometryIntersection (const Geometry& geometry, Intersection* intersec
 
 SectorRay::SectorRay (const Coord& startPoint, const Coord& endPoint)
 {
-	type = Sector;
 	origin = startPoint;
 	direction = Normalize (endPoint - startPoint);
 	length = Distance (startPoint, endPoint);
 }
 
+bool SectorRay::IsLengthReached (double currentLength) const
+{
+	return IsGreater (currentLength, length);
+}
+
 InfiniteRay::InfiniteRay (const Coord& startPoint, const Coord& rayDirection)
 {
-	type = Infinite;
 	origin = startPoint;
 	direction = Normalize (rayDirection);
-	length = 0.0;
+}
+
+bool InfiniteRay::IsLengthReached (double currentLength) const
+{
+	return false;
 }
