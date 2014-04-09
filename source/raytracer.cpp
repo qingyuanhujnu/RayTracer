@@ -111,8 +111,6 @@ static Coord GetReflectedDirection (const Coord& originalDirection, const Coord&
 
 Color RayTracer::ProcessOneRay (const Ray& ray, int depth)
 {
-	bool visible = false;
-
 	Ray::Intersection intersection;
 	if (ray.GeometryIntersection (geometry, &intersection)) {
 		SectorRay shadowRay (intersection.position, light.GetPosition ());

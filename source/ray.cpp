@@ -113,7 +113,7 @@ InfiniteRay::InfiniteRay (const Coord& startPoint, const Coord& rayDirection)
 	direction = Normalize (rayDirection);
 }
 
-bool InfiniteRay::IsLengthReached (double currentLength) const
+bool InfiniteRay::IsLengthReached (double /*currentLength*/) const
 {
 	return false;
 }
