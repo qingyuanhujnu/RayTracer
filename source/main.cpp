@@ -4,6 +4,7 @@
 #include "raytracer.hpp"
 #include "generator.hpp"
 #include "export.hpp"
+#include "configfile.hpp"
 
 static void ConstructGeometry (Geometry& geometry)
 {
@@ -26,6 +27,13 @@ int main ()
 	// - Create input text file format.
 	// - Speed up intersection (first with cached bounding sphere intersection check).
 	// - Create user interface.
+
+	{
+		Camera camera;
+		Light light;
+		Geometry geometry;
+		ConfigFile::Read (L"config.txt", camera, light, geometry);	
+	}
 
 	Geometry geometry;
 	ConstructGeometry (geometry);
