@@ -1,8 +1,17 @@
 #include "configfile.hpp"
+#include "generator.hpp"
 
 #include <fstream>
 
 static bool ReadDouble (std::wifstream& inputStream, double& val)
+{
+	if (inputStream >> val) {
+		return true;
+	}
+	return false;
+}
+
+static bool ReadUIndex (std::wifstream& inputStream, UIndex& val)
 {
 	if (inputStream >> val) {
 		return true;
@@ -81,6 +90,28 @@ static bool ReadMaterial (std::wifstream& inputStream, Material& material)
 	return true;
 }
 
+static bool ReadCuboid (std::wifstream& inputStream, Model& model, bool inverse)
+{
+	double xSize;
+	double ySize;
+	double zSize;
+	Coord offset;
+	UIndex material;
+
+	if (!ReadDouble (inputStream, xSize)) { return false; }
+	if (!ReadDouble (inputStream, ySize)) { return false; }
+	if (!ReadDouble (inputStream, zSize)) { return false; }
+	if (!ReadCoord (inputStream, offset)) { return false; }
+	if (!ReadUIndex (inputStream, material)) { return false; }
+	
+	if (inverse) {
+		Generator::GenerateInverseCuboid (model, xSize, ySize, zSize, offset, material);
+	} else {
+		Generator::GenerateCuboid (model, xSize, ySize, zSize, offset, material);
+	}
+	return true;
+}
+
 bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& light, Model& model)
 {
 	std::wifstream inputStream (fileName.c_str ());
@@ -104,6 +135,10 @@ bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& ligh
 				return false;
 			}
 			model.AddMaterial (material);
+		} else if (commandName == L"cuboid") {
+			ReadCuboid (inputStream, model, false);
+		} else if (commandName == L"inversecuboid") {
+			ReadCuboid (inputStream, model, true);
 		}
 	}
 
