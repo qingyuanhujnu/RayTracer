@@ -40,12 +40,12 @@ void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double
 	mesh.AddVertex (offset + Coord (x, y, z));
 	mesh.AddVertex (offset + Coord (-x, y, z));
 
-	AddQuadrangle (mesh, 0, 1, 2, 3, material, -1, invert);
-	AddQuadrangle (mesh, 1, 5, 6, 2, material, -1, invert);
-	AddQuadrangle (mesh, 5, 4, 7, 6, material, -1, invert);
-	AddQuadrangle (mesh, 4, 0, 3, 7, material, -1, invert);
-	AddQuadrangle (mesh, 0, 4, 5, 1, material, -1, invert);
-	AddQuadrangle (mesh, 3, 2, 6, 7, material, -1, invert);
+	AddQuadrangle (mesh, 0, 1, 2, 3, material, Mesh::NonCurved, invert);
+	AddQuadrangle (mesh, 1, 5, 6, 2, material, Mesh::NonCurved, invert);
+	AddQuadrangle (mesh, 5, 4, 7, 6, material, Mesh::NonCurved, invert);
+	AddQuadrangle (mesh, 4, 0, 3, 7, material, Mesh::NonCurved, invert);
+	AddQuadrangle (mesh, 0, 4, 5, 1, material, Mesh::NonCurved, invert);
+	AddQuadrangle (mesh, 3, 2, 6, 7, material, Mesh::NonCurved, invert);
 
 	mesh.Finalize ();
 	model.AddMesh (mesh);
@@ -79,7 +79,7 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 		if (i == segmentation - 1) {
 			next = 0;
 		}
-		AddQuadrangle (mesh, current, next, next + 1, current + 1, material, 0, invert);
+		AddQuadrangle (mesh, current, next, next + 1, current + 1, material, 0 /* curvedGroup */, invert);
 	}
 
 	std::vector<UIndex> topPolygon;
@@ -88,8 +88,8 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 		topPolygon.push_back (2 * (segmentation - i - 1));
 		bottomPolygon.push_back (2 * i + 1);
 	}
-	AddPolygon (mesh, topPolygon, material, -1, invert);
-	AddPolygon (mesh, bottomPolygon, material, -1, invert);
+	AddPolygon (mesh, topPolygon, material, Mesh::NonCurved, invert);
+	AddPolygon (mesh, bottomPolygon, material, Mesh::NonCurved, invert);
 
 	mesh.Finalize ();
 	model.AddMesh (mesh);

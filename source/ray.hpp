@@ -20,14 +20,14 @@ public:
 	{
 		MeshIntersection ();
 
-		int triangle;
+		UIndex triangle;
 	};
 
 	struct ModelIntersection : public MeshIntersection
 	{
 		ModelIntersection ();
 
-		int mesh;
+		UIndex mesh;
 	};
 
 	const Coord&	GetDirection () const;

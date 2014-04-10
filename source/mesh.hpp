@@ -5,14 +5,16 @@
 #include "coord.hpp"
 #include <vector>
 
+
 class Mesh
 {
 public:
+	static const UIndex NonCurved = (UIndex)-1;
+
 	class Triangle
 	{
 	public:
-		Triangle ();
-		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex material, UIndex curveGroup = -1);
+		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex material, UIndex curveGroup = Mesh::NonCurved);
 		~Triangle ();
 
 		UIndex		vertex0;

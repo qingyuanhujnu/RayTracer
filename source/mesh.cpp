@@ -2,26 +2,13 @@
 
 #include <algorithm>
 
-Mesh::Triangle::Triangle () :
-	vertex0 (-1),
-	vertex1 (-1),
-	vertex2 (-1),
-	normal0 (-1),
-	normal1 (-1),
-	normal2 (-1),
-	material (-1),
-	curveGroup (-1)
-{
-
-}
-
 Mesh::Triangle::Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex material, UIndex curveGroup) :
 	vertex0 (vertex0),
 	vertex1 (vertex1),
 	vertex2 (vertex2),
-	normal0 (-1),
-	normal1 (-1),
-	normal2 (-1),
+	normal0 (InvalidIndex),
+	normal1 (InvalidIndex),
+	normal2 (InvalidIndex),
 	material (material),
 	curveGroup (curveGroup)
 {
@@ -61,7 +48,7 @@ void Mesh::Finalize ()
 	bool needVertexNormals = false;
 	for (UIndex i = 0; i < triangles.size (); i++) {
 		const Triangle& triangle = triangles[i];
-		if (triangle.curveGroup != -1) {
+		if (triangle.curveGroup != Mesh::NonCurved) {
 			needVertexNormals = true;
 			break;
 		}
@@ -122,11 +109,11 @@ static Coord BarycentricInterpolation (const Coord& vertex0, const Coord& vertex
 Coord Mesh::GetNormal (UIndex index, const Coord& coordinate) const
 {
 	const Triangle& triangle = triangles[index];
-	if (triangle.curveGroup == -1) {
+	if (triangle.curveGroup == NonCurved) {
 		return triangleNormals[index];
 	}
 
-	if (DBGERROR (triangle.normal0 == -1 || triangle.normal1 == -1 || triangle.normal2 == -1)) {
+	if (DBGERROR (triangle.normal0 == InvalidIndex || triangle.normal1 == InvalidIndex || triangle.normal2 == InvalidIndex)) {
 		return triangleNormals[index];
 	}
 
@@ -142,7 +129,7 @@ Coord Mesh::GetNormal (UIndex index, const Coord& coordinate) const
 	return Normalize (normal);
 }
 
-static Coord GetAverageNormal (const Mesh& mesh, UIndex baseTriangleIndex, const std::vector<int>& neighbourTriangles, const std::vector<Coord>& triangleNormals)
+static Coord GetAverageNormal (const Mesh& mesh, UIndex baseTriangleIndex, const std::vector<UIndex>& neighbourTriangles, const std::vector<Coord>& triangleNormals)
 {
 	UIndex baseCurveGroup = mesh.GetTriangle (baseTriangleIndex).curveGroup;
 
@@ -170,11 +157,11 @@ void Mesh::CalculateVertexNormals ()
 {
 	vertexNormals.clear ();
 
-	std::vector<std::vector<int>> vertexToTriangle;
+	std::vector<std::vector<UIndex>> vertexToTriangle;
 	vertexToTriangle.resize (vertices.size ());
 
 	for (UIndex i = 0; i < triangles.size (); i++) {
-		Triangle& triangle = triangles[i];
+		const Triangle& triangle = triangles[i];
 		vertexToTriangle[triangle.vertex0].push_back (i);
 		vertexToTriangle[triangle.vertex1].push_back (i);
 		vertexToTriangle[triangle.vertex2].push_back (i);
@@ -182,7 +169,7 @@ void Mesh::CalculateVertexNormals ()
 
 	for (UIndex i = 0; i < triangles.size (); i++) {
 		Triangle& triangle = triangles[i];
-		if (triangle.curveGroup != -1) {
+		if (triangle.curveGroup != NonCurved) {
 			vertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex0], triangleNormals));
 			vertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex1], triangleNormals));
 			vertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex2], triangleNormals));
@@ -195,7 +182,7 @@ void Mesh::CalculateVertexNormals ()
 
 Coord Mesh::CalculateTriangleNormal (UIndex index)
 {
-	Triangle& triangle = triangles[index];
+	const Triangle& triangle = triangles[index];
 
 	const Coord& vertex0 = GetVertex (triangle.vertex0);
 	const Coord& vertex1 = GetVertex (triangle.vertex1);

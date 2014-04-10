@@ -14,13 +14,13 @@ Ray::TriangleIntersection::TriangleIntersection () :
 
 Ray::MeshIntersection::MeshIntersection () :
 	TriangleIntersection (),
-	triangle (-1)
+	triangle (InvalidIndex)
 {
 }
 
 Ray::ModelIntersection::ModelIntersection () :
 	MeshIntersection (),
-	mesh (-1)
+	mesh (InvalidIndex)
 {
 }
 
