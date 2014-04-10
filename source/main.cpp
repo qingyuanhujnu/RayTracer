@@ -22,7 +22,7 @@ static void ConstructDefaultModel (Camera& camera, Light& light, Model& model)
 	Generator::GenerateCuboid (model, 4.0, 0.1, 3.0, Coord (0.5, -0.6, 1.5), 0);
 	Generator::GenerateCuboid (model, 1.2, 1.2, 1.8, Coord (-1.0, 1.4, 0.9), 1);
 	Generator::GenerateCuboid (model, 1.2, 1.2, 1.2, Coord (1.0, 1.4, 0.6), 2);
-	Generator::GenerateInverseCuboid (model, 12.0, 12.0, 12.0, Coord (0.0, 0.0, 6.0), 3);
+	Generator::GenerateInsideOutCuboid (model, 12.0, 12.0, 12.0, Coord (0.0, 0.0, 6.0), 3);
 }
 
 int main ()

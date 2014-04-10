@@ -19,7 +19,7 @@ static void AddQuadrangle (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex d, U
 	AddPolygon (mesh, indices, material, curveGroup);
 }
 
-static void GenerateCuboidBase (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material, bool inverse)
+static void GenerateCuboidBase (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material, Generator::Facing facing)
 {
 	Mesh mesh;
 
@@ -36,7 +36,14 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 	mesh.AddVertex (offset + Coord (x, y, z));
 	mesh.AddVertex (offset + Coord (-x, y, z));
 
-	if (inverse) {
+	if (facing == Generator::Facing::Inside) {
+		AddQuadrangle (mesh, 0, 1, 2, 3, material, Mesh::NonCurved);
+		AddQuadrangle (mesh, 1, 5, 6, 2, material, Mesh::NonCurved);
+		AddQuadrangle (mesh, 5, 4, 7, 6, material, Mesh::NonCurved);
+		AddQuadrangle (mesh, 4, 0, 3, 7, material, Mesh::NonCurved);
+		AddQuadrangle (mesh, 0, 4, 5, 1, material, Mesh::NonCurved);
+		AddQuadrangle (mesh, 3, 2, 6, 7, material, Mesh::NonCurved);
+	} else if (facing == Generator::Facing::Outside) {
 		AddQuadrangle (mesh, 0, 3, 2, 1, material, Mesh::NonCurved);
 		AddQuadrangle (mesh, 1, 2, 6, 5, material, Mesh::NonCurved);
 		AddQuadrangle (mesh, 5, 6, 7, 4, material, Mesh::NonCurved);
@@ -44,12 +51,7 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 		AddQuadrangle (mesh, 0, 1, 5, 4, material, Mesh::NonCurved);
 		AddQuadrangle (mesh, 3, 7, 6, 2, material, Mesh::NonCurved);
 	} else {
-		AddQuadrangle (mesh, 0, 1, 2, 3, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 1, 5, 6, 2, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 5, 4, 7, 6, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 4, 0, 3, 7, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 0, 4, 5, 1, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 3, 2, 6, 7, material, Mesh::NonCurved);
+		DBGERROR (true);
 	}
 
 	mesh.Finalize ();
@@ -58,12 +60,12 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 
 void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material)
 {
-	GenerateCuboidBase (model, xSize, ySize, zSize, offset, material, false);
+	GenerateCuboidBase (model, xSize, ySize, zSize, offset, material, Facing::Inside);
 }
 
-void Generator::GenerateInverseCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material)
+void Generator::GenerateInsideOutCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material)
 {
-	GenerateCuboidBase (model, xSize, ySize, zSize, offset, material, true);
+	GenerateCuboidBase (model, xSize, ySize, zSize, offset, material, Facing::Outside);
 }
 
 static Coord CylindricalToCartesian (double radius, double height, double theta)
