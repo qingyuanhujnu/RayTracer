@@ -27,7 +27,7 @@ static void ConstructDefaultModel (Camera& camera, Light& light, Model& model)
 
 int main ()
 {
-	std::wstring configFileName = L"config02.txt";
+	std::wstring configFileName = L"config01.txt";
 
 	Camera camera;
 	Light light;

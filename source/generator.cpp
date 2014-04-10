@@ -19,6 +19,11 @@ static void AddQuadrangle (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex d, U
 	AddPolygon (mesh, indices, material, curveGroup);
 }
 
+static void AddTriangle (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex material, UIndex curveGroup)
+{
+	mesh.AddTriangle (Mesh::Triangle (a, b, c, material, curveGroup));
+}
+
 static void GenerateCuboidBase (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material, bool inverse)
 {
 	Mesh mesh;
@@ -106,6 +111,75 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 
 	AddPolygon (mesh, topPolygon, material, Mesh::NonCurved);
 	AddPolygon (mesh, bottomPolygon, material, Mesh::NonCurved);
+
+	mesh.Finalize ();
+	model.AddMesh (mesh);
+}
+
+static Coord SphericalToCartesian (double radius, double theta, double phi)
+{
+	Coord result;
+	result.x = radius * sin (theta) * cos (phi);
+	result.y = radius * sin (theta) * sin (phi);
+	result.z = radius * cos (theta);
+	return result;
+};
+
+void Generator::GenerateSphere (Model& model, double radius, int segmentation, const Coord& offset, UIndex material)
+{
+	Mesh mesh;
+
+	int circle = segmentation * 2;
+	double step = PI / segmentation;
+	double theta = step;
+
+	UIndex topIndex = mesh.AddVertex (offset + SphericalToCartesian (radius, 0.0, 0.0));
+	for (int i = 1; i < segmentation; i++) {
+		double phi = 0;
+		for (int j = 0; j < circle; j++) {
+			mesh.AddVertex (offset + SphericalToCartesian (radius, theta, phi));
+			phi += step;
+		}
+		theta += step;
+	}
+	UIndex bottomIndex = mesh.AddVertex (offset + SphericalToCartesian (-radius, 0.0, 0.0));
+
+	for (int i = 1; i <= segmentation; i++) {
+		if (i == 1) {
+			int offset = 1;
+			for (int j = 0; j < circle; j++) {
+				int current = offset + j;
+				int next = current + 1;
+				if (j == circle - 1) {
+					next = offset;
+				}
+				AddTriangle (mesh, current, next, topIndex, material, 0);
+			}
+		} else if (i < segmentation) {
+			int offset = (i - 1) * circle + 1;
+			for (int j = 0; j < circle; j++) {
+				int current = offset + j;
+				int next = current + 1;
+				int top = current - circle;
+				int ntop = top + 1;
+				if (j == circle - 1) {
+					next = offset;
+					ntop = offset - circle;
+				}
+				AddQuadrangle (mesh, current, next, ntop, top, material, 0);
+			}
+		} else if (i == segmentation) {
+			int offset = (i - 2) * circle + 1;
+			for (int j = 0; j < circle; j++) {
+				int current = offset + j;
+				int next = current + 1;
+				if (j == circle - 1) {
+					next = offset;
+				}
+				AddTriangle (mesh, current, bottomIndex, next, material, 0);
+			}
+		}
+	}
 
 	mesh.Finalize ();
 	model.AddMesh (mesh);

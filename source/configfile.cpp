@@ -140,6 +140,22 @@ static bool ReadCylinder (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
+static bool ReadSphere (std::wifstream& inputStream, Model& model)
+{
+	double radius;
+	int segmentation;
+	Coord offset;
+	UIndex material;
+
+	if (!ReadDouble (inputStream, radius)) { return false; }
+	if (!ReadInteger (inputStream, segmentation)) { return false; }
+	if (!ReadCoord (inputStream, offset)) { return false; }
+	if (!ReadUIndex (inputStream, material)) { return false; }
+	
+	Generator::GenerateSphere (model, radius, segmentation, offset, material);
+	return true;
+}
+
 bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& light, Model& model)
 {
 	std::wifstream inputStream (fileName.c_str ());
@@ -173,6 +189,10 @@ bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& ligh
 			}
 		} else if (commandName == L"cylinder") {
 			if (DBGERROR (!ReadCylinder (inputStream, model))) {
+				error = true;
+			}
+		} else if (commandName == L"sphere") {
+			if (DBGERROR (!ReadSphere (inputStream, model))) {
 				error = true;
 			}
 		} else {
