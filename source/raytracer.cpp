@@ -92,6 +92,7 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance ());
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
+#pragma omp parallel for schedule(dynamic, 4) num_threads (8)
 	for (int i = 0; i < parameters.GetResolutionX (); i++) {
 		for (int j = 0; j < parameters.GetResolutionY (); j++) {
 			InfiniteRay cameraRay (camera.GetEye (), image.GetFieldCenter (i, j) - camera.GetEye ());
