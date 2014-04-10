@@ -1,6 +1,9 @@
 #include "light.hpp"
 
-Light::Light ()
+Light::Light () :
+	ambient (0.0),
+	diffuse (0.0),
+	specular (0.0)
 {
 }
 

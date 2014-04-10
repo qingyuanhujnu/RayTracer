@@ -1,7 +1,11 @@
 #include "material.hpp"
 #include "common.hpp"
 
-Material::Material ()
+Material::Material () :
+	ambient (0.0),
+	diffuse (0.0),
+	specular (0.0),
+	reflection (0.0)
 {
 }
 

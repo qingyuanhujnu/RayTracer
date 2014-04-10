@@ -1,6 +1,8 @@
 #include "camera.hpp"
 
-Camera::Camera ()
+Camera::Camera () :
+	xFov (0.0),
+	yFov (0.0)
 {
 
 }
