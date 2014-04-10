@@ -54,6 +54,14 @@ Color Color::operator* (double scalar) const
 	return result;
 }
 
+Color& Color::operator+= (const Color& color)
+{
+	r += color.r;
+	g += color.g;
+	b += color.b;
+	return *this;
+}
+
 static double ClampValue (double val)
 {
 	if (val < 0.0) {

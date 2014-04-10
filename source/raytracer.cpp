@@ -95,7 +95,7 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 	for (int i = 0; i < parameters.GetResolutionX (); i++) {
 		for (int j = 0; j < parameters.GetResolutionY (); j++) {
 			InfiniteRay cameraRay (camera.GetEye (), image.GetFieldCenter (i, j) - camera.GetEye ());
-			Color fieldColor = ProcessOneRay (cameraRay, 0);
+			Color fieldColor = RayTrace (cameraRay, 0);
 			result.SetColor (i, j, fieldColor);
 		}
 	}
@@ -109,35 +109,36 @@ static Coord GetReflectedDirection (const Coord& originalDirection, const Coord&
 	return originalDirection + (normal * 2.0 * dotProduct);
 }
 
-Color RayTracer::ProcessOneRay (const Ray& ray, int depth)
+Color RayTracer::RayTrace (const Ray& ray, int depth)
 {
+	Color color (0.0, 0.0, 0.0);
+
+	if (depth > 10) {
+		return color;
+	}
+
 	Ray::ModelIntersection intersection;
-	if (ray.GetModelIntersection (model, &intersection)) {
-		SectorRay shadowRay (intersection.position, light.GetPosition ());
-		if (shadowRay.GetModelIntersection (model, NULL)) {
-			return Color (0.0, 0.0, 0.0);
-		}
-	} else {
-		return Color (0.0, 0.0, 0.0);
+	if (!ray.GetModelIntersection (model, &intersection)) {
+		return color;
 	}
 
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 	const Material& material = model.GetMaterial (triangle.material);
 	const Coord& normal = mesh.GetNormal (intersection.triangle, intersection.position);
-	
-	Color currentColor = GetPhongShading (material, light, intersection.position, normal);
-	if (depth > 10) {
-		return currentColor;
+
+	SectorRay shadowRay (intersection.position, light.GetPosition ());
+	if (!shadowRay.GetModelIntersection (model, NULL)) {
+		color += GetPhongShading (material, light, intersection.position, normal);
 	}
 
 	if (material.IsReflective ()) {
 		Coord reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-		Color reflectedColor = ProcessOneRay (reflectedRay, depth + 1);
+		Color reflectedColor = RayTrace (reflectedRay, depth + 1);
 		double reflection = material.GetReflection ();
-		currentColor = (currentColor * (1.0 - reflection)) + (reflectedColor * reflection);
+		color += (reflectedColor * reflection);
 	}
 
-	return currentColor;
+	return Clamp (color);
 }

@@ -50,7 +50,7 @@ public:
 	bool		Do (const Parameters& parameters, ResultImage& result);
 
 private:
-	Color		ProcessOneRay (const Ray& ray, int depth);
+	Color		RayTrace (const Ray& ray, int depth);
 
 	Model		model;
 	Camera		camera;

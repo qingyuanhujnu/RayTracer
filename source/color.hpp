@@ -13,6 +13,8 @@ public:
 	Color	operator* (const Color& color) const;
 	Color	operator* (double scalar) const;
 
+	Color&	operator+= (const Color& color);
+
 	double	r;
 	double	g;
 	double	b;
