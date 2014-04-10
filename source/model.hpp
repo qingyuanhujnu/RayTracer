@@ -21,6 +21,8 @@ public:
 	const Mesh&				GetMesh (UIndex index) const;
 	const Material&			GetMaterial (UIndex index) const;
 
+	bool					Check () const;
+
 private:
 	std::vector<Mesh>		meshes;
 	std::vector<Material>	materials;

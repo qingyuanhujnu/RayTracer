@@ -41,3 +41,14 @@ const Material& Model::GetMaterial (UIndex index) const
 {
 	return materials[index];
 }
+
+bool Model::Check () const
+{
+	UIndex materialCount = materials.size ();
+	for (UIndex i = 0; i < meshes.size (); i++) {
+		if (DBGERROR (!meshes[i].Check (materialCount))) {
+			return false;
+		}
+	}
+	return true;
+}
