@@ -122,9 +122,9 @@ Color RayTracer::ProcessOneRay (const Ray& ray, int depth)
 	}
 
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
-	const Triangle& triangle = mesh.GetTriangle (intersection.triangle);
-	const Material& material = model.GetMaterial (triangle.mat);
-	const Coord& normal = mesh.GetNormal (intersection.triangle);
+	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
+	const Material& material = model.GetMaterial (triangle.material);
+	const Coord& normal = mesh.GetNormal (intersection.triangle, intersection.position);
 	
 	Color currentColor = GetPhongShading (material, light, intersection.position, normal);
 	if (depth > 10) {

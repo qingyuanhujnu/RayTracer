@@ -23,6 +23,11 @@ Coord::~Coord ()
 
 }
 
+bool Coord::operator== (const Coord& coord) const
+{
+	return IsEqual (x, coord.x) && IsEqual (y, coord.y) && IsEqual (z, coord.z);
+}
+
 Coord Coord::operator+ (const Coord& coord) const
 {
 	Coord result;
@@ -61,6 +66,15 @@ Coord Coord::operator* (double scalar) const
 	result.x = x * scalar;
 	result.y = y * scalar;
 	result.z = z * scalar;
+	return result;
+}
+
+Coord Coord::operator/ (double scalar) const
+{
+	Coord result;
+	result.x = x / scalar;
+	result.y = y / scalar;
+	result.z = z / scalar;
 	return result;
 }
 

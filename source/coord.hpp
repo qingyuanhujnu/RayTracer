@@ -8,11 +8,14 @@ public:
 	Coord (double x, double y, double z);
 	~Coord ();
 
+	bool	operator== (const Coord& coord) const;
+
 	Coord	operator+ (const Coord& coord) const;
 	Coord	operator- (const Coord& coord) const;
 	Coord	operator^ (const Coord& coord) const;
 	double	operator* (const Coord& coord) const;
 	Coord	operator* (double scalar) const;
+	Coord	operator/ (double scalar) const;
 
 	double x;
 	double y;

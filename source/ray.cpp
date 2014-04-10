@@ -79,19 +79,19 @@ bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection)
 	MeshIntersection minIntersection;
 
 	for (UIndex i = 0; i < mesh.TriangleCount (); i++) {
-		const Triangle& triangle = mesh.GetTriangle (i);
-		const Coord& v0 = mesh.GetVertex (triangle.v0);
-		const Coord& v1 = mesh.GetVertex (triangle.v1);
-		const Coord& v2 = mesh.GetVertex (triangle.v2);
+		const Mesh::Triangle& triangle = mesh.GetTriangle (i);
+		const Coord& vertex0 = mesh.GetVertex (triangle.vertex0);
+		const Coord& vertex1 = mesh.GetVertex (triangle.vertex1);
+		const Coord& vertex2 = mesh.GetVertex (triangle.vertex2);
 		
 		if (intersection == NULL) {
-			if (GetTriangleIntersection (v0, v1, v2, NULL)) {
+			if (GetTriangleIntersection (vertex0, vertex1, vertex2, NULL)) {
 				found = true;
 				break;
 			}
 		} else {
 			Ray::MeshIntersection currentIntersection;
-			if (GetTriangleIntersection (v0, v1, v2, &currentIntersection)) {
+			if (GetTriangleIntersection (vertex0, vertex1, vertex2, &currentIntersection)) {
 				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
 					minIntersection = currentIntersection;
 					minIntersection.triangle = i;
