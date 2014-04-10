@@ -125,7 +125,7 @@ Color RayTracer::ProcessOneRay (const Ray& ray, int depth)
 
 	SectorRay shadowRay (intersection.position, light.GetPosition ());
 	if (!shadowRay.GetModelIntersection (model, NULL)) {
-		//Color currentColor = GetPhongShading (material, light, intersection.position, normal);
+		//currentColor = GetPhongShading (material, light, intersection.position, normal);
 		currentColor = GetBRDFShading (material, light, camera.GetEye (), intersection.position, normal);
 	}
 
