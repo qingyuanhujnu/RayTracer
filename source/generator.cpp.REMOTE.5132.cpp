@@ -37,19 +37,19 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 	mesh.AddVertex (offset + Coord (-x, y, z));
 
 	if (inverse) {
-		AddQuadrangle (mesh, 0, 3, 2, 1, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 1, 2, 6, 5, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 5, 6, 7, 4, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 4, 7, 3, 0, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 0, 1, 5, 4, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 3, 7, 6, 2, material, Mesh::NonCurved);
+		AddQuadrangle (mesh, 0, 3, 2, 1, material, -1);
+		AddQuadrangle (mesh, 1, 2, 6, 5, material, -1);
+		AddQuadrangle (mesh, 5, 6, 7, 4, material, -1);
+		AddQuadrangle (mesh, 4, 7, 3, 0, material, -1);
+		AddQuadrangle (mesh, 0, 1, 5, 4, material, -1);
+		AddQuadrangle (mesh, 3, 7, 6, 2, material, -1);
 	} else {
-		AddQuadrangle (mesh, 0, 1, 2, 3, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 1, 5, 6, 2, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 5, 4, 7, 6, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 4, 0, 3, 7, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 0, 4, 5, 1, material, Mesh::NonCurved);
-		AddQuadrangle (mesh, 3, 2, 6, 7, material, Mesh::NonCurved);
+		AddQuadrangle (mesh, 0, 1, 2, 3, material, -1);
+		AddQuadrangle (mesh, 1, 5, 6, 2, material, -1);
+		AddQuadrangle (mesh, 5, 4, 7, 6, material, -1);
+		AddQuadrangle (mesh, 4, 0, 3, 7, material, -1);
+		AddQuadrangle (mesh, 0, 4, 5, 1, material, -1);
+		AddQuadrangle (mesh, 3, 2, 6, 7, material, -1);
 	}
 
 	mesh.Finalize ();
@@ -94,7 +94,7 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 		if (i == segmentation - 1) {
 			next = 0;
 		}
-		AddQuadrangle (mesh, current, next, next + 1, current + 1, material, 0 /* curvedGroup */);
+		AddQuadrangle (mesh, current, next, next + 1, current + 1, material, 0);
 	}
 
 	std::vector<UIndex> topPolygon;
@@ -103,9 +103,8 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 		topPolygon.push_back (2 * (segmentation - i - 1));
 		bottomPolygon.push_back (2 * i + 1);
 	}
-
-	AddPolygon (mesh, topPolygon, material, Mesh::NonCurved);
-	AddPolygon (mesh, bottomPolygon, material, Mesh::NonCurved);
+	AddPolygon (mesh, topPolygon, material, -1);
+	AddPolygon (mesh, bottomPolygon, material, -1);
 
 	mesh.Finalize ();
 	model.AddMesh (mesh);
