@@ -143,42 +143,43 @@ static bool ReadCylinder (std::wifstream& inputStream, Model& model)
 bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& light, Model& model)
 {
 	std::wifstream inputStream (fileName.c_str ());
-	if (!inputStream) {
+	if (DBGERROR (!inputStream)) {
 		return false;
 	}
 
+	bool error = false;
 	std::wstring commandName;
-	while (inputStream >> commandName) {
+	while (!error && inputStream >> commandName) {
 		if (commandName == L"camera") {
-			if (!ReadCamera (inputStream, camera)) {
-				return false;
+			if (DBGERROR (!ReadCamera (inputStream, camera))) {
+				error = true;
 			}
 		} else if (commandName == L"light") {
-			if (!ReadLight (inputStream, light)) {
-				return false;
+			if (DBGERROR (!ReadLight (inputStream, light))) {
+				error = true;
 			}
 		} else if (commandName == L"material") {
 			Material material;
-			if (!ReadMaterial (inputStream, model)) {
-				return false;
+			if (DBGERROR (!ReadMaterial (inputStream, model))) {
+				error = true;
 			}
 		} else if (commandName == L"cuboid") {
-			if (!ReadCuboid (inputStream, model, false)) {
-				return false;
+			if (DBGERROR (!ReadCuboid (inputStream, model, false))) {
+				error = true;
 			}
 		} else if (commandName == L"inversecuboid") {
-			if (!ReadCuboid (inputStream, model, true)) {
-				return false;
+			if (DBGERROR (!ReadCuboid (inputStream, model, true))) {
+				error = true;
 			}
 		} else if (commandName == L"cylinder") {
-			if (!ReadCylinder (inputStream, model)) {
-				return false;
+			if (DBGERROR (!ReadCylinder (inputStream, model))) {
+				error = true;
 			}
 		} else {
-			return false;
+			error = true;
 		}
 	}
 
 	inputStream.close ();
-	return true;
+	return !error;
 }
