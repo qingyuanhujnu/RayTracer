@@ -37,19 +37,19 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 	mesh.AddVertex (offset + Coord (-x, y, z));
 
 	if (inverse) {
-		AddQuadrangle (mesh, 0, 1, 2, 3, material, -1);
-		AddQuadrangle (mesh, 1, 5, 6, 2, material, -1);
-		AddQuadrangle (mesh, 5, 4, 7, 6, material, -1);
-		AddQuadrangle (mesh, 4, 0, 3, 7, material, -1);
-		AddQuadrangle (mesh, 0, 4, 5, 1, material, -1);
-		AddQuadrangle (mesh, 3, 2, 6, 7, material, -1);
-	} else {
 		AddQuadrangle (mesh, 0, 3, 2, 1, material, -1);
 		AddQuadrangle (mesh, 1, 2, 6, 5, material, -1);
 		AddQuadrangle (mesh, 5, 6, 7, 4, material, -1);
 		AddQuadrangle (mesh, 4, 7, 3, 0, material, -1);
 		AddQuadrangle (mesh, 0, 1, 5, 4, material, -1);
 		AddQuadrangle (mesh, 3, 7, 6, 2, material, -1);
+	} else {
+		AddQuadrangle (mesh, 0, 1, 2, 3, material, -1);
+		AddQuadrangle (mesh, 1, 5, 6, 2, material, -1);
+		AddQuadrangle (mesh, 5, 4, 7, 6, material, -1);
+		AddQuadrangle (mesh, 4, 0, 3, 7, material, -1);
+		AddQuadrangle (mesh, 0, 4, 5, 1, material, -1);
+		AddQuadrangle (mesh, 3, 2, 6, 7, material, -1);
 	}
 
 	mesh.Finalize ();
