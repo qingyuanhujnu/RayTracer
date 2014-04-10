@@ -11,6 +11,14 @@ static bool ReadDouble (std::wifstream& inputStream, double& val)
 	return false;
 }
 
+static bool ReadInteger (std::wifstream& inputStream, int& val)
+{
+	if (inputStream >> val) {
+		return true;
+	}
+	return false;
+}
+
 static bool ReadUIndex (std::wifstream& inputStream, UIndex& val)
 {
 	if (inputStream >> val) {
@@ -72,7 +80,7 @@ static bool ReadLight (std::wifstream& inputStream, Light& light)
 	return true;
 }
 
-static bool ReadMaterial (std::wifstream& inputStream, Material& material)
+static bool ReadMaterial (std::wifstream& inputStream, Model& model)
 {
 	Color color;
 	double ambient;
@@ -86,7 +94,9 @@ static bool ReadMaterial (std::wifstream& inputStream, Material& material)
 	if (!ReadDouble (inputStream, specular)) { return false; }
 	if (!ReadDouble (inputStream, reflection)) { return false; }
 
+	Material material;
 	material.Set (color, ambient, diffuse, specular, reflection);
+	model.AddMaterial (material);
 	return true;
 }
 
@@ -112,6 +122,24 @@ static bool ReadCuboid (std::wifstream& inputStream, Model& model, bool inverse)
 	return true;
 }
 
+static bool ReadCylinder (std::wifstream& inputStream, Model& model)
+{
+	double radius;
+	double height;
+	int segmentation;
+	Coord offset;
+	UIndex material;
+
+	if (!ReadDouble (inputStream, radius)) { return false; }
+	if (!ReadDouble (inputStream, height)) { return false; }
+	if (!ReadInteger (inputStream, segmentation)) { return false; }
+	if (!ReadCoord (inputStream, offset)) { return false; }
+	if (!ReadUIndex (inputStream, material)) { return false; }
+	
+	Generator::GenerateCylinder (model, radius, height, segmentation, offset, material);
+	return true;
+}
+
 bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& light, Model& model)
 {
 	std::wifstream inputStream (fileName.c_str ());
@@ -131,14 +159,23 @@ bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& ligh
 			}
 		} else if (commandName == L"material") {
 			Material material;
-			if (!ReadMaterial (inputStream, material)) {
+			if (!ReadMaterial (inputStream, model)) {
 				return false;
 			}
-			model.AddMaterial (material);
 		} else if (commandName == L"cuboid") {
-			ReadCuboid (inputStream, model, false);
+			if (!ReadCuboid (inputStream, model, false)) {
+				return false;
+			}
 		} else if (commandName == L"inversecuboid") {
-			ReadCuboid (inputStream, model, true);
+			if (!ReadCuboid (inputStream, model, true)) {
+				return false;
+			}
+		} else if (commandName == L"cylinder") {
+			if (!ReadCylinder (inputStream, model)) {
+				return false;
+			}
+		} else {
+			return false;
 		}
 	}
 

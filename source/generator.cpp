@@ -19,7 +19,7 @@ static void AddQuadrangle (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex d, U
 	AddPolygon (mesh, indices, material, curveGroup);
 }
 
-void Generator::GenerateInverseCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material)
+static void GenerateCuboidBase (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material, bool inverse)
 {
 	Mesh mesh;
 
@@ -36,12 +36,21 @@ void Generator::GenerateInverseCuboid (Model& model, double xSize, double ySize,
 	mesh.AddVertex (offset + Coord (x, y, z));
 	mesh.AddVertex (offset + Coord (-x, y, z));
 
-	AddQuadrangle (mesh, 0, 3, 2, 1, material, -1);
-	AddQuadrangle (mesh, 1, 2, 6, 5, material, -1);
-	AddQuadrangle (mesh, 5, 6, 7, 4, material, -1);
-	AddQuadrangle (mesh, 4, 7, 3, 0, material, -1);
-	AddQuadrangle (mesh, 0, 1, 5, 4, material, -1);
-	AddQuadrangle (mesh, 3, 7, 6, 2, material, -1);
+	if (inverse) {
+		AddQuadrangle (mesh, 0, 1, 2, 3, material, -1);
+		AddQuadrangle (mesh, 1, 5, 6, 2, material, -1);
+		AddQuadrangle (mesh, 5, 4, 7, 6, material, -1);
+		AddQuadrangle (mesh, 4, 0, 3, 7, material, -1);
+		AddQuadrangle (mesh, 0, 4, 5, 1, material, -1);
+		AddQuadrangle (mesh, 3, 2, 6, 7, material, -1);
+	} else {
+		AddQuadrangle (mesh, 0, 3, 2, 1, material, -1);
+		AddQuadrangle (mesh, 1, 2, 6, 5, material, -1);
+		AddQuadrangle (mesh, 5, 6, 7, 4, material, -1);
+		AddQuadrangle (mesh, 4, 7, 3, 0, material, -1);
+		AddQuadrangle (mesh, 0, 1, 5, 4, material, -1);
+		AddQuadrangle (mesh, 3, 7, 6, 2, material, -1);
+	}
 
 	mesh.Finalize ();
 	model.AddMesh (mesh);
@@ -49,30 +58,12 @@ void Generator::GenerateInverseCuboid (Model& model, double xSize, double ySize,
 
 void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material)
 {
-	Mesh mesh;
+	GenerateCuboidBase (model, xSize, ySize, zSize, offset, material, false);
+}
 
-	double x = xSize / 2.0;
-	double y = ySize / 2.0;
-	double z = zSize / 2.0;
-
-	mesh.AddVertex (offset + Coord (-x, -y, -z));
-	mesh.AddVertex (offset + Coord (x, -y, -z));
-	mesh.AddVertex (offset + Coord (x, -y, z));
-	mesh.AddVertex (offset + Coord (-x, -y, z));
-	mesh.AddVertex (offset + Coord (-x, y, -z));
-	mesh.AddVertex (offset + Coord (x, y, -z));
-	mesh.AddVertex (offset + Coord (x, y, z));
-	mesh.AddVertex (offset + Coord (-x, y, z));
-
-	AddQuadrangle (mesh, 0, 1, 2, 3, material, -1);
-	AddQuadrangle (mesh, 1, 5, 6, 2, material, -1);
-	AddQuadrangle (mesh, 5, 4, 7, 6, material, -1);
-	AddQuadrangle (mesh, 4, 0, 3, 7, material, -1);
-	AddQuadrangle (mesh, 0, 4, 5, 1, material, -1);
-	AddQuadrangle (mesh, 3, 2, 6, 7, material, -1);
-
-	mesh.Finalize ();
-	model.AddMesh (mesh);
+void Generator::GenerateInverseCuboid (Model& model, double xSize, double ySize, double zSize, const Coord& offset, UIndex material)
+{
+	GenerateCuboidBase (model, xSize, ySize, zSize, offset, material, true);
 }
 
 static Coord CylindricalToCartesian (double radius, double height, double theta)
