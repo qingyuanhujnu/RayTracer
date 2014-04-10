@@ -1,6 +1,8 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
+#pragma warning(disable: 4481)
+
 #define EPS		0.000001
 #define INF		9999999999
 #define PI		3.14159265359

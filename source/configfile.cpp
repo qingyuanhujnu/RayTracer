@@ -100,7 +100,7 @@ static bool ReadMaterial (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
-static bool ReadCuboid (std::wifstream& inputStream, Model& model, bool inverse)
+static bool ReadCuboid (std::wifstream& inputStream, Model& model, Generator::Facing facing)
 {
 	double xSize;
 	double ySize;
@@ -114,10 +114,12 @@ static bool ReadCuboid (std::wifstream& inputStream, Model& model, bool inverse)
 	if (!ReadCoord (inputStream, offset)) { return false; }
 	if (!ReadUIndex (inputStream, material)) { return false; }
 	
-	if (inverse) {
-		Generator::GenerateInverseCuboid (model, xSize, ySize, zSize, offset, material);
-	} else {
+	if (facing == Generator::Inside) {
 		Generator::GenerateCuboid (model, xSize, ySize, zSize, offset, material);
+	} else if (facing == Generator::Outside) {
+		Generator::GenerateInsideOutCuboid (model, xSize, ySize, zSize, offset, material);
+	} else {
+		DBGERROR (true);
 	}
 	return true;
 }
@@ -180,11 +182,11 @@ bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& ligh
 				error = true;
 			}
 		} else if (commandName == L"cuboid") {
-			if (DBGERROR (!ReadCuboid (inputStream, model, false))) {
+			if (DBGERROR (!ReadCuboid (inputStream, model, Generator::Inside))) {
 				error = true;
 			}
-		} else if (commandName == L"inversecuboid") {
-			if (DBGERROR (!ReadCuboid (inputStream, model, true))) {
+		} else if (commandName == L"insideoutcuboid") {
+			if (DBGERROR (!ReadCuboid (inputStream, model, Generator::Outside))) {
 				error = true;
 			}
 		} else if (commandName == L"cylinder") {

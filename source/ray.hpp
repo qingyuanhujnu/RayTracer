@@ -1,6 +1,7 @@
 #ifndef RAY_HPP
 #define RAY_HPP
 
+#include "common.hpp"
 #include "model.hpp"
 
 class Ray
