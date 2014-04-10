@@ -36,6 +36,10 @@ int main ()
 		ConstructDefaultModel (camera, light, model);
 	}
 
+	if (DBGERROR (!model.Check ())) {
+		return 1;
+	}
+
 	RayTracer rayTracer (model, camera, light);
 	RayTracer::Parameters parameters (400, 400, 1.0);
 	RayTracer::ResultImage result;

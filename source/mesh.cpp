@@ -1,4 +1,5 @@
 #include "mesh.hpp"
+#include "common.hpp"
 
 #include <algorithm>
 
@@ -18,6 +19,25 @@ Mesh::Triangle::Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex
 Mesh::Triangle::~Triangle ()
 {
 
+}
+
+bool Mesh::Triangle::Check (UIndex materialCount, UIndex vertexCount, UIndex vertexNormalCount) const
+{
+	if (DBGERROR (material >= materialCount)) {
+		return false;
+	}
+
+	if (DBGERROR (vertex0 >= vertexCount || vertex1 >= vertexCount || vertex2 >= vertexCount)) {
+		return false;
+	}
+
+	if (curveGroup != NonCurved) {
+		if (DBGERROR (normal0 >= vertexNormalCount || normal1 >= vertexNormalCount || normal2 >= vertexNormalCount)) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 Mesh::Mesh ()
@@ -127,6 +147,23 @@ Coord Mesh::GetNormal (UIndex index, const Coord& coordinate) const
 
 	Coord normal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, coordinate);
 	return Normalize (normal);
+}
+
+bool Mesh::Check (UIndex materialCount) const
+{
+	if (DBGERROR (triangles.size () != triangleNormals.size ())) {
+		return false;
+	}
+
+	UIndex vertexCount = vertices.size ();
+	UIndex vertexNormalCount = vertexNormals.size ();
+	for (UIndex i = 0; i < triangles.size (); i++) {
+		const Triangle& triangle = triangles[i];
+		if (DBGERROR (!triangle.Check (materialCount, vertexCount, vertexNormalCount))) {
+			return false;
+		}
+	}
+	return true;
 }
 
 static Coord GetAverageNormal (const Mesh& mesh, UIndex baseTriangleIndex, const std::vector<UIndex>& neighbourTriangles, const std::vector<Coord>& triangleNormals)

@@ -17,6 +17,8 @@ public:
 		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex material, UIndex curveGroup = Mesh::NonCurved);
 		~Triangle ();
 
+		bool		Check (UIndex materialCount, UIndex vertexCount, UIndex vertexNormalCount) const;
+
 		UIndex		vertex0;
 		UIndex		vertex1;
 		UIndex		vertex2;
@@ -43,6 +45,8 @@ public:
 	const Triangle&			GetTriangle (UIndex index) const;
 
 	Coord					GetNormal (UIndex index, const Coord& coordinate) const;
+
+	bool					Check (UIndex materialCount) const;
 
 private:
 	Coord					CalculateTriangleNormal (UIndex index);
