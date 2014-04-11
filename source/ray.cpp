@@ -1,7 +1,7 @@
 #include "ray.hpp"
 #include "common.hpp"
 
-Ray::Ray (const Coord& startPoint, const Coord& rayDirection) :
+Ray::Ray (const Vec3& startPoint, const Vec3& rayDirection) :
 	origin (startPoint),
 	direction (Normalize (rayDirection))
 {
@@ -24,33 +24,33 @@ Ray::ModelIntersection::ModelIntersection () :
 {
 }
 
-const Coord& Ray::GetDirection () const
+const Vec3& Ray::GetDirection () const
 {
 	return direction;
 }
 
-bool Ray::GetTriangleIntersection (const Coord& v0, const Coord& v1, const Coord& v2, TriangleIntersection* intersection) const
+bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, TriangleIntersection* intersection) const
 {
 	// Moller–Trumbore algorithm
 
-	Coord edgeDir1 = v1 - v0;
-	Coord edgeDir2 = v2 - v0;
+	Vec3 edgeDir1 = v1 - v0;
+	Vec3 edgeDir2 = v2 - v0;
 
-	Coord p = direction ^ edgeDir2;
+	Vec3 p = direction ^ edgeDir2;
 	double determinant = edgeDir1 * p;
 	if (!IsPositive (determinant)) {
 		return false;
 	}
 
 	double invDeterminant = 1.0 / determinant;
-	Coord originToTriangle = origin - v0;
+	Vec3 originToTriangle = origin - v0;
 
 	double u = (originToTriangle * p) * invDeterminant;
 	if (IsLower (u, 0.0) || IsGreater (u, 1.0)) {
 		return false;
 	}
 
-	Coord q = originToTriangle ^ edgeDir1;
+	Vec3 q = originToTriangle ^ edgeDir1;
 	double v = (direction * q) * invDeterminant;
 	if (IsLower (v, 0.0) || IsGreater (u + v, 1.0)) {
 		return false;
@@ -80,9 +80,9 @@ bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection)
 
 	for (UIndex i = 0; i < mesh.TriangleCount (); i++) {
 		const Mesh::Triangle& triangle = mesh.GetTriangle (i);
-		const Coord& vertex0 = mesh.GetVertex (triangle.vertex0);
-		const Coord& vertex1 = mesh.GetVertex (triangle.vertex1);
-		const Coord& vertex2 = mesh.GetVertex (triangle.vertex2);
+		const Vec3& vertex0 = mesh.GetVertex (triangle.vertex0);
+		const Vec3& vertex1 = mesh.GetVertex (triangle.vertex1);
+		const Vec3& vertex2 = mesh.GetVertex (triangle.vertex2);
 		
 		if (intersection == NULL) {
 			if (GetTriangleIntersection (vertex0, vertex1, vertex2, NULL)) {
@@ -137,7 +137,7 @@ bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersect
 	return found;
 }
 
-SectorRay::SectorRay (const Coord& startPoint, const Coord& endPoint) :
+SectorRay::SectorRay (const Vec3& startPoint, const Vec3& endPoint) :
 	Ray (startPoint, endPoint - startPoint),
 	length (Distance (startPoint, endPoint))
 {
@@ -148,7 +148,7 @@ bool SectorRay::IsLengthReached (double currentLength) const
 	return IsGreater (currentLength, length);
 }
 
-InfiniteRay::InfiniteRay (const Coord& startPoint, const Coord& rayDirection) :
+InfiniteRay::InfiniteRay (const Vec3& startPoint, const Vec3& rayDirection) :
 	Ray (startPoint, rayDirection)
 {
 }

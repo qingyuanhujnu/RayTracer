@@ -1,28 +1,28 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include "coord.hpp"
+#include "Vec3.hpp"
 
 class Camera
 {
 public:
 	Camera ();
-	Camera (const Coord& eye, const Coord& center, const Coord& up, double xFov, double yFov);
+	Camera (const Vec3& eye, const Vec3& center, const Vec3& up, double xFov, double yFov);
 	~Camera ();
 
-	void			Set (const Coord& eye, const Coord& center, const Coord& up, double xFov, double yFov);
+	void			Set (const Vec3& eye, const Vec3& center, const Vec3& up, double xFov, double yFov);
 
-	const Coord&	GetEye () const;
-	const Coord&	GetCenter () const;
-	const Coord&	GetUp () const;
+	const Vec3&	GetEye () const;
+	const Vec3&	GetCenter () const;
+	const Vec3&	GetUp () const;
 
 	double			GetXFov () const;
 	double			GetYFov () const;
 
 private:
-	Coord	eye;
-	Coord	center;
-	Coord	up;
+	Vec3	eye;
+	Vec3	center;
+	Vec3	up;
 	
 	double	xFov;
 	double	yFov;

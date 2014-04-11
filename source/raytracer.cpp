@@ -110,7 +110,7 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 	return true;
 }
 
-static Coord GetReflectedDirection (const Coord& originalDirection, const Coord& normal)
+static Vec3 GetReflectedDirection (const Vec3& originalDirection, const Vec3& normal)
 {
 	double dotProduct = -(normal * originalDirection);
 	return originalDirection + (normal * 2.0 * dotProduct);
@@ -132,7 +132,7 @@ Color RayTracer::RayTrace (const Ray& ray, int depth)
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 	const Material& material = model.GetMaterial (triangle.material);
-	const Coord& normal = mesh.GetNormal (intersection.triangle, intersection.position);
+	const Vec3& normal = mesh.GetNormal (intersection.triangle, intersection.position);
 
 	SectorRay shadowRay (intersection.position, light.GetPosition ());
 	if (!shadowRay.GetModelIntersection (model, NULL)) {
@@ -140,7 +140,7 @@ Color RayTracer::RayTrace (const Ray& ray, int depth)
 	}
 
 	if (material.IsReflective ()) {
-		Coord reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 		Color reflectedColor = RayTrace (reflectedRay, depth + 1);
 		double reflection = material.GetReflection ();

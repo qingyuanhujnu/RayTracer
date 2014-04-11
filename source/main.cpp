@@ -9,8 +9,8 @@
 
 static void ConstructDefaultModel (Camera& camera, Light& light, Model& model)
 {
-	camera.Set (Coord (5.0, 3.0, 4.0), Coord (0.0, 0.0, 0.5), Coord (0.0, 0.0, 1.0), 45.0, 45.0); 
-	light.Set (Coord (3.0, 3.5, 5.5), Color (1.0, 1.0, 1.0), 1.0, 1.0, 0.0);
+	camera.Set (Vec3 (5.0, 3.0, 4.0), Vec3 (0.0, 0.0, 0.5), Vec3 (0.0, 0.0, 1.0), 45.0, 45.0); 
+	light.Set (Vec3 (3.0, 3.5, 5.5), Color (1.0, 1.0, 1.0), 1.0, 1.0, 0.0);
 
 	model = Model ();
 
@@ -19,15 +19,15 @@ static void ConstructDefaultModel (Camera& camera, Light& light, Model& model)
 	model.AddMaterial (Material (Color (0.0, 0.0, 1.0), 0.2, 0.8, 0.0, 0.0));
 	model.AddMaterial (Material (Color (1.0, 1.0, 1.0), 0.2, 0.8, 0.0, 0.0));
 
-	Generator::GenerateCuboid (model, 4.0, 0.1, 3.0, Coord (0.5, -0.6, 1.5), 0);
-	Generator::GenerateCuboid (model, 1.2, 1.2, 1.8, Coord (-1.0, 1.4, 0.9), 1);
-	Generator::GenerateCuboid (model, 1.2, 1.2, 1.2, Coord (1.0, 1.4, 0.6), 2);
-	Generator::GenerateInsideOutCuboid (model, 12.0, 12.0, 12.0, Coord (0.0, 0.0, 6.0), 3);
+	Generator::GenerateCuboid (model, 4.0, 0.1, 3.0, Vec3 (0.5, -0.6, 1.5), 0);
+	Generator::GenerateCuboid (model, 1.2, 1.2, 1.8, Vec3 (-1.0, 1.4, 0.9), 1);
+	Generator::GenerateCuboid (model, 1.2, 1.2, 1.2, Vec3 (1.0, 1.4, 0.6), 2);
+	Generator::GenerateInsideOutCuboid (model, 12.0, 12.0, 12.0, Vec3 (0.0, 0.0, 6.0), 3);
 }
 
 int main ()
 {
-	std::wstring configFileName = L"config01.txt";
+	std::wstring configFileName = L"config03.txt";
 
 	Camera camera;
 	Light light;

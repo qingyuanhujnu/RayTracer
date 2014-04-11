@@ -1,19 +1,19 @@
 #ifndef LIGHT_HPP
 #define LIGHT_HPP
 
-#include "coord.hpp"
+#include "Vec3.hpp"
 #include "color.hpp"
 
 class Light
 {
 public:
 	Light ();
-	Light (const Coord& position, const Color& color, double ambient, double diffuse, double specular);
+	Light (const Vec3& position, const Color& color, double ambient, double diffuse, double specular);
 	~Light ();
 
-	void			Set (const Coord& position, const Color& color, double ambient, double diffuse, double specular);
+	void			Set (const Vec3& position, const Color& color, double ambient, double diffuse, double specular);
 
-	const Coord&	GetPosition () const;
+	const Vec3&	GetPosition () const;
 
 	const Color&	GetColor () const;
 
@@ -26,7 +26,7 @@ public:
 	Color			GetSpecularColor () const;
 
 private:
-	Coord			position;
+	Vec3			position;
 
 	Color			color;
 

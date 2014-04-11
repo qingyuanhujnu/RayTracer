@@ -3,13 +3,13 @@
 #include <algorithm>
 #include <vector>
 
-Color GetPhongShading (const Material& material, const Light& light, const Coord& coordinate, const Coord& normal)
+Color GetPhongShading (const Material& material, const Light& light, const Vec3& Vec3inate, const Vec3& normal)
 {
 	Color ambientProduct = light.GetAmbientColor () * material.GetAmbientColor ();
 	Color diffuseProduct = light.GetDiffuseColor () * material.GetDiffuseColor ();
 	Color specularProduct = light.GetSpecularColor () * material.GetSpecularColor ();
 
-	Coord lightDirection = Normalize (light.GetPosition () - coordinate);
+	Vec3 lightDirection = Normalize (light.GetPosition () - Vec3inate);
 	double lightNormalProduct = lightDirection * normal;
 
 	double diffuseCoeff = std::max (lightNormalProduct, 0.0);

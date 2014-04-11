@@ -27,11 +27,11 @@ static bool ReadUIndex (std::wifstream& inputStream, UIndex& val)
 	return false;
 }
 
-static bool ReadCoord (std::wifstream& inputStream, Coord& coord)
+static bool ReadVec3 (std::wifstream& inputStream, Vec3& Vec3)
 {
-	if (!ReadDouble (inputStream, coord.x)) { return false; }
-	if (!ReadDouble (inputStream, coord.y)) { return false; }
-	if (!ReadDouble (inputStream, coord.z)) { return false; }
+	if (!ReadDouble (inputStream, Vec3.x)) { return false; }
+	if (!ReadDouble (inputStream, Vec3.y)) { return false; }
+	if (!ReadDouble (inputStream, Vec3.z)) { return false; }
 	return true;
 }
 
@@ -45,16 +45,16 @@ static bool ReadColor (std::wifstream& inputStream, Color& color)
 
 static bool ReadCamera (std::wifstream& inputStream, Camera& camera)
 {
-	Coord	eye;
-	Coord	center;
-	Coord	up;
+	Vec3	eye;
+	Vec3	center;
+	Vec3	up;
 
 	double	xFov;
 	double	yFov;
 
-	if (!ReadCoord (inputStream, eye)) { return false; }
-	if (!ReadCoord (inputStream, center)) { return false; }
-	if (!ReadCoord (inputStream, up)) { return false; }
+	if (!ReadVec3 (inputStream, eye)) { return false; }
+	if (!ReadVec3 (inputStream, center)) { return false; }
+	if (!ReadVec3 (inputStream, up)) { return false; }
 	if (!ReadDouble (inputStream, xFov)) { return false; }
 	if (!ReadDouble (inputStream, yFov)) { return false; }
 
@@ -64,13 +64,13 @@ static bool ReadCamera (std::wifstream& inputStream, Camera& camera)
 
 static bool ReadLight (std::wifstream& inputStream, Light& light)
 {
-	Coord position;
+	Vec3 position;
 	Color color;
 	double ambient;
 	double diffuse;
 	double specular;
 
-	if (!ReadCoord (inputStream, position)) { return false; }
+	if (!ReadVec3 (inputStream, position)) { return false; }
 	if (!ReadColor (inputStream, color)) { return false; }
 	if (!ReadDouble (inputStream, ambient)) { return false; }
 	if (!ReadDouble (inputStream, diffuse)) { return false; }
@@ -105,13 +105,13 @@ static bool ReadCuboid (std::wifstream& inputStream, Model& model, Generator::Fa
 	double xSize;
 	double ySize;
 	double zSize;
-	Coord offset;
+	Vec3 offset;
 	UIndex material;
 
 	if (!ReadDouble (inputStream, xSize)) { return false; }
 	if (!ReadDouble (inputStream, ySize)) { return false; }
 	if (!ReadDouble (inputStream, zSize)) { return false; }
-	if (!ReadCoord (inputStream, offset)) { return false; }
+	if (!ReadVec3 (inputStream, offset)) { return false; }
 	if (!ReadUIndex (inputStream, material)) { return false; }
 	
 	if (facing == Generator::Inside) {
@@ -129,13 +129,13 @@ static bool ReadCylinder (std::wifstream& inputStream, Model& model)
 	double radius;
 	double height;
 	int segmentation;
-	Coord offset;
+	Vec3 offset;
 	UIndex material;
 
 	if (!ReadDouble (inputStream, radius)) { return false; }
 	if (!ReadDouble (inputStream, height)) { return false; }
 	if (!ReadInteger (inputStream, segmentation)) { return false; }
-	if (!ReadCoord (inputStream, offset)) { return false; }
+	if (!ReadVec3 (inputStream, offset)) { return false; }
 	if (!ReadUIndex (inputStream, material)) { return false; }
 	
 	Generator::GenerateCylinder (model, radius, height, segmentation, offset, material);
@@ -146,12 +146,12 @@ static bool ReadSphere (std::wifstream& inputStream, Model& model)
 {
 	double radius;
 	int segmentation;
-	Coord offset;
+	Vec3 offset;
 	UIndex material;
 
 	if (!ReadDouble (inputStream, radius)) { return false; }
 	if (!ReadInteger (inputStream, segmentation)) { return false; }
-	if (!ReadCoord (inputStream, offset)) { return false; }
+	if (!ReadVec3 (inputStream, offset)) { return false; }
 	if (!ReadUIndex (inputStream, material)) { return false; }
 	
 	Generator::GenerateSphere (model, radius, segmentation, offset, material);

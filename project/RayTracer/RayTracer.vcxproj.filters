@@ -19,9 +19,6 @@
     <ClCompile Include="..\..\source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\coord.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\raytracer.cpp">
       <Filter>RayTracer</Filter>
     </ClCompile>
@@ -64,11 +61,11 @@
     <ClCompile Include="..\..\source\model.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\vec3.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\coord.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\raytracer.hpp">
       <Filter>RayTracer</Filter>
     </ClInclude>
@@ -109,6 +106,9 @@
       <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\model.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\vec3.hpp">
       <Filter>Geometry</Filter>
     </ClInclude>
   </ItemGroup>

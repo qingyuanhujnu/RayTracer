@@ -7,13 +7,13 @@
 class Ray
 {
 public:
-	Ray (const Coord& startPoint, const Coord& rayDirection);
+	Ray (const Vec3& startPoint, const Vec3& rayDirection);
 
 	struct TriangleIntersection
 	{
 		TriangleIntersection ();
 
-		Coord position;
+		Vec3 position;
 		double distance;
 	};
 
@@ -31,22 +31,22 @@ public:
 		UIndex mesh;
 	};
 
-	const Coord&	GetDirection () const;
-	bool			GetTriangleIntersection (const Coord& v0, const Coord& v1, const Coord& v2, TriangleIntersection* intersection) const;
+	const Vec3&	GetDirection () const;
+	bool			GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, TriangleIntersection* intersection) const;
 	bool			GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const;
 	bool			GetModelIntersection (const Model& model, ModelIntersection* intersection) const;
 
 protected:
 	virtual bool	IsLengthReached (double currentLength) const = 0;
 
-	Coord			origin;
-	Coord			direction;
+	Vec3			origin;
+	Vec3			direction;
 };
 
 class SectorRay : public Ray
 {
 public:
-	SectorRay (const Coord& startPoint, const Coord& endPoint);
+	SectorRay (const Vec3& startPoint, const Vec3& endPoint);
 
 private:
 	virtual bool	IsLengthReached (double currentLength) const override;
@@ -57,7 +57,7 @@ private:
 class InfiniteRay : public Ray
 {
 public:
-	InfiniteRay (const Coord& startPoint, const Coord& rayDirection);
+	InfiniteRay (const Vec3& startPoint, const Vec3& rayDirection);
 
 private:
 	virtual bool	IsLengthReached (double currentLength) const override;

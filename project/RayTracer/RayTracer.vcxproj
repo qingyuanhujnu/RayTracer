@@ -15,7 +15,7 @@
     <ClCompile Include="..\..\source\color.cpp" />
     <ClCompile Include="..\..\source\common.cpp" />
     <ClCompile Include="..\..\source\configfile.cpp" />
-    <ClCompile Include="..\..\source\coord.cpp" />
+    <ClCompile Include="..\..\source\vec3.cpp" />
     <ClCompile Include="..\..\source\export.cpp" />
     <ClCompile Include="..\..\source\generator.cpp" />
     <ClCompile Include="..\..\source\mesh.cpp" />
@@ -33,7 +33,7 @@
     <ClInclude Include="..\..\source\color.hpp" />
     <ClInclude Include="..\..\source\common.hpp" />
     <ClInclude Include="..\..\source\configfile.hpp" />
-    <ClInclude Include="..\..\source\coord.hpp" />
+    <ClInclude Include="..\..\source\vec3.hpp" />
     <ClInclude Include="..\..\source\export.hpp" />
     <ClInclude Include="..\..\source\generator.hpp" />
     <ClInclude Include="..\..\source\mesh.hpp" />

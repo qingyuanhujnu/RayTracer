@@ -10,16 +10,16 @@ public:
 	Image (const Camera& camera, int resolutionX, int resolutionY, double distance);
 	~Image ();
 
-	Coord		GetFieldCenter (int x, int y) const;
+	Vec3		GetFieldCenter (int x, int y) const;
 
 private:
 	double		fieldWidth;
 	double		fieldHeight;
 
-	Coord		xDirection;
-	Coord		yDirection;
+	Vec3		xDirection;
+	Vec3		yDirection;
 
-	Coord		bottomLeft;
+	Vec3		bottomLeft;
 };
 
 #endif

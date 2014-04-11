@@ -7,7 +7,7 @@ Light::Light () :
 {
 }
 
-Light::Light (const Coord& position, const Color& color, double ambient, double diffuse, double specular)
+Light::Light (const Vec3& position, const Color& color, double ambient, double diffuse, double specular)
 {
 	Set (position, color, ambient, diffuse, specular);
 }
@@ -16,7 +16,7 @@ Light::~Light ()
 {
 }
 
-void Light::Set (const Coord& position, const Color& color, double ambient, double diffuse, double specular)
+void Light::Set (const Vec3& position, const Color& color, double ambient, double diffuse, double specular)
 {
 	this->position = position;
 	this->color = color;
@@ -25,7 +25,7 @@ void Light::Set (const Coord& position, const Color& color, double ambient, doub
 	this->specular = specular;
 }
 
-const Coord& Light::GetPosition () const
+const Vec3& Light::GetPosition () const
 {
 	return position;
 }

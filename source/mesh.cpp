@@ -50,9 +50,9 @@ Mesh::~Mesh ()
 
 }
 
-UIndex Mesh::AddVertex (const Coord& coord)
+UIndex Mesh::AddVertex (const Vec3& Vec3)
 {
-	vertices.push_back (coord);
+	vertices.push_back (Vec3);
 	return vertices.size () - 1;
 }
 
@@ -89,7 +89,7 @@ UIndex Mesh::TriangleCount () const
 	return triangles.size ();
 }
 
-const Coord& Mesh::GetVertex (UIndex index) const
+const Vec3& Mesh::GetVertex (UIndex index) const
 {
 	return vertices[index];
 }
@@ -105,9 +105,9 @@ static double GetTriangleArea (double a, double b, double c)
 	return sqrt (s * (s - a) * (s - b) * (s - c));
 }
 
-static Coord BarycentricInterpolation (const Coord& vertex0, const Coord& vertex1, const Coord& vertex2,
-									   const Coord& value0, const Coord& value1, const Coord& value2,
-									   const Coord& interpolationVertex)
+static Vec3 BarycentricInterpolation (const Vec3& vertex0, const Vec3& vertex1, const Vec3& vertex2,
+									   const Vec3& value0, const Vec3& value1, const Vec3& value2,
+									   const Vec3& interpolationVertex)
 {
 	double edge0 = Distance (vertex0, vertex1);
 	double edge1 = Distance (vertex1, vertex2);
@@ -122,11 +122,11 @@ static Coord BarycentricInterpolation (const Coord& vertex0, const Coord& vertex
 	double area1 = GetTriangleArea (edge1, distance1, distance2);
 	double area2 = GetTriangleArea (edge2, distance0, distance2);
 
-	Coord interpolated = (value0 * area1 + value1 * area2 + value2 * area0) / area;
+	Vec3 interpolated = (value0 * area1 + value1 * area2 + value2 * area0) / area;
 	return interpolated;
 }
 
-Coord Mesh::GetNormal (UIndex index, const Coord& coordinate) const
+Vec3 Mesh::GetNormal (UIndex index, const Vec3& Vec3inate) const
 {
 	const Triangle& triangle = triangles[index];
 	if (triangle.curveGroup == NonCurved) {
@@ -137,15 +137,15 @@ Coord Mesh::GetNormal (UIndex index, const Coord& coordinate) const
 		return triangleNormals[index];
 	}
 
-	const Coord& vertex0 = vertices[triangle.vertex0];
-	const Coord& vertex1 = vertices[triangle.vertex1];
-	const Coord& vertex2 = vertices[triangle.vertex2];
+	const Vec3& vertex0 = vertices[triangle.vertex0];
+	const Vec3& vertex1 = vertices[triangle.vertex1];
+	const Vec3& vertex2 = vertices[triangle.vertex2];
 
-	const Coord& normal0 = vertexNormals[triangle.normal0];
-	const Coord& normal1 = vertexNormals[triangle.normal1];
-	const Coord& normal2 = vertexNormals[triangle.normal2];
+	const Vec3& normal0 = vertexNormals[triangle.normal0];
+	const Vec3& normal1 = vertexNormals[triangle.normal1];
+	const Vec3& normal2 = vertexNormals[triangle.normal2];
 
-	Coord normal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, coordinate);
+	Vec3 normal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, Vec3inate);
 	return Normalize (normal);
 }
 
@@ -166,20 +166,20 @@ bool Mesh::Check (UIndex materialCount) const
 	return true;
 }
 
-static Coord GetAverageNormal (const Mesh& mesh, UIndex baseTriangleIndex, const std::vector<UIndex>& neighbourTriangles, const std::vector<Coord>& triangleNormals)
+static Vec3 GetAverageNormal (const Mesh& mesh, UIndex baseTriangleIndex, const std::vector<UIndex>& neighbourTriangles, const std::vector<Vec3>& triangleNormals)
 {
 	UIndex baseCurveGroup = mesh.GetTriangle (baseTriangleIndex).curveGroup;
 
-	Coord averageNormal (0.0, 0.0, 0.0);
+	Vec3 averageNormal (0.0, 0.0, 0.0);
 	int averageNormalCount = 0;
 
-	std::vector<Coord> foundNormals;
+	std::vector<Vec3> foundNormals;
 	for (UIndex i = 0; i < neighbourTriangles.size (); i++) {
 		UIndex currentTriangleIndex = neighbourTriangles[i];
 		UIndex currentCurveGroup = mesh.GetTriangle (currentTriangleIndex).curveGroup;
 		if (currentCurveGroup == baseCurveGroup) {
-			const Coord& currentNormal = triangleNormals[currentTriangleIndex];
-			std::vector<Coord>::iterator found = std::find (foundNormals.begin (), foundNormals.end (), currentNormal);
+			const Vec3& currentNormal = triangleNormals[currentTriangleIndex];
+			std::vector<Vec3>::iterator found = std::find (foundNormals.begin (), foundNormals.end (), currentNormal);
 			if (found == foundNormals.end ()) {
 				averageNormal = averageNormal + currentNormal;
 				averageNormalCount = averageNormalCount + 1;
@@ -217,15 +217,15 @@ void Mesh::CalculateVertexNormals ()
 	}
 }
 
-Coord Mesh::CalculateTriangleNormal (UIndex index)
+Vec3 Mesh::CalculateTriangleNormal (UIndex index)
 {
 	const Triangle& triangle = triangles[index];
 
-	const Coord& vertex0 = GetVertex (triangle.vertex0);
-	const Coord& vertex1 = GetVertex (triangle.vertex1);
-	const Coord& vertex2 = GetVertex (triangle.vertex2);
+	const Vec3& vertex0 = GetVertex (triangle.vertex0);
+	const Vec3& vertex1 = GetVertex (triangle.vertex1);
+	const Vec3& vertex2 = GetVertex (triangle.vertex2);
 
-	Coord edgeDir1 = vertex1 - vertex0;
-	Coord edgeDir2 = vertex2 - vertex0;
+	Vec3 edgeDir1 = vertex1 - vertex0;
+	Vec3 edgeDir2 = vertex2 - vertex0;
 	return Normalize (edgeDir1 ^ edgeDir2);
 }
