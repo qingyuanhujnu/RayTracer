@@ -44,7 +44,7 @@ public:
 	const Vec3&			GetVertex (UIndex index) const;
 	const Triangle&			GetTriangle (UIndex index) const;
 
-	Vec3					GetNormal (UIndex index, const Vec3& Vec3inate) const;
+	Vec3					GetNormal (UIndex index, const Vec3& coord) const;
 
 	bool					Check (UIndex materialCount) const;
 

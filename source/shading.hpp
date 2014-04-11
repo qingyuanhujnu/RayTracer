@@ -5,6 +5,6 @@
 #include "material.hpp"
 #include "light.hpp"
 
-Color GetPhongShading (const Material& material, const Light& light, const Vec3& Vec3inate, const Vec3& normal);
+Color GetPhongShading (const Material& material, const Light& light, const Vec3& coord, const Vec3& normal);
 
 #endif

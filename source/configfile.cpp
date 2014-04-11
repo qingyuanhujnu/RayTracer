@@ -27,11 +27,11 @@ static bool ReadUIndex (std::wifstream& inputStream, UIndex& val)
 	return false;
 }
 
-static bool ReadVec3 (std::wifstream& inputStream, Vec3& Vec3)
+static bool ReadVec3 (std::wifstream& inputStream, Vec3& vec)
 {
-	if (!ReadDouble (inputStream, Vec3.x)) { return false; }
-	if (!ReadDouble (inputStream, Vec3.y)) { return false; }
-	if (!ReadDouble (inputStream, Vec3.z)) { return false; }
+	if (!ReadDouble (inputStream, vec.x)) { return false; }
+	if (!ReadDouble (inputStream, vec.y)) { return false; }
+	if (!ReadDouble (inputStream, vec.z)) { return false; }
 	return true;
 }
 

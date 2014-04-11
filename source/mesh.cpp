@@ -126,7 +126,7 @@ static Vec3 BarycentricInterpolation (const Vec3& vertex0, const Vec3& vertex1, 
 	return interpolated;
 }
 
-Vec3 Mesh::GetNormal (UIndex index, const Vec3& Vec3inate) const
+Vec3 Mesh::GetNormal (UIndex index, const Vec3& coord) const
 {
 	const Triangle& triangle = triangles[index];
 	if (triangle.curveGroup == NonCurved) {
@@ -145,7 +145,7 @@ Vec3 Mesh::GetNormal (UIndex index, const Vec3& Vec3inate) const
 	const Vec3& normal1 = vertexNormals[triangle.normal1];
 	const Vec3& normal2 = vertexNormals[triangle.normal2];
 
-	Vec3 normal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, Vec3inate);
+	Vec3 normal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, coord);
 	return Normalize (normal);
 }
 
