@@ -3,6 +3,7 @@
 #include "image.hpp"
 #include "common.hpp"
 #include "shading.hpp"
+#include <omp.h>
 
 RayTracer::Parameters::Parameters (int resolutionX, int resolutionY, double imageDistance) :
 	resolutionX (resolutionX),
@@ -91,14 +92,19 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 {
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance ());
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
+	
+	const int resX = parameters.GetResolutionX ();
+	const int resY = parameters.GetResolutionY ();
 
-#pragma omp parallel for schedule(dynamic, 4) num_threads (8)
-	for (int i = 0; i < parameters.GetResolutionX (); i++) {
-		for (int j = 0; j < parameters.GetResolutionY (); j++) {
-			InfiniteRay cameraRay (camera.GetEye (), image.GetFieldCenter (i, j) - camera.GetEye ());
-			Color fieldColor = RayTrace (cameraRay, 0);
-			result.SetColor (i, j, fieldColor);
-		}
+	const int procs = omp_get_num_procs ();		// logical cores
+#pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
+	for (int pix = 0; pix < (resX * resY); ++pix) {
+		int x = pix % resX;
+		int y = pix / resY;
+
+		InfiniteRay cameraRay (camera.GetEye (), image.GetFieldCenter (x, y) - camera.GetEye ());
+		Color fieldColor = RayTrace (cameraRay, 0);
+		result.SetColor (x, y, fieldColor);
 	}
 
 	return true;
