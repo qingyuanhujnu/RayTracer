@@ -37,8 +37,9 @@ Vec3 Ray::GetReflectedDirection (const Vec3& normal) const
 
 bool Ray::GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const
 {
-	double b = 2.0 * (direction.x * (origin.x - sphere.origin.x) + direction.y * (origin.y - sphere.origin.y) + direction.z * (origin.z - sphere.origin.z));
-	double c = pow (origin.x - sphere.origin.x, 2) + pow (origin.y - sphere.origin.y, 2) + pow (origin.z - sphere.origin.z, 2) - pow (sphere.radius, 2);
+	Vec3 sphereToRay = origin - sphere.origin;
+	double b = (direction * sphereToRay) * 2.0;
+	double c = sphereToRay * sphereToRay - sphere.radius * sphere.radius;
 	double discriminant = b * b - 4.0 * c;
 	if (IsNegative (discriminant)) {
 		return false;
