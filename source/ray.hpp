@@ -9,15 +9,15 @@ class Ray
 public:
 	Ray (const Vec3& startPoint, const Vec3& rayDirection);
 
-	struct TriangleIntersection
+	struct ShapeIntersection
 	{
-		TriangleIntersection ();
+		ShapeIntersection ();
 
 		Vec3 position;
 		double distance;
 	};
 
-	struct MeshIntersection : public TriangleIntersection
+	struct MeshIntersection : public ShapeIntersection
 	{
 		MeshIntersection ();
 
@@ -34,7 +34,8 @@ public:
 	const Vec3&		GetDirection () const;
 	Vec3			GetReflectedDirection (const Vec3& normal) const;
 
-	bool			GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, TriangleIntersection* intersection) const;
+	bool			GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const;
+	bool			GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, ShapeIntersection* intersection) const;
 	bool			GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const;
 	bool			GetModelIntersection (const Model& model, ModelIntersection* intersection) const;
 

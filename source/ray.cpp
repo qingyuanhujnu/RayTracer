@@ -7,13 +7,13 @@ Ray::Ray (const Vec3& startPoint, const Vec3& rayDirection) :
 {
 }
 
-Ray::TriangleIntersection::TriangleIntersection () :
+Ray::ShapeIntersection::ShapeIntersection () :
 	distance (INF)
 {
 }
 
 Ray::MeshIntersection::MeshIntersection () :
-	TriangleIntersection (),
+	ShapeIntersection (),
 	triangle (InvalidIndex)
 {
 }
@@ -35,7 +35,33 @@ Vec3 Ray::GetReflectedDirection (const Vec3& normal) const
 	return direction + (normal * 2.0 * dotProduct);
 }
 
-bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, TriangleIntersection* intersection) const
+bool Ray::GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const
+{
+	double b = 2.0 * (direction.x * (origin.x - sphere.origin.x) + direction.y * (origin.y - sphere.origin.y) + direction.z * (origin.z - sphere.origin.z));
+	double c = pow (origin.x - sphere.origin.x, 2) + pow (origin.y - sphere.origin.y, 2) + pow (origin.z - sphere.origin.z, 2) - pow (sphere.radius, 2);
+	double discriminant = b * b - 4.0 * c;
+	if (IsNegative (discriminant)) {
+		return false;
+	}
+
+	if (intersection != NULL) {
+		double t = 0;
+		if (IsZero (discriminant)) {
+			t = -b / 2.0;
+		} else {
+			double s = sqrt (b * b - 4.0 * c);
+			t = std::min ((-b + s) / 2.0, (-b - s) / 2.0);
+		}
+
+		if (intersection != NULL) {
+			intersection->distance = t;
+			intersection->position = origin + direction * t;
+		}
+	}
+	return true;
+}
+
+bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, ShapeIntersection* intersection) const
 {
 	// Moller-Trumbore algorithm
 
@@ -81,6 +107,10 @@ bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v
 
 bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const
 {
+	if (!GetSphereIntersection (mesh.GetBoundingSphere (), NULL)) {
+		return false;
+	}
+
 	bool found = false;
 	MeshIntersection minIntersection;
 
