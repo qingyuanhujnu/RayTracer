@@ -131,8 +131,7 @@ Color RayTracer::Shade (const Ray& ray, const Ray::ModelIntersection& intersecti
 	const Vec3& normal = mesh.GetNormal (intersection.triangle, intersection.position);
 
 	Color color;
-	SectorRay shadowRay (intersection.position, light.GetPosition ());
-	if (!shadowRay.GetModelIntersection (model, NULL)) {
+	if (!IsInShadow (intersection.position)) {
 		color += GetPhongShading (material, light, intersection.position, normal);
 	} else {
 		color = material.GetAmbientColor ();
@@ -146,4 +145,10 @@ Color RayTracer::Shade (const Ray& ray, const Ray::ModelIntersection& intersecti
 	}
 
 	return Clamp (color);
+}
+
+bool RayTracer::IsInShadow (const Vec3& position) const
+{
+	SectorRay shadowRay (position, light.GetPosition ());
+	return shadowRay.GetModelIntersection (model, NULL);
 }

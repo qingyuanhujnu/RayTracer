@@ -6,7 +6,7 @@
 class Export
 {
 public:
-	static bool ExportImage (const RayTracer::ResultImage& image, const wchar_t* mimeType);
+	static bool ExportImage (const RayTracer::ResultImage& image, const std::wstring& fileName, const wchar_t* mimeType);
 };
 
 #endif

@@ -25,26 +25,65 @@ static void ConstructDefaultModel (Camera& camera, Light& light, Model& model)
 	Generator::GenerateInsideOutCuboid (model, 12.0, 12.0, 12.0, Vec3 (0.0, 0.0, 6.0), 3);
 }
 
-int main ()
+int wmain (int argc, wchar_t **argv)
 {
-	std::wstring configFileName = L"config01.txt";
+	if (argc != 6) {
+		// development mode
+		std::wstring configFileName = L"config01.txt";
+
+		Camera camera;
+		Light light;
+		Model model;
+		if (DBGERROR (!ConfigFile::Read (configFileName, camera, light, model))) {
+			ConstructDefaultModel (camera, light, model);
+		}
+
+		if (DBGERROR (!model.Check ())) {
+			return 1;
+		}
+
+		RayTracer rayTracer (model, camera, light);
+		RayTracer::Parameters parameters (400, 400, 1.0);
+		RayTracer::ResultImage resultImage;
+		rayTracer.Do (parameters, resultImage);
+	
+		Export::ExportImage (resultImage, L"result.png", L"image/png");
+		return 0;
+	}
+
+	int resolutionX = _wtoi (argv[1]);
+	if (DBGERROR (resolutionX < 0)) {
+		return 1;
+	}
+
+	int resolutionY = _wtoi (argv[2]);
+	if (DBGERROR (resolutionY < 0)) {
+		return 1;
+	}
+
+	double distance = _wtof (argv[3]);
+	if (DBGERROR (!IsPositive (distance))) {
+		return 1;
+	}
+
+	std::wstring configFile (argv[4]);
+	std::wstring resultFile (argv[5]);
 
 	Camera camera;
 	Light light;
 	Model model;
-	if (DBGERROR (!ConfigFile::Read (configFileName, camera, light, model))) {
-		ConstructDefaultModel (camera, light, model);
-	}
-
-	if (DBGERROR (!model.Check ())) {
+	if (DBGERROR (!ConfigFile::Read (configFile, camera, light, model))) {
 		return 1;
 	}
 
 	RayTracer rayTracer (model, camera, light);
-	RayTracer::Parameters parameters (400, 400, 1.0);
-	RayTracer::ResultImage result;
-	rayTracer.Do (parameters, result);
+	RayTracer::Parameters parameters (resolutionX, resolutionY, distance);
+	RayTracer::ResultImage resultImage;
+	rayTracer.Do (parameters, resultImage);
 	
-	Export::ExportImage (result, L"image/png");
+	if (DBGERROR (!Export::ExportImage (resultImage, resultFile, L"image/png"))) {
+		return 1;
+	}	
+
 	return 0;
 }

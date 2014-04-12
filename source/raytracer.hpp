@@ -52,6 +52,8 @@ public:
 private:
 	Color		Trace (const Ray& ray, int depth) const;
 	Color		Shade (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const;
+	
+	bool		IsInShadow (const Vec3& position) const;
 
 	Model		model;
 	Camera		camera;
