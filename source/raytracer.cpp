@@ -103,7 +103,7 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 		int y = pix / resY;
 
 		InfiniteRay cameraRay (camera.GetEye (), image.GetFieldCenter (x, y) - camera.GetEye ());
-		Color fieldColor = RayTrace (cameraRay, 0);
+		Color fieldColor = Trace (cameraRay, 0);
 		result.SetColor (x, y, fieldColor);
 	}
 
@@ -116,24 +116,27 @@ static Vec3 GetReflectedDirection (const Vec3& originalDirection, const Vec3& no
 	return originalDirection + (normal * 2.0 * dotProduct);
 }
 
-Color RayTracer::RayTrace (const Ray& ray, int depth)
+Color RayTracer::Trace (const Ray& ray, int depth) const
 {
-	Color color (0.0, 0.0, 0.0);
-
-	if (depth > 10) {
-		return color;
+	if (depth <= 10) {
+		Ray::ModelIntersection intersection;
+		if (ray.GetModelIntersection (model, &intersection)) {
+			return Shade (ray, intersection, depth);
+		}
 	}
 
-	Ray::ModelIntersection intersection;
-	if (!ray.GetModelIntersection (model, &intersection)) {
-		return color;
-	}
+	Color black (0.0, 0.0, 0.0);
+	return black;
+}
 
+Color RayTracer::Shade (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const
+{
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 	const Material& material = model.GetMaterial (triangle.material);
 	const Vec3& normal = mesh.GetNormal (intersection.triangle, intersection.position);
 
+	Color color;
 	SectorRay shadowRay (intersection.position, light.GetPosition ());
 	if (!shadowRay.GetModelIntersection (model, NULL)) {
 		color += GetPhongShading (material, light, intersection.position, normal);
@@ -144,9 +147,8 @@ Color RayTracer::RayTrace (const Ray& ray, int depth)
 	if (material.IsReflective ()) {
 		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-		Color reflectedColor = RayTrace (reflectedRay, depth + 1);
-		double reflection = material.GetReflection ();
-		color += (reflectedColor * reflection);
+		Color reflectedColor = Trace (reflectedRay, depth + 1);
+		color += reflectedColor * material.GetReflection ();
 	}
 
 	return Clamp (color);

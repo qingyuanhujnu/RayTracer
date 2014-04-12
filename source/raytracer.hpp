@@ -50,7 +50,8 @@ public:
 	bool		Do (const Parameters& parameters, ResultImage& result);
 
 private:
-	Color		RayTrace (const Ray& ray, int depth);
+	Color		Trace (const Ray& ray, int depth) const;
+	Color		Shade (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const;
 
 	Model		model;
 	Camera		camera;
