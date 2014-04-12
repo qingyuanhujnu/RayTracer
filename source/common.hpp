@@ -10,7 +10,7 @@
 
 typedef unsigned int	UIndex;
 
-const UIndex InvalidIndex = (UIndex)-1;
+const UIndex InvalidIndex = (UIndex) -1;
 
 #ifdef DEBUG
 	#include <crtdbg.h>

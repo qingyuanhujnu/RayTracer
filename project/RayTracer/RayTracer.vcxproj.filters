@@ -64,6 +64,9 @@
     <ClCompile Include="..\..\source\vec3.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sphere.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer.hpp">
@@ -109,6 +112,9 @@
       <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\vec3.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sphere.hpp">
       <Filter>Geometry</Filter>
     </ClInclude>
   </ItemGroup>

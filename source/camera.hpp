@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include "Vec3.hpp"
+#include "vec3.hpp"
 
 class Camera
 {
@@ -20,12 +20,12 @@ public:
 	double			GetYFov () const;
 
 private:
-	Vec3	eye;
-	Vec3	center;
-	Vec3	up;
+	Vec3			eye;
+	Vec3			center;
+	Vec3			up;
 	
-	double	xFov;
-	double	yFov;
+	double			xFov;
+	double			yFov;
 };
 
 #endif
