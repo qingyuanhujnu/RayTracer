@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import time
 import shutil
 import filecmp
 
@@ -23,22 +24,32 @@ def EqualFile (aFile, bFile):
 	return filecmp.cmp (aFile, bFile)
 
 def Test (binaryPath, sourceFolder, resultFolder, referenceFolder, configFile):
+	def WriteMessage (message, time):
+		print message + ' (' + str (time) + ')'
+
 	sys.stdout.write (configFile + '...')
-	if RayTrace (binaryPath, sourceFolder, resultFolder, configFile) != 0:
-		print 'ray tracing failed'
+
+	start = time.time ()
+	rayTraceResult = RayTrace (binaryPath, sourceFolder, resultFolder, configFile)
+	end = time.time ()
+	elapsedTime = end - start
+
+	if rayTraceResult != 0:
+		WriteMessage ('ray tracing failed', elapsedTime)
 		return 1
+
 	referenceFile = GetImageFileName (referenceFolder, configFile)
 	resultFile = GetImageFileName (resultFolder, configFile)
 	if not os.path.exists (referenceFile):
-		print 'no reference file'
+		WriteMessage ('no reference file', elapsedTime)
 		return 1
 	if not os.path.exists (resultFile):
-		print 'no result file'
+		WriteMessage ('no result file', elapsedTime)
 		return 1
 	if not EqualFile (referenceFile, resultFile):
-		print 'failed'
+		WriteMessage ('failed', elapsedTime)
 		return 1
-	print 'succeeded'
+	WriteMessage ('succeeded', elapsedTime)
 	return 0
 	
 def Main ():
