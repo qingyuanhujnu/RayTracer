@@ -1,5 +1,6 @@
 #include "image.hpp"
 #include "common.hpp"
+#include "random.hpp"
 
 #include <math.h>
 
@@ -30,5 +31,13 @@ Vec3 Image::GetFieldCenter (int x, int y) const
 	Vec3 result = bottomLeft;
 	result = Offset (result, xDirection, x * fieldWidth + fieldWidth / 2.0);
 	result = Offset (result, yDirection, y * fieldHeight + fieldHeight / 2.0);
+	return result;
+}
+
+Vec3 Image::GetFieldRandom (int x, int y) const
+{
+	Vec3 result = bottomLeft;
+	result = Offset (result, xDirection, x * fieldWidth + fieldWidth * random ());
+	result = Offset (result, yDirection, y * fieldHeight + fieldHeight *random ());
 	return result;
 }

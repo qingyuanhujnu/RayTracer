@@ -11,6 +11,7 @@ public:
 	~Image ();
 
 	Vec3		GetFieldCenter (int x, int y) const;
+	Vec3		GetFieldRandom (int x, int y) const;
 
 private:
 	double		fieldWidth;

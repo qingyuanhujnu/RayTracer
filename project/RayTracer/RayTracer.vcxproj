@@ -27,6 +27,7 @@
     <ClCompile Include="..\..\source\ray.cpp" />
     <ClCompile Include="..\..\source\raytracer.cpp" />
     <ClCompile Include="..\..\source\shading.cpp" />
+    <ClCompile Include="..\..\source\random.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\camera.hpp" />
@@ -44,6 +45,7 @@
     <ClInclude Include="..\..\source\ray.hpp" />
     <ClInclude Include="..\..\source\raytracer.hpp" />
     <ClInclude Include="..\..\source\shading.hpp" />
+    <ClInclude Include="..\..\source\random.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C636F519-F3DF-4CA4-8BAF-C47828C399D4}</ProjectGuid>

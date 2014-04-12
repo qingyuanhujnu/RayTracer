@@ -49,12 +49,30 @@ public:
 
 	bool		Do (const Parameters& parameters, ResultImage& result);
 
-private:
-	Color		RayTrace (const Ray& ray, int depth);
+protected:
+	Color		RayTrace (const Ray& ray, int depth) const;
 
 	Model		model;
 	Camera		camera;
 	Light		light;
+};
+
+
+class PathTracer : public RayTracer {
+public:
+	enum IntersectionType {
+		XNothing,
+		XModel,
+		XLight
+	};
+
+	PathTracer (const Model& model, const Camera& camera, const Light& light) :
+		RayTracer (model, camera, light)
+	{}
+
+	bool				Do (const Parameters& parameters, ResultImage& result);
+	Color				Radiance (const Ray& ray, int depth) const;
+	IntersectionType	RayCast (const Ray& ray, Vec3& isect) const;
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "light.hpp"
 
 Light::Light () :
+	r (0.1),
 	ambient (0.0),
 	diffuse (0.0),
 	specular (0.0)
@@ -63,4 +64,27 @@ Color Light::GetDiffuseColor () const
 Color Light::GetSpecularColor () const
 {
 	return color * specular;
+}
+
+bool Light::Intersect (const Ray& ray, Vec3& isect) const
+{
+	Vec3 op = position - ray.GetOrigin (); // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0 
+
+	double b = op * ray.GetDirection ();
+	double det = b*b - op*op + r*r;		// (b^2 - 4ac)/4
+	if (det < 0)
+		return false;
+	else
+		det = sqrt (det);
+	
+	double t = 0;
+	if (b - det > EPS)
+		t = b - det;
+	else if (b + det > EPS)
+		t = b + det;
+	else
+		return false;
+	
+	isect = ray.GetOrigin () + ray.GetDirection () * t;
+	return true;
 }

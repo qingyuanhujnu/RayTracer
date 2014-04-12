@@ -64,6 +64,9 @@
     <ClCompile Include="..\..\source\vec3.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer.hpp">
@@ -110,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\vec3.hpp">
       <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\random.hpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
