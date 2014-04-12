@@ -27,7 +27,7 @@ static void ConstructDefaultModel (Camera& camera, Light& light, Model& model)
 
 int main ()
 {
-	std::wstring configFileName = L"config03.txt";
+	std::wstring configFileName = L"config01.txt";
 
 	Camera camera;
 	Light light;
@@ -41,7 +41,7 @@ int main ()
 	}
 
 	RayTracer rayTracer (model, camera, light);
-	RayTracer::Parameters parameters (800, 800, 1.0);
+	RayTracer::Parameters parameters (400, 400, 1.0);
 	RayTracer::ResultImage result;
 	rayTracer.Do (parameters, result);
 	

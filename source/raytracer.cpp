@@ -137,6 +137,8 @@ Color RayTracer::RayTrace (const Ray& ray, int depth)
 	SectorRay shadowRay (intersection.position, light.GetPosition ());
 	if (!shadowRay.GetModelIntersection (model, NULL)) {
 		color += GetPhongShading (material, light, intersection.position, normal);
+	} else {
+		color = material.GetAmbientColor ();
 	}
 
 	if (material.IsReflective ()) {
