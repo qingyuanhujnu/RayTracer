@@ -48,7 +48,7 @@ int main ()
 	*/
 
 	PathTracer pathTracer (model, camera, light);
-	PathTracer::Parameters parameters (400, 400, 1.0);
+	PathTracer::Parameters parameters (800, 800, 1.0);
 	PathTracer::ResultImage result;
 	pathTracer.Do (parameters, result);
 	

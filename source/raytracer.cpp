@@ -166,8 +166,9 @@ bool PathTracer::Do (const Parameters& parameters, ResultImage& result)
 	const int procs = omp_get_num_procs ();		// logical cores
 #pragma omp parallel for schedule(dynamic, 4) num_threads (procs - 1)
 	for (int pix = 0; pix < (resX * resY); ++pix) {
+
 		float progress = float (pix) / (resX * resY) * 100;
-		printf ("%f%%\n", progress);
+		printf ("%.3f%%\n", progress);
 
 		int x = pix % resX;
 		int y = pix / resY;
@@ -207,7 +208,9 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	}
 
 	// Diffuse reflection
-	// Get random direction in hemisphere
+	// Get random direction in the hemisphere given by hit surface's normal
+	Color color;
+
 	double r1 = random () * 2 * PI;		// random angle around
 	double r2 = random ();		// distance
 	double r2s = sqrt (r2);
@@ -219,27 +222,28 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Vec3 v = w ^ u;
 	Vec3 randomDir = Normalize (u*cos (r1)*r2s + v*sin (r1)*r2s + w*sqrt (1 - r2));		// Random direction in hemisphere
 
-	// Loop over any lights. This code only works for spherical lights right now but it
-	// could be modified to work with any bound box.
-	Color color;
-	//for (int i = 0; i<lights; i++){		// right now there is only one light
-		// Start a random ray toward light sphere.
-		Vec3 sw = light.GetPosition () - isect.position;
-		Vec3 su = Normalize ((fabs (sw.x) > .1 ? Vec3 (0, 1, 0) : Vec3 (1, 0, 0)) ^ sw);
-		Vec3 sv = sw ^ su;
-		double lr = light.GetR ();
-		double cos_a_max = sqrt (1 - lr*lr / ((isect.position - light.GetPosition ()) * (isect.position -light.GetPosition ())));
-		double eps1 = random (), eps2 = random ();
-		double cos_a = 1 - eps1 + eps1*cos_a_max;
-		double sin_a = sqrt (1 - cos_a*cos_a);
-		double phi = 2 * PI * eps2;
-		Vec3 l = su*cos (phi)*sin_a + sv*sin (phi)*sin_a + sw*cos_a;
-		l = Normalize (l);
-		Vec3 lightIsect;
-		if (RayCast (InfiniteRay (isect.position, l), lightIsect) == PathTracer::XLight) {		// TODO: when we have more than one light we need to know if we hit the one we intended to hit!
-			color += GetPhongShading (material, light, isect.position, normal) * 0.5;
-		}
-	//}
+	{
+		// Loop over any lights. This code only works for spherical lights right now but it could be modified to work with any bound box. 
+		// Note that path tracing works without this but shooting rays towards the light's sphere makes it converge in less samples.
+		//for (int i = 0; i<lights; i++){		// right now there is only one light
+			// Start a random ray toward light sphere.
+			Vec3 sw = light.GetPosition () - isect.position;
+			Vec3 su = Normalize ((fabs (sw.x) > .1 ? Vec3 (0, 1, 0) : Vec3 (1, 0, 0)) ^ sw);
+			Vec3 sv = sw ^ su;
+			double lr = light.GetR ();
+			double cos_a_max = sqrt (1 - lr*lr / ((isect.position - light.GetPosition ()) * (isect.position - light.GetPosition ())));
+			double eps1 = random (), eps2 = random ();
+			double cos_a = 1 - eps1 + eps1*cos_a_max;
+			double sin_a = sqrt (1 - cos_a*cos_a);
+			double phi = 2 * PI * eps2;
+			Vec3 l = su*cos (phi)*sin_a + sv*sin (phi)*sin_a + sw*cos_a;
+			l = Normalize (l);
+			Vec3 lightIsect;
+			if (RayCast (InfiniteRay (isect.position, l), lightIsect) == PathTracer::XLight) {		// TODO: when we have more than one light we need to know if we hit the one we intended to hit!
+				color += GetPhongShading (material, light, isect.position, normal) * 0.5;
+			}
+		//}
+	}
 
 	InfiniteRay shadowRay (isect.position, randomDir);
 	Vec3 shadowISect;
@@ -251,11 +255,21 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 		color += Radiance (shadowRay, depth) * cDiffIntensity * 0.5;
 	}
 
+	// Ideal reflection
+	if (material.IsReflective ()) {
+		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+		InfiniteRay reflectedRay (isect.position, reflectedDirection);
+		Color reflectedColor = Radiance (reflectedRay, depth + 1);
+		double reflection = material.GetReflection ();
+		color += (reflectedColor * reflection);
+	}
+
 	return Clamp (color);
 }
 
 PathTracer::IntersectionType PathTracer::RayCast (const Ray& ray, Vec3& isect) const
 {
+	// Is there a light in ray's path?
 	Vec3 lightIsect;
 	double lightDist = std::numeric_limits<double>::max ();
 	if (light.Intersect (ray, lightIsect)) {
