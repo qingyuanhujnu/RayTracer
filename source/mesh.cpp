@@ -50,9 +50,9 @@ Mesh::~Mesh ()
 
 }
 
-UIndex Mesh::AddVertex (const Vec3& Vec3)
+UIndex Mesh::AddVertex (const Vec3& position)
 {
-	vertices.push_back (Vec3);
+	vertices.push_back (position);
 	return vertices.size () - 1;
 }
 

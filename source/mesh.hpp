@@ -34,7 +34,7 @@ public:
 	Mesh ();
 	~Mesh ();
 
-	UIndex					AddVertex (const Vec3& Vec3);
+	UIndex					AddVertex (const Vec3& position);
 	UIndex					AddTriangle (const Triangle& triangle);
 	void					Finalize ();
 
