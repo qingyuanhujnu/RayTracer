@@ -45,17 +45,21 @@ bool Ray::GetSphereIntersection (const Sphere& sphere, ShapeIntersection* inters
 	}
 
 	if (intersection != NULL) {
-		double t = 0;
+		double distance = 0;
 		if (IsZero (discriminant)) {
-			t = -b / 2.0;
+			distance = -b / 2.0;
 		} else {
 			double s = sqrt (b * b - 4.0 * c);
-			t = std::min ((-b + s) / 2.0, (-b - s) / 2.0);
+			distance = std::min ((-b + s) / 2.0, (-b - s) / 2.0);
+		}
+
+		if (IsLengthReached (distance)) {
+			return false;
 		}
 
 		if (intersection != NULL) {
-			intersection->distance = t;
-			intersection->position = origin + direction * t;
+			intersection->position = origin + direction * distance;
+			intersection->distance = distance;
 		}
 	}
 	return true;
