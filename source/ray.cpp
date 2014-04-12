@@ -29,9 +29,15 @@ const Vec3& Ray::GetDirection () const
 	return direction;
 }
 
+Vec3 Ray::GetReflectedDirection (const Vec3& normal) const
+{
+	double dotProduct = -(normal * direction);
+	return direction + (normal * 2.0 * dotProduct);
+}
+
 bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, TriangleIntersection* intersection) const
 {
-	// Moller–Trumbore algorithm
+	// Moller-Trumbore algorithm
 
 	Vec3 edgeDir1 = v1 - v0;
 	Vec3 edgeDir2 = v2 - v0;

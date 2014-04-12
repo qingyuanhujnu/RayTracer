@@ -110,12 +110,6 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 	return true;
 }
 
-static Vec3 GetReflectedDirection (const Vec3& originalDirection, const Vec3& normal)
-{
-	double dotProduct = -(normal * originalDirection);
-	return originalDirection + (normal * 2.0 * dotProduct);
-}
-
 Color RayTracer::Trace (const Ray& ray, int depth) const
 {
 	if (depth <= 10) {
@@ -145,7 +139,7 @@ Color RayTracer::Shade (const Ray& ray, const Ray::ModelIntersection& intersecti
 	}
 
 	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+		Vec3 reflectedDirection = ray.GetReflectedDirection (normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 		Color reflectedColor = Trace (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();

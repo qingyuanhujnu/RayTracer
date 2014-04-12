@@ -31,7 +31,9 @@ public:
 		UIndex mesh;
 	};
 
-	const Vec3&	GetDirection () const;
+	const Vec3&		GetDirection () const;
+	Vec3			GetReflectedDirection (const Vec3& normal) const;
+
 	bool			GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, TriangleIntersection* intersection) const;
 	bool			GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const;
 	bool			GetModelIntersection (const Model& model, ModelIntersection* intersection) const;
