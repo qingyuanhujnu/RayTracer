@@ -7,15 +7,15 @@ camera
 light
 	position 3.0 3.5 5.5
 	color 1.0 1.0 1.0
-	ambient 1.0
-	diffuse 1.0
+	ambient 0.7
+	diffuse 0.7
 	specular 0.0
 material
 	color 1.0 0.0 0.0
 	ambient 0.2
 	diffuse 0.8
 	specular 1.0
-	reflection 0.7
+	reflection 0.5
 material
 	color 0.0 1.0 0.0
 	ambient 0.2
