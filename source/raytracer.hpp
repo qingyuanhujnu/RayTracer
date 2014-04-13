@@ -50,8 +50,8 @@ public:
 	bool		Do (const Parameters& parameters, ResultImage& result);
 
 private:
-	Color		Trace (const Ray& ray, int depth) const;
-	Color		Shade (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const;
+	Color		RayCast (const Ray& ray, int depth) const;
+	Color		RayTrace (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const;
 	
 	bool		IsInShadow (const Vec3& position) const;
 

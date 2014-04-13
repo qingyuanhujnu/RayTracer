@@ -106,7 +106,7 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 		Image::Field field = image.GetField (x, y);
 		for (int i = 0; i < field.SampleCount (); i++) {
 			InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
-			averageColor = averageColor + Trace (cameraRay, 0);
+			averageColor = averageColor + RayCast (cameraRay, 0);
 		}
 		averageColor = averageColor / (double) field.SampleCount ();
 		result.SetColor (x, y, averageColor);
@@ -115,12 +115,12 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 	return true;
 }
 
-Color RayTracer::Trace (const Ray& ray, int depth) const
+Color RayTracer::RayCast (const Ray& ray, int depth) const
 {
 	if (depth <= 10) {
 		Ray::ModelIntersection intersection;
 		if (ray.GetModelIntersection (model, &intersection)) {
-			return Shade (ray, intersection, depth);
+			return RayTrace (ray, intersection, depth);
 		}
 	}
 
@@ -128,7 +128,7 @@ Color RayTracer::Trace (const Ray& ray, int depth) const
 	return black;
 }
 
-Color RayTracer::Shade (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const
+Color RayTracer::RayTrace (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const
 {
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
@@ -145,7 +145,7 @@ Color RayTracer::Shade (const Ray& ray, const Ray::ModelIntersection& intersecti
 	if (material.IsReflective ()) {
 		Vec3 reflectedDirection = ray.GetReflectedDirection (normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-		Color reflectedColor = Trace (reflectedRay, depth + 1);
+		Color reflectedColor = RayCast (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
 	}
 
