@@ -54,6 +54,15 @@ Color Color::operator* (double scalar) const
 	return result;
 }
 
+Color Color::operator/ (double scalar) const
+{
+	Color result;
+	result.r = r / scalar;
+	result.g = g / scalar;
+	result.b = b / scalar;
+	return result;
+}
+
 Color& Color::operator+= (const Color& color)
 {
 	r += color.r;

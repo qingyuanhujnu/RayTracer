@@ -93,7 +93,7 @@ RayTracer::~RayTracer ()
 
 bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 {
-	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance ());
+	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 3);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 	
 	const int resX = parameters.GetResolutionX ();
@@ -105,60 +105,68 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 		int x = pix % resX;
 		int y = pix / resY;
 
-		InfiniteRay cameraRay (camera.GetEye (), image.GetFieldCenter (x, y) - camera.GetEye ());
-		Color fieldColor = RayTrace (cameraRay, 0);
-		result.SetColor (x, y, fieldColor);
+		Color averageColor (0.0, 0.0, 0.0);
+		Image::Field field = image.GetField (x, y);
+		for (int i = 0; i < field.SampleCount (); i++) {
+			InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
+			averageColor = averageColor + RayCast (cameraRay, 0);
+		}
+		averageColor = averageColor / (double) field.SampleCount ();
+		result.SetColor (x, y, averageColor);
 	}
 
 	return true;
 }
 
-static Vec3 GetReflectedDirection (const Vec3& originalDirection, const Vec3& normal)
+Color RayTracer::RayCast (const Ray& ray, int depth) const
 {
-	double dotProduct = -(normal * originalDirection);
-	return originalDirection + (normal * 2.0 * dotProduct);
+	if (depth <= 10) {
+		Ray::ModelIntersection intersection;
+		if (ray.GetModelIntersection (model, &intersection)) {
+			return RayTrace (ray, intersection, depth);
+		}
+	}
+
+	Color black (0.0, 0.0, 0.0);
+	return black;
 }
 
-Color RayTracer::RayTrace (const Ray& ray, int depth) const
+Color RayTracer::RayTrace (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const
 {
-	Color color (0.0, 0.0, 0.0);
-
-	if (depth > 10) {
-		return color;
-	}
-
-	Ray::ModelIntersection intersection;
-	if (!ray.GetModelIntersection (model, &intersection)) {
-		return color;
-	}
-
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 	const Material& material = model.GetMaterial (triangle.material);
 	const Vec3& normal = mesh.GetNormal (intersection.triangle, intersection.position);
 
-	SectorRay shadowRay (intersection.position, light.GetPosition ());
-	if (!shadowRay.GetModelIntersection (model, NULL)) {
+	Color color;
+	if (!IsInShadow (intersection.position)) {
 		color += GetPhongShading (material, light, intersection.position, normal);
+	} else {
+		color = material.GetAmbientColor ();
 	}
 
 	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+		Vec3 reflectedDirection = ray.GetReflectedDirection (normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-		Color reflectedColor = RayTrace (reflectedRay, depth + 1);
-		double reflection = material.GetReflection ();
-		color += (reflectedColor * reflection);
+		Color reflectedColor = RayCast (reflectedRay, depth + 1);
+		color += reflectedColor * material.GetReflection ();
 	}
 
 	return Clamp (color);
 }
 
+bool RayTracer::IsInShadow (const Vec3& position) const
+{
+	SectorRay shadowRay (position, light.GetPosition ());
+	return shadowRay.GetModelIntersection (model, NULL);
+}
+
 bool PathTracer::Do (const Parameters& parameters, ResultImage& result)
 {
-	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance ());
+	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 1);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
-	const int sampleNum = 8; // per pixel
+	const int sampleNum = 100; // per pixel
 
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
@@ -222,7 +230,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Vec3 v = w ^ u;
 	Vec3 randomDir = Normalize (u*cos (r1)*r2s + v*sin (r1)*r2s + w*sqrt (1 - r2));		// Random direction in hemisphere
 
-	{
+	/*{
 		// Loop over any lights. This code only works for spherical lights right now but it could be modified to work with any bound box. 
 		// Note that path tracing works without this but shooting rays towards the light's sphere makes it converge in less samples.
 		//for (int i = 0; i<lights; i++){		// right now there is only one light
@@ -243,21 +251,21 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 				color += GetPhongShading (material, light, isect.position, normal) * 0.5;
 			}
 		//}
-	}
+	}*/
 
 	InfiniteRay shadowRay (isect.position, randomDir);
 	Vec3 shadowISect;
 	PathTracer::IntersectionType shadowISectType = RayCast (shadowRay, shadowISect);
 
 	if (shadowISectType == PathTracer::XLight) {		// light hit!
-		color += GetPhongShading (material, light, isect.position, normal) * 0.5;
+		color += GetPhongShading (material, light, isect.position, normal);
 	} else if (shadowISectType == PathTracer::XModel) {
-		color += Radiance (shadowRay, depth) * cDiffIntensity * 0.5;
+		color += Radiance (shadowRay, depth) * cDiffIntensity;
 	}
 
 	// Ideal reflection
 	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+		Vec3 reflectedDirection = ray.GetReflectedDirection (normal);
 		InfiniteRay reflectedRay (isect.position, reflectedDirection);
 		Color reflectedColor = Radiance (reflectedRay, depth + 1);
 		double reflection = material.GetReflection ();

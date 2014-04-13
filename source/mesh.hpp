@@ -2,14 +2,14 @@
 #define MESH_HPP
 
 #include "common.hpp"
-#include "Vec3.hpp"
+#include "vec3.hpp"
+#include "sphere.hpp"
 #include <vector>
-
 
 class Mesh
 {
 public:
-	static const UIndex NonCurved = (UIndex)-1;
+	static const UIndex NonCurved = (UIndex) -1;
 
 	class Triangle
 	{
@@ -34,28 +34,31 @@ public:
 	Mesh ();
 	~Mesh ();
 
-	UIndex					AddVertex (const Vec3& Vec3);
+	UIndex					AddVertex (const Vec3& position);
 	UIndex					AddTriangle (const Triangle& triangle);
 	void					Finalize ();
 
 	UIndex					VertexCount () const;
 	UIndex					TriangleCount () const;
 
-	const Vec3&			GetVertex (UIndex index) const;
+	const Vec3&				GetVertex (UIndex index) const;
 	const Triangle&			GetTriangle (UIndex index) const;
 
 	Vec3					GetNormal (UIndex index, const Vec3& coord) const;
+	const Sphere&			GetBoundingSphere () const;
 
 	bool					Check (UIndex materialCount) const;
 
 private:
 	Vec3					CalculateTriangleNormal (UIndex index);
 	void					CalculateVertexNormals ();
+	void					CalculateBoundingSphere ();
 
 	std::vector<Vec3>		vertices;
 	std::vector<Triangle>	triangles;
 	std::vector<Vec3>		triangleNormals;
 	std::vector<Vec3>		vertexNormals;
+	Sphere					boundingSphere;
 };
 
 #endif

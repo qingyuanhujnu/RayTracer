@@ -1,7 +1,7 @@
 #ifndef SHADING_HPP
 #define SHADING_HPP
 
-#include "Vec3.hpp"
+#include "vec3.hpp"
 #include "material.hpp"
 #include "light.hpp"
 

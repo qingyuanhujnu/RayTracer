@@ -1,5 +1,6 @@
 #include "ray.hpp"
 #include "common.hpp"
+#include <algorithm>
 
 Ray::Ray (const Vec3& startPoint, const Vec3& rayDirection) :
 	origin (startPoint),
@@ -7,13 +8,13 @@ Ray::Ray (const Vec3& startPoint, const Vec3& rayDirection) :
 {
 }
 
-Ray::TriangleIntersection::TriangleIntersection () :
+Ray::ShapeIntersection::ShapeIntersection () :
 	distance (INF)
 {
 }
 
 Ray::MeshIntersection::MeshIntersection () :
-	TriangleIntersection (),
+	ShapeIntersection (),
 	triangle (InvalidIndex)
 {
 }
@@ -29,9 +30,46 @@ const Vec3& Ray::GetDirection () const
 	return direction;
 }
 
-bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, TriangleIntersection* intersection) const
+Vec3 Ray::GetReflectedDirection (const Vec3& normal) const
 {
-	// Moller–Trumbore algorithm
+	double dotProduct = -(normal * direction);
+	return direction + (normal * 2.0 * dotProduct);
+}
+
+bool Ray::GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const
+{
+	Vec3 sphereToRay = origin - sphere.origin;
+	double b = (direction * sphereToRay) * 2.0;
+	double c = sphereToRay * sphereToRay - sphere.radius * sphere.radius;
+	double discriminant = b * b - 4.0 * c;
+	if (IsNegative (discriminant)) {
+		return false;
+	}
+
+	if (intersection != NULL) {
+		double distance = 0;
+		if (IsZero (discriminant)) {
+			distance = -b / 2.0;
+		} else {
+			double s = sqrt (b * b - 4.0 * c);
+			distance = std::min ((-b + s) / 2.0, (-b - s) / 2.0);
+		}
+
+		if (IsLengthReached (distance)) {
+			return false;
+		}
+
+		if (intersection != NULL) {
+			intersection->position = origin + direction * distance;
+			intersection->distance = distance;
+		}
+	}
+	return true;
+}
+
+bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, ShapeIntersection* intersection) const
+{
+	// Moller-Trumbore algorithm
 
 	Vec3 edgeDir1 = v1 - v0;
 	Vec3 edgeDir2 = v2 - v0;
@@ -75,6 +113,10 @@ bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v
 
 bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const
 {
+	if (!GetSphereIntersection (mesh.GetBoundingSphere (), NULL)) {
+		return false;
+	}
+
 	bool found = false;
 	MeshIntersection minIntersection;
 

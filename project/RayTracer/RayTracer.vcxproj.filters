@@ -1,121 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Geometry">
-      <UniqueIdentifier>{3a80260c-fac7-4a48-aad1-05ec8af78324}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RayTracer">
-      <UniqueIdentifier>{04f62679-124d-493b-8547-6771a3139d6e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Common">
-      <UniqueIdentifier>{8715a19b-2979-48aa-b4c2-8e965d38c99a}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="..\..\source\camera.cpp" />
+    <ClCompile Include="..\..\source\color.cpp" />
+    <ClCompile Include="..\..\source\common.cpp" />
+    <ClCompile Include="..\..\source\configfile.cpp" />
+    <ClCompile Include="..\..\source\sphere.cpp" />
+    <ClCompile Include="..\..\source\vec3.cpp" />
+    <ClCompile Include="..\..\source\export.cpp" />
+    <ClCompile Include="..\..\source\generator.cpp" />
+    <ClCompile Include="..\..\source\mesh.cpp" />
+    <ClCompile Include="..\..\source\image.cpp" />
+    <ClCompile Include="..\..\source\light.cpp" />
+    <ClCompile Include="..\..\source\main.cpp" />
+    <ClCompile Include="..\..\source\material.cpp" />
+    <ClCompile Include="..\..\source\model.cpp" />
+    <ClCompile Include="..\..\source\ray.cpp" />
+    <ClCompile Include="..\..\source\raytracer.cpp" />
+    <ClCompile Include="..\..\source\shading.cpp" />
+    <ClCompile Include="..\..\source\random.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\raytracer.cpp">
-      <Filter>RayTracer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\camera.cpp">
-      <Filter>RayTracer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\image.cpp">
-      <Filter>RayTracer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\ray.cpp">
-      <Filter>RayTracer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\material.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\light.cpp">
-      <Filter>RayTracer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\color.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\shading.cpp">
-      <Filter>RayTracer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\common.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\export.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\configfile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\generator.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\mesh.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\model.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\vec3.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\random.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\source\raytracer.hpp">
-      <Filter>RayTracer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\camera.hpp">
-      <Filter>RayTracer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\image.hpp">
-      <Filter>RayTracer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\ray.hpp">
-      <Filter>RayTracer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\material.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\light.hpp">
-      <Filter>RayTracer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\color.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\shading.hpp">
-      <Filter>RayTracer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\common.hpp">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\export.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\configfile.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\generator.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\mesh.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\model.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\vec3.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\random.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
+    <ClInclude Include="..\..\source\camera.hpp" />
+    <ClInclude Include="..\..\source\color.hpp" />
+    <ClInclude Include="..\..\source\common.hpp" />
+    <ClInclude Include="..\..\source\configfile.hpp" />
+    <ClInclude Include="..\..\source\sphere.hpp" />
+    <ClInclude Include="..\..\source\vec3.hpp" />
+    <ClInclude Include="..\..\source\export.hpp" />
+    <ClInclude Include="..\..\source\generator.hpp" />
+    <ClInclude Include="..\..\source\mesh.hpp" />
+    <ClInclude Include="..\..\source\image.hpp" />
+    <ClInclude Include="..\..\source\light.hpp" />
+    <ClInclude Include="..\..\source\material.hpp" />
+    <ClInclude Include="..\..\source\model.hpp" />
+    <ClInclude Include="..\..\source\ray.hpp" />
+    <ClInclude Include="..\..\source\raytracer.hpp" />
+    <ClInclude Include="..\..\source\shading.hpp" />
+    <ClInclude Include="..\..\source\random.hpp" />
   </ItemGroup>
 </Project>

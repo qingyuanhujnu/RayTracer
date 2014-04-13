@@ -17,9 +17,9 @@ public:
 	Vec3	operator* (double scalar) const;
 	Vec3	operator/ (double scalar) const;
 
-	double x;
-	double y;
-	double z;
+	double	x;
+	double	y;
+	double	z;
 };
 
 Vec3	Normalize (const Vec3& vec);

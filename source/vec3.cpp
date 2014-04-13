@@ -1,4 +1,4 @@
-#include "Vec3.hpp"
+#include "vec3.hpp"
 #include "common.hpp"
 
 #include <math.h>

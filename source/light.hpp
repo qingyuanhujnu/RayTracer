@@ -1,7 +1,7 @@
 #ifndef LIGHT_HPP
 #define LIGHT_HPP
 
-#include "Vec3.hpp"
+#include "vec3.hpp"
 #include "color.hpp"
 #include "ray.hpp"
 

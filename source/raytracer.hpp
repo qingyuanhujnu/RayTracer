@@ -50,7 +50,10 @@ public:
 	bool		Do (const Parameters& parameters, ResultImage& result);
 
 protected:
-	Color		RayTrace (const Ray& ray, int depth) const;
+	Color		RayTrace (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const;
+	Color		RayCast (const Ray& ray, int depth) const;
+	
+	bool		IsInShadow (const Vec3& position) const;
 
 	Model		model;
 	Camera		camera;

@@ -34,7 +34,7 @@ static bool GetEncoderClassId (const wchar_t* format, CLSID* classId)
 	return false;
 }
 
-bool Export::ExportImage (const RayTracer::ResultImage& image, const wchar_t* mimeType)
+bool Export::ExportImage (const RayTracer::ResultImage& image, const std::wstring& fileName, const wchar_t* mimeType)
 {
 	Gdiplus::GdiplusStartupInput	input;
 	Gdiplus::GdiplusStartupOutput	output;
@@ -60,7 +60,7 @@ bool Export::ExportImage (const RayTracer::ResultImage& image, const wchar_t* mi
 			return false;
 		}
 
-		status = bitmap.Save (L"result.png", &classId);
+		status = bitmap.Save (fileName.c_str (), &classId);
 		if (status != Gdiplus::Ok) {
 			return false;
 		}

@@ -50,9 +50,9 @@ Mesh::~Mesh ()
 
 }
 
-UIndex Mesh::AddVertex (const Vec3& Vec3)
+UIndex Mesh::AddVertex (const Vec3& position)
 {
-	vertices.push_back (Vec3);
+	vertices.push_back (position);
 	return vertices.size () - 1;
 }
 
@@ -77,6 +77,8 @@ void Mesh::Finalize ()
 	if (needVertexNormals) {
 		CalculateVertexNormals ();
 	}
+
+	CalculateBoundingSphere ();
 }
 
 UIndex Mesh::VertexCount () const
@@ -149,6 +151,11 @@ Vec3 Mesh::GetNormal (UIndex index, const Vec3& coord) const
 	return Normalize (normal);
 }
 
+const Sphere& Mesh::GetBoundingSphere () const
+{
+	return boundingSphere;
+}
+
 bool Mesh::Check (UIndex materialCount) const
 {
 	if (DBGERROR (triangles.size () != triangleNormals.size ())) {
@@ -190,6 +197,19 @@ static Vec3 GetAverageNormal (const Mesh& mesh, UIndex baseTriangleIndex, const 
 	return Normalize (averageNormal / averageNormalCount);
 }
 
+Vec3 Mesh::CalculateTriangleNormal (UIndex index)
+{
+	const Triangle& triangle = triangles[index];
+
+	const Vec3& vertex0 = GetVertex (triangle.vertex0);
+	const Vec3& vertex1 = GetVertex (triangle.vertex1);
+	const Vec3& vertex2 = GetVertex (triangle.vertex2);
+
+	Vec3 edgeDir1 = vertex1 - vertex0;
+	Vec3 edgeDir2 = vertex2 - vertex0;
+	return Normalize (edgeDir1 ^ edgeDir2);
+}
+
 void Mesh::CalculateVertexNormals ()
 {
 	vertexNormals.clear ();
@@ -217,15 +237,28 @@ void Mesh::CalculateVertexNormals ()
 	}
 }
 
-Vec3 Mesh::CalculateTriangleNormal (UIndex index)
+void Mesh::CalculateBoundingSphere ()
 {
-	const Triangle& triangle = triangles[index];
+	Vec3 min (INF, INF, INF);
+	Vec3 max (-INF, -INF, -INF);
+	for (UIndex i = 0; i < vertices.size (); i++) {
+		const Vec3& position = vertices[i];
+		if (position.x < min.x) { min.x = position.x; };
+		if (position.y < min.y) { min.y = position.y; };
+		if (position.z < min.z) { min.z = position.z; };
+		if (position.x > max.x) { max.x = position.x; };
+		if (position.y > max.y) { max.y = position.y; };
+		if (position.z > max.z) { max.z = position.z; };
+	}
+	boundingSphere.origin = (min + max) / 2.0;
 
-	const Vec3& vertex0 = GetVertex (triangle.vertex0);
-	const Vec3& vertex1 = GetVertex (triangle.vertex1);
-	const Vec3& vertex2 = GetVertex (triangle.vertex2);
-
-	Vec3 edgeDir1 = vertex1 - vertex0;
-	Vec3 edgeDir2 = vertex2 - vertex0;
-	return Normalize (edgeDir1 ^ edgeDir2);
+	double maxDistance = INF;
+	for (UIndex i = 0; i < vertices.size (); i++) {
+		const Vec3& position = vertices[i];
+		double currentDistance = Distance (position, boundingSphere.origin);
+		if (currentDistance < maxDistance) {
+			maxDistance = currentDistance;
+		}
+	}
+	boundingSphere.radius = maxDistance;
 }
