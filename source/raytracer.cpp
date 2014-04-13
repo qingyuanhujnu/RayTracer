@@ -90,7 +90,7 @@ RayTracer::~RayTracer ()
 
 bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 {
-	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance ());
+	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 3);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 	
 	const int resX = parameters.GetResolutionX ();
@@ -102,9 +102,14 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 		int x = pix % resX;
 		int y = pix / resY;
 
-		InfiniteRay cameraRay (camera.GetEye (), image.GetFieldCenter (x, y) - camera.GetEye ());
-		Color fieldColor = Trace (cameraRay, 0);
-		result.SetColor (x, y, fieldColor);
+		Color averageColor (0.0, 0.0, 0.0);
+		Image::Field field = image.GetField (x, y);
+		for (int i = 0; i < field.SampleCount (); i++) {
+			InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
+			averageColor = averageColor + Trace (cameraRay, 0);
+		}
+		averageColor = averageColor / (double) field.SampleCount ();
+		result.SetColor (x, y, averageColor);
 	}
 
 	return true;
