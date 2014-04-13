@@ -1,5 +1,6 @@
 #include "ray.hpp"
 #include "common.hpp"
+#include <algorithm>
 
 Ray::Ray (const Vec3& startPoint, const Vec3& rayDirection) :
 	origin (startPoint),
