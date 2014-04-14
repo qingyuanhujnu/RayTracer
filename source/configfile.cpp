@@ -152,16 +152,18 @@ static bool ReadCuboid (std::wifstream& inputStream, Model& model, Generator::Fa
 {
 	Vec3 size;
 	Vec3 offset;
+	Vec3 rotation;
 	UIndex material;
 
 	if (!ReadNamedVec3 (inputStream, L"size", size)) { return false; }
 	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
 	if (!ReadNamedUIndex (inputStream, L"material", material)) { return false; }
 	
 	if (facing == Generator::Inside) {
-		Generator::GenerateCuboid (model, size.x, size.y, size.z, offset, material);
+		Generator::GenerateCuboid (model, size.x, size.y, size.z, offset, rotation * DEGRAD, material);
 	} else if (facing == Generator::Outside) {
-		Generator::GenerateInsideOutCuboid (model, size.x, size.y, size.z, offset, material);
+		Generator::GenerateInsideOutCuboid (model, size.x, size.y, size.z, offset, rotation * DEGRAD, material);
 	} else {
 		DBGERROR (true);
 	}
@@ -174,15 +176,17 @@ static bool ReadCylinder (std::wifstream& inputStream, Model& model)
 	double height;
 	int segmentation;
 	Vec3 offset;
+	Vec3 rotation;
 	UIndex material;
 
 	if (!ReadNamedDouble (inputStream, L"radius", radius)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"height", height)) { return false; }
 	if (!ReadNamedInteger (inputStream, L"segmentation", segmentation)) { return false; }
 	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
 	if (!ReadNamedUIndex (inputStream, L"material", material)) { return false; }
 	
-	Generator::GenerateCylinder (model, radius, height, segmentation, offset, material);
+	Generator::GenerateCylinder (model, radius, height, segmentation, offset, rotation * DEGRAD, material);
 	return true;
 }
 
@@ -191,14 +195,16 @@ static bool ReadSphere (std::wifstream& inputStream, Model& model)
 	double radius;
 	int segmentation;
 	Vec3 offset;
+	Vec3 rotation;
 	UIndex material;
 
 	if (!ReadNamedDouble (inputStream, L"radius", radius)) { return false; }
 	if (!ReadNamedInteger (inputStream, L"segmentation", segmentation)) { return false; }
 	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
 	if (!ReadNamedUIndex (inputStream, L"material", material)) { return false; }
 	
-	Generator::GenerateSphere (model, radius, segmentation, offset, material);
+	Generator::GenerateSphere (model, radius, segmentation, offset, rotation * DEGRAD, material);
 	return true;
 }
 

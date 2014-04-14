@@ -2,6 +2,7 @@
 #include "ray.hpp"
 #include "image.hpp"
 #include "common.hpp"
+#include "average.hpp"
 #include "shading.hpp"
 #include <omp.h>
 
@@ -102,14 +103,13 @@ bool RayTracer::Do (const Parameters& parameters, ResultImage& result)
 		int x = pix % resX;
 		int y = pix / resY;
 
-		Color averageColor (0.0, 0.0, 0.0);
+		Average<Color> averageColor;
 		Image::Field field = image.GetField (x, y);
 		for (int i = 0; i < field.SampleCount (); i++) {
 			InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
-			averageColor = averageColor + RayCast (cameraRay, 0);
+			averageColor.Add (RayCast (cameraRay, 0));
 		}
-		averageColor = averageColor / (double) field.SampleCount ();
-		result.SetColor (x, y, averageColor);
+		result.SetColor (x, y, averageColor.Get ());
 	}
 
 	return true;

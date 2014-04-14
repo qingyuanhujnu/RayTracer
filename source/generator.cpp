@@ -24,7 +24,7 @@ static void AddTriangle (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex materi
 	mesh.AddTriangle (Mesh::Triangle (a, b, c, material, curveGroup));
 }
 
-static void GenerateCuboidBase (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, UIndex material, Generator::Facing facing)
+static void GenerateCuboidBase (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material, Generator::Facing facing)
 {
 	Mesh mesh;
 
@@ -32,14 +32,14 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 	double y = ySize / 2.0;
 	double z = zSize / 2.0;
 
-	mesh.AddVertex (offset + Vec3 (-x, -y, -z));
-	mesh.AddVertex (offset + Vec3 (x, -y, -z));
-	mesh.AddVertex (offset + Vec3 (x, -y, z));
-	mesh.AddVertex (offset + Vec3 (-x, -y, z));
-	mesh.AddVertex (offset + Vec3 (-x, y, -z));
-	mesh.AddVertex (offset + Vec3 (x, y, -z));
-	mesh.AddVertex (offset + Vec3 (x, y, z));
-	mesh.AddVertex (offset + Vec3 (-x, y, z));
+	mesh.AddVertex (Vec3 (-x, -y, -z));
+	mesh.AddVertex (Vec3 (x, -y, -z));
+	mesh.AddVertex (Vec3 (x, -y, z));
+	mesh.AddVertex (Vec3 (-x, -y, z));
+	mesh.AddVertex (Vec3 (-x, y, -z));
+	mesh.AddVertex (Vec3 (x, y, -z));
+	mesh.AddVertex (Vec3 (x, y, z));
+	mesh.AddVertex (Vec3 (-x, y, z));
 
 	if (facing == Generator::Inside) {
 		AddQuadrangle (mesh, 0, 1, 2, 3, material, Mesh::NonCurved);
@@ -59,18 +59,23 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 		DBGERROR (true);
 	}
 
+	Transformation tr;
+	tr.AppendRotationXYZ (rotation);
+	tr.AppendTranslation (offset);
+	mesh.Transform (tr);
+
 	mesh.Finalize ();
 	model.AddMesh (mesh);
 }
 
-void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, UIndex material)
+void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
-	GenerateCuboidBase (model, xSize, ySize, zSize, offset, material, Inside);
+	GenerateCuboidBase (model, xSize, ySize, zSize, offset, rotation, material, Inside);
 }
 
-void Generator::GenerateInsideOutCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, UIndex material)
+void Generator::GenerateInsideOutCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
-	GenerateCuboidBase (model, xSize, ySize, zSize, offset, material, Outside);
+	GenerateCuboidBase (model, xSize, ySize, zSize, offset, rotation, material, Outside);
 }
 
 static Vec3 CylindricalToCartesian (double radius, double height, double theta)
@@ -82,7 +87,7 @@ static Vec3 CylindricalToCartesian (double radius, double height, double theta)
 	return result;
 };
 
-void Generator::GenerateCylinder (Model& model, double radius, double height, int segmentation, const Vec3& offset, UIndex material)
+void Generator::GenerateCylinder (Model& model, double radius, double height, int segmentation, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
 	Mesh mesh;
 
@@ -90,8 +95,8 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 	double step = 2.0 * PI / segmentation;
 	
 	for (int i = 0; i < segmentation; i++) {
-		mesh.AddVertex (offset + CylindricalToCartesian (radius, height / 2.0, theta));
-		mesh.AddVertex (offset + CylindricalToCartesian (radius, -height / 2.0, theta));
+		mesh.AddVertex (CylindricalToCartesian (radius, height / 2.0, theta));
+		mesh.AddVertex (CylindricalToCartesian (radius, -height / 2.0, theta));
 		theta -= step;
 	}
 
@@ -114,6 +119,11 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 	AddPolygon (mesh, topPolygon, material, Mesh::NonCurved);
 	AddPolygon (mesh, bottomPolygon, material, Mesh::NonCurved);
 
+	Transformation tr;
+	tr.AppendRotationXYZ (rotation);
+	tr.AppendTranslation (offset);
+	mesh.Transform (tr);
+
 	mesh.Finalize ();
 	model.AddMesh (mesh);
 }
@@ -127,7 +137,7 @@ static Vec3 SphericalToCartesian (double radius, double theta, double phi)
 	return result;
 };
 
-void Generator::GenerateSphere (Model& model, double radius, int segmentation, const Vec3& offset, UIndex material)
+void Generator::GenerateSphere (Model& model, double radius, int segmentation, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
 	Mesh mesh;
 
@@ -135,16 +145,16 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 	double step = PI / segmentation;
 	double theta = step;
 
-	UIndex topIndex = mesh.AddVertex (offset + SphericalToCartesian (radius, 0.0, 0.0));
+	UIndex topIndex = mesh.AddVertex (SphericalToCartesian (radius, 0.0, 0.0));
 	for (int i = 1; i < segmentation; i++) {
 		double phi = 0;
 		for (int j = 0; j < circle; j++) {
-			mesh.AddVertex (offset + SphericalToCartesian (radius, theta, phi));
+			mesh.AddVertex (SphericalToCartesian (radius, theta, phi));
 			phi += step;
 		}
 		theta += step;
 	}
-	UIndex bottomIndex = mesh.AddVertex (offset + SphericalToCartesian (-radius, 0.0, 0.0));
+	UIndex bottomIndex = mesh.AddVertex (SphericalToCartesian (-radius, 0.0, 0.0));
 
 	for (int i = 1; i <= segmentation; i++) {
 		if (i == 1) {
@@ -182,6 +192,11 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 			}
 		}
 	}
+
+	Transformation tr;
+	tr.AppendRotationXYZ (rotation);
+	tr.AppendTranslation (offset);
+	mesh.Transform (tr);
 
 	mesh.Finalize ();
 	model.AddMesh (mesh);

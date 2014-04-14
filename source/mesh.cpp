@@ -1,5 +1,6 @@
 #include "mesh.hpp"
 #include "common.hpp"
+#include "average.hpp"
 
 #include <algorithm>
 
@@ -61,6 +62,13 @@ UIndex Mesh::AddTriangle (const Triangle& triangle)
 	triangles.push_back (triangle);
 	triangleNormals.push_back (CalculateTriangleNormal (triangles.size () - 1));
 	return triangles.size () - 1;
+}
+
+void Mesh::Transform (const Transformation& transformation)
+{
+	for (UIndex i = 0; i < vertices.size (); i++) {
+		vertices[i] = transformation.Apply (vertices[i]);
+	}
 }
 
 void Mesh::Finalize ()
@@ -177,9 +185,7 @@ static Vec3 GetAverageNormal (const Mesh& mesh, UIndex baseTriangleIndex, const 
 {
 	UIndex baseCurveGroup = mesh.GetTriangle (baseTriangleIndex).curveGroup;
 
-	Vec3 averageNormal (0.0, 0.0, 0.0);
-	int averageNormalCount = 0;
-
+	Average<Vec3> averageNormal;
 	std::vector<Vec3> foundNormals;
 	for (UIndex i = 0; i < neighbourTriangles.size (); i++) {
 		UIndex currentTriangleIndex = neighbourTriangles[i];
@@ -188,13 +194,12 @@ static Vec3 GetAverageNormal (const Mesh& mesh, UIndex baseTriangleIndex, const 
 			const Vec3& currentNormal = triangleNormals[currentTriangleIndex];
 			std::vector<Vec3>::iterator found = std::find (foundNormals.begin (), foundNormals.end (), currentNormal);
 			if (found == foundNormals.end ()) {
-				averageNormal = averageNormal + currentNormal;
-				averageNormalCount = averageNormalCount + 1;
+				averageNormal.Add (currentNormal);
 				foundNormals.push_back (currentNormal);
 			}
 		}
 	}
-	return Normalize (averageNormal / averageNormalCount);
+	return Normalize (averageNormal.Get ());
 }
 
 Vec3 Mesh::CalculateTriangleNormal (UIndex index)

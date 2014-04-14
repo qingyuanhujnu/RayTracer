@@ -67,6 +67,9 @@
     <ClCompile Include="..\..\source\sphere.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\transformation.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer.hpp">
@@ -115,6 +118,12 @@
       <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sphere.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\average.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\transformation.hpp">
       <Filter>Geometry</Filter>
     </ClInclude>
   </ItemGroup>

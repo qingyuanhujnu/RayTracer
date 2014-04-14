@@ -19,10 +19,11 @@ static void ConstructDefaultModel (Camera& camera, Light& light, Model& model)
 	model.AddMaterial (Material (Color (0.0, 0.0, 1.0), 0.2, 0.8, 0.0, 0.0));
 	model.AddMaterial (Material (Color (1.0, 1.0, 1.0), 0.2, 0.8, 0.0, 0.0));
 
-	Generator::GenerateCuboid (model, 4.0, 0.1, 3.0, Vec3 (0.5, -0.6, 1.5), 0);
-	Generator::GenerateCuboid (model, 1.2, 1.2, 1.8, Vec3 (-1.0, 1.4, 0.9), 1);
-	Generator::GenerateCuboid (model, 1.2, 1.2, 1.2, Vec3 (1.0, 1.4, 0.6), 2);
-	Generator::GenerateInsideOutCuboid (model, 12.0, 12.0, 12.0, Vec3 (0.0, 0.0, 6.0), 3);
+	Vec3 rotation;
+	Generator::GenerateCuboid (model, 4.0, 0.1, 3.0, Vec3 (0.5, -0.6, 1.5), rotation, 0);
+	Generator::GenerateCuboid (model, 1.2, 1.2, 1.8, Vec3 (-1.0, 1.4, 0.9), rotation, 1);
+	Generator::GenerateCuboid (model, 1.2, 1.2, 1.2, Vec3 (1.0, 1.4, 0.6), rotation, 2);
+	Generator::GenerateInsideOutCuboid (model, 12.0, 12.0, 12.0, Vec3 (0.0, 0.0, 6.0), rotation, 3);
 }
 
 int wmain (int argc, wchar_t **argv)

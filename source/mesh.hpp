@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 #include "vec3.hpp"
+#include "transformation.hpp"
 #include "sphere.hpp"
 #include <vector>
 
@@ -36,6 +37,8 @@ public:
 
 	UIndex					AddVertex (const Vec3& position);
 	UIndex					AddTriangle (const Triangle& triangle);
+	void					Transform (const Transformation& transformation);
+
 	void					Finalize ();
 
 	UIndex					VertexCount () const;
