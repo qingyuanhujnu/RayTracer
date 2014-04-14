@@ -16,6 +16,9 @@ public:
 
 	Color&	operator+= (const Color& color);
 
+	bool	operator== (const Color& color) const;
+	bool	operator!= (const Color& color) const;
+
 	double	r;
 	double	g;
 	double	b;

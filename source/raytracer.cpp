@@ -166,7 +166,7 @@ bool PathTracer::Do (const Parameters& parameters, ResultImage& result)
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 1);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
-	const int sampleNum = 100; // per pixel
+	const int sampleNum = 128; // per pixel
 
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
@@ -182,10 +182,17 @@ bool PathTracer::Do (const Parameters& parameters, ResultImage& result)
 		int y = pix / resY;
 
 		Color fieldColor;
+		int hitCount = 0;
 		for (int s = 0; s < sampleNum; ++s) {
 			InfiniteRay cameraRay (camera.GetEye (), image.GetFieldRandom (x, y) - camera.GetEye ());
-			fieldColor += Clamp (Radiance (cameraRay, 0) * (1.0 / sampleNum));
+			Color color = Clamp (Radiance (cameraRay, 0));
+			if (color != Color (0.0, 0.0, 0.0)) {
+				fieldColor += color;
+				++hitCount;
+			}
 		}
+		if (hitCount > 0)
+			fieldColor = fieldColor / hitCount;
 		result.SetColor (x, y, fieldColor);
 	}
 
@@ -220,7 +227,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Color color;
 
 	double r1 = random () * 2 * PI;		// random angle around
-	double r2 = random ();		// distance
+	double r2 = randomNormalDistrib ();		// distance that is weighted towards normals direction
 	double r2s = sqrt (r2);
 
 	Vec3 w = normal;
@@ -230,7 +237,8 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Vec3 v = w ^ u;
 	Vec3 randomDir = Normalize (u*cos (r1)*r2s + v*sin (r1)*r2s + w*sqrt (1 - r2));		// Random direction in hemisphere
 
-	/*{
+	/*
+	{
 		// Loop over any lights. This code only works for spherical lights right now but it could be modified to work with any bound box. 
 		// Note that path tracing works without this but shooting rays towards the light's sphere makes it converge in less samples.
 		//for (int i = 0; i<lights; i++){		// right now there is only one light
@@ -248,7 +256,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 			l = Normalize (l);
 			Vec3 lightIsect;
 			if (RayCast (InfiniteRay (isect.position, l), lightIsect) == PathTracer::XLight) {		// TODO: when we have more than one light we need to know if we hit the one we intended to hit!
-				color += GetPhongShading (material, light, isect.position, normal) * 0.5;
+				color += GetPhongShading (material, light, isect.position, normal);
 			}
 		//}
 	}*/

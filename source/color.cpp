@@ -71,6 +71,16 @@ Color& Color::operator+= (const Color& color)
 	return *this;
 }
 
+bool Color::operator== (const Color& color) const
+{
+	return r == color.r && g == color.g && b == color.b;
+}
+
+bool Color::operator!= (const Color& color) const
+{
+	return !this->operator== (color);
+}
+
 static double ClampValue (double val)
 {
 	if (val < 0.0) {

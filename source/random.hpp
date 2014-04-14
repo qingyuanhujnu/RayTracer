@@ -3,4 +3,6 @@
 
 double random ();
 
+double randomNormalDistrib ();
+
 #endif
