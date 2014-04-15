@@ -73,6 +73,9 @@
     <ClCompile Include="..\..\source\raytracer\interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\raytracer\renderer.cpp">
+      <Filter>RayTracer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer\raytracer.hpp">
@@ -131,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\raytracer\interface.hpp">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\raytracer\renderer.hpp">
+      <Filter>RayTracer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
