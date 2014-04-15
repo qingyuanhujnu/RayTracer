@@ -4,14 +4,30 @@
 
 typedef bool (*RayTraceFunction) (const wchar_t* configFile, const wchar_t* resultFile, int resolutionX, int resolutionY, double distance);
 
+class LibraryGuard
+{
+public:
+	LibraryGuard (const wchar_t* name)
+	{
+		module = LoadLibrary (name);
+	}
+
+	~LibraryGuard ()
+	{
+		FreeLibrary (module);
+	}
+
+	HMODULE module;
+};
+
 int wmain (int argc, wchar_t **argv)
 {
-	HMODULE rayTracerModule = LoadLibrary (L"RayTracer.dll");
-	if (rayTracerModule == NULL) {
+	LibraryGuard rayTracerModule (L"RayTracer.dll");
+	if (rayTracerModule.module == NULL) {
 		return 1;
 	}
 
-	RayTraceFunction rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule, "RayTrace");
+	RayTraceFunction rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "RayTrace");
 	if (rayTraceFunction == NULL) {
 		return 1;
 	}
