@@ -1,7 +1,7 @@
 #include "light.hpp"
 
 Light::Light () :
-	r (1.5),
+	r (2.0),
 	ambient (0.0),
 	diffuse (0.0),
 	specular (0.0)

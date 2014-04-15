@@ -29,7 +29,7 @@ int wmain (int argc, wchar_t **argv)
 {
 	if (argc != 6) {
 		// development mode
-		std::wstring configFileName = L"config01.txt";
+		std::wstring configFileName = L"config02.txt";
 
 		Camera camera;
 		Light light;

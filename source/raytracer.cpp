@@ -166,7 +166,7 @@ bool PathTracer::Do (const Parameters& parameters, ResultImage& result)
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 1);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
-	const int sampleNum = 128; // per pixel
+	const int sampleNum = 8; // per pixel
 
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
@@ -182,17 +182,11 @@ bool PathTracer::Do (const Parameters& parameters, ResultImage& result)
 		int y = pix / resY;
 
 		Color fieldColor;
-		int hitCount = 0;
 		for (int s = 0; s < sampleNum; ++s) {
 			InfiniteRay cameraRay (camera.GetEye (), image.GetFieldRandom (x, y) - camera.GetEye ());
 			Color color = Clamp (Radiance (cameraRay, 0));
-			if (color != Color (0.0, 0.0, 0.0)) {
-				fieldColor += color;
-				++hitCount;
-			}
+			fieldColor += (color / sampleNum);
 		}
-		if (hitCount > 0)
-			fieldColor = fieldColor / hitCount;
 		result.SetColor (x, y, fieldColor);
 	}
 
@@ -237,7 +231,6 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Vec3 v = w ^ u;
 	Vec3 randomDir = Normalize (u*cos (r1)*r2s + v*sin (r1)*r2s + w*sqrt (1 - r2));		// Random direction in hemisphere
 
-	/*
 	{
 		// Loop over any lights. This code only works for spherical lights right now but it could be modified to work with any bound box. 
 		// Note that path tracing works without this but shooting rays towards the light's sphere makes it converge in less samples.
@@ -247,7 +240,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 			Vec3 su = Normalize ((fabs (sw.x) > .1 ? Vec3 (0, 1, 0) : Vec3 (1, 0, 0)) ^ sw);
 			Vec3 sv = sw ^ su;
 			double lr = light.GetR ();
-			double cos_a_max = sqrt (1 - lr*lr / ((isect.position - light.GetPosition ()) * (isect.position - light.GetPosition ())));
+			double cos_a_max = sqrt (1 - lr*lr / ((isect.position - light.GetPosition ()) * (isect.position - light.GetPosition ())));		// angle of the cone in which we see the light
 			double eps1 = random (), eps2 = random ();
 			double cos_a = 1 - eps1 + eps1*cos_a_max;
 			double sin_a = sqrt (1 - cos_a*cos_a);
@@ -256,10 +249,11 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 			l = Normalize (l);
 			Vec3 lightIsect;
 			if (RayCast (InfiniteRay (isect.position, l), lightIsect) == PathTracer::XLight) {		// TODO: when we have more than one light we need to know if we hit the one we intended to hit!
-				color += GetPhongShading (material, light, isect.position, normal);
+				double omega = 2 * PI * (1 - cos_a_max);
+				color += GetPhongShading (material, light, isect.position, normal) * omega * INV_PI;
 			}
 		//}
-	}*/
+	}
 
 	InfiniteRay shadowRay (isect.position, randomDir);
 	Vec3 shadowISect;
