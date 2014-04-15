@@ -11,44 +11,46 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\camera.cpp" />
-    <ClCompile Include="..\..\source\color.cpp" />
-    <ClCompile Include="..\..\source\common.cpp" />
-    <ClCompile Include="..\..\source\configfile.cpp" />
-    <ClCompile Include="..\..\source\transformation.cpp" />
-    <ClCompile Include="..\..\source\sphere.cpp" />
-    <ClCompile Include="..\..\source\vec3.cpp" />
-    <ClCompile Include="..\..\source\export.cpp" />
-    <ClCompile Include="..\..\source\generator.cpp" />
-    <ClCompile Include="..\..\source\mesh.cpp" />
-    <ClCompile Include="..\..\source\image.cpp" />
-    <ClCompile Include="..\..\source\light.cpp" />
-    <ClCompile Include="..\..\source\main.cpp" />
-    <ClCompile Include="..\..\source\material.cpp" />
-    <ClCompile Include="..\..\source\model.cpp" />
-    <ClCompile Include="..\..\source\ray.cpp" />
-    <ClCompile Include="..\..\source\raytracer.cpp" />
-    <ClCompile Include="..\..\source\shading.cpp" />
+    <ClCompile Include="..\..\source\raytracer\camera.cpp" />
+    <ClCompile Include="..\..\source\raytracer\color.cpp" />
+    <ClCompile Include="..\..\source\raytracer\common.cpp" />
+    <ClCompile Include="..\..\source\raytracer\configfile.cpp" />
+    <ClCompile Include="..\..\source\raytracer\interface.cpp" />
+    <ClCompile Include="..\..\source\raytracer\transformation.cpp" />
+    <ClCompile Include="..\..\source\raytracer\sphere.cpp" />
+    <ClCompile Include="..\..\source\raytracer\vec3.cpp" />
+    <ClCompile Include="..\..\source\raytracer\export.cpp" />
+    <ClCompile Include="..\..\source\raytracer\generator.cpp" />
+    <ClCompile Include="..\..\source\raytracer\mesh.cpp" />
+    <ClCompile Include="..\..\source\raytracer\image.cpp" />
+    <ClCompile Include="..\..\source\raytracer\light.cpp" />
+    <ClCompile Include="..\..\source\raytracer\main.cpp" />
+    <ClCompile Include="..\..\source\raytracer\material.cpp" />
+    <ClCompile Include="..\..\source\raytracer\model.cpp" />
+    <ClCompile Include="..\..\source\raytracer\ray.cpp" />
+    <ClCompile Include="..\..\source\raytracer\raytracer.cpp" />
+    <ClCompile Include="..\..\source\raytracer\shading.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\average.hpp" />
-    <ClInclude Include="..\..\source\camera.hpp" />
-    <ClInclude Include="..\..\source\color.hpp" />
-    <ClInclude Include="..\..\source\common.hpp" />
-    <ClInclude Include="..\..\source\configfile.hpp" />
-    <ClInclude Include="..\..\source\transformation.hpp" />
-    <ClInclude Include="..\..\source\sphere.hpp" />
-    <ClInclude Include="..\..\source\vec3.hpp" />
-    <ClInclude Include="..\..\source\export.hpp" />
-    <ClInclude Include="..\..\source\generator.hpp" />
-    <ClInclude Include="..\..\source\mesh.hpp" />
-    <ClInclude Include="..\..\source\image.hpp" />
-    <ClInclude Include="..\..\source\light.hpp" />
-    <ClInclude Include="..\..\source\material.hpp" />
-    <ClInclude Include="..\..\source\model.hpp" />
-    <ClInclude Include="..\..\source\ray.hpp" />
-    <ClInclude Include="..\..\source\raytracer.hpp" />
-    <ClInclude Include="..\..\source\shading.hpp" />
+    <ClInclude Include="..\..\source\raytracer\average.hpp" />
+    <ClInclude Include="..\..\source\raytracer\camera.hpp" />
+    <ClInclude Include="..\..\source\raytracer\color.hpp" />
+    <ClInclude Include="..\..\source\raytracer\common.hpp" />
+    <ClInclude Include="..\..\source\raytracer\configfile.hpp" />
+    <ClInclude Include="..\..\source\raytracer\interface.hpp" />
+    <ClInclude Include="..\..\source\raytracer\transformation.hpp" />
+    <ClInclude Include="..\..\source\raytracer\sphere.hpp" />
+    <ClInclude Include="..\..\source\raytracer\vec3.hpp" />
+    <ClInclude Include="..\..\source\raytracer\export.hpp" />
+    <ClInclude Include="..\..\source\raytracer\generator.hpp" />
+    <ClInclude Include="..\..\source\raytracer\mesh.hpp" />
+    <ClInclude Include="..\..\source\raytracer\image.hpp" />
+    <ClInclude Include="..\..\source\raytracer\light.hpp" />
+    <ClInclude Include="..\..\source\raytracer\material.hpp" />
+    <ClInclude Include="..\..\source\raytracer\model.hpp" />
+    <ClInclude Include="..\..\source\raytracer\ray.hpp" />
+    <ClInclude Include="..\..\source\raytracer\raytracer.hpp" />
+    <ClInclude Include="..\..\source\raytracer\shading.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C636F519-F3DF-4CA4-8BAF-C47828C399D4}</ProjectGuid>
@@ -56,12 +58,12 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>

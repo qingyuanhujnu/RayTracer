@@ -63,7 +63,7 @@ def Main ():
 	DeleteFolder (resultFolder)
 	CreateFolder (resultFolder)
 	
-	binaryPath = os.path.abspath ('../project/Release/RayTracer.exe')
+	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
 	if not os.path.exists (binaryPath):
 		print 'no release binary found'
 		return

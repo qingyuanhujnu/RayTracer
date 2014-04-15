@@ -3,6 +3,9 @@ project/Release/*
 project/RayTracer/Debug/*
 project/RayTracer/Release/*
 project/RayTracer/*.png
+project/CommandLine/Debug/*
+project/CommandLine/Release/*
+project/CommandLine/*.png
 *.opensdf
 *.sdf
 *.suo
