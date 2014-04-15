@@ -13,3 +13,4 @@ project/UserInterface/obj/*
 *.suo
 *.ipch
 *.vcxproj.user
+*.csproj.user
