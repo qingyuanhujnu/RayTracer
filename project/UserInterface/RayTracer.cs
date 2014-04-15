@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace UserInterface {
 	static class Win32Functions
 	{
-		[DllImport ("RayTracer.dll")]
+		[DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
 		[return: MarshalAs (UnmanagedType.I1)]
 		public static extern bool RayTrace (
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,

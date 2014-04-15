@@ -3,7 +3,7 @@
 #include "raytracer.hpp"
 #include "export.hpp"
 
-bool __stdcall RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resolutionX, int resolutionY, double distance)
+bool RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resolutionX, int resolutionY, double distance)
 {
 	if (DBGERROR (resolutionX < 0)) {
 		return false;
