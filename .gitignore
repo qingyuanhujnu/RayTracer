@@ -6,6 +6,8 @@ project/RayTracer/*.png
 project/CommandLine/Debug/*
 project/CommandLine/Release/*
 project/CommandLine/*.png
+project/UserInterface/bin/*
+project/UserInterface/obj/*
 *.opensdf
 *.sdf
 *.suo
