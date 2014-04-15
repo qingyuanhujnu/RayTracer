@@ -13,5 +13,11 @@ namespace UserInterface {
 		{
 			InitializeComponent ();
 		}
+
+		private void FileMenuOpen_Click (object sender, EventArgs e)
+		{
+			RayTracer rayTracer = new RayTracer ();
+			rayTracer.Do ();
+		}
 	}
 }
