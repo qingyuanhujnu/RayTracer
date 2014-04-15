@@ -24,6 +24,7 @@ def Main ():
 	DeleteReleaseDebug (os.path.join ('..', 'project'))
 	DeleteReleaseDebug (os.path.join ('..', 'project', 'RayTracer'))
 	DeleteReleaseDebug (os.path.join ('..', 'project', 'CommandLine'))
+	DeleteFolder (os.path.join ('..', 'project', 'UserInterface', 'obj'))
 	DeleteFile (os.path.join ('..', 'project', 'RayTracer.sdf'))
 	return
 	
