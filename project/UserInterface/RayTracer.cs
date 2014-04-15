@@ -7,8 +7,14 @@ using System.Runtime.InteropServices;
 namespace UserInterface {
 	static class Win32Functions
 	{
-		[DllImport ("kernel32.dll")]
-		public static extern IntPtr LoadLibrary (string dllToLoad);
+		[DllImport ("RayTracer.dll")]
+		[return: MarshalAs (UnmanagedType.I1)]
+		public static extern bool RayTrace (
+			[MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
+			[MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
+			int resolutionX,
+			int resolutionY,
+			double distance);
 	}
 
 	class RayTracer
@@ -19,7 +25,7 @@ namespace UserInterface {
 
 		public void Do ()
 		{
-			IntPtr rayTracerModule = Win32Functions.LoadLibrary ("RayTracer.dll"); 
+			bool res = Win32Functions.RayTrace ("config01.txt", "result.png", 100, 100, 1.0);
 		}
 	}
 }

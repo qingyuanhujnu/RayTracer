@@ -40,6 +40,7 @@ Global
 		{DD6572C7-EB53-4847-9DBE-7D9034B6BC26}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{DD6572C7-EB53-4847-9DBE-7D9034B6BC26}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{DD6572C7-EB53-4847-9DBE-7D9034B6BC26}.Debug|Win32.ActiveCfg = Debug|x86
+		{DD6572C7-EB53-4847-9DBE-7D9034B6BC26}.Debug|Win32.Build.0 = Debug|x86
 		{DD6572C7-EB53-4847-9DBE-7D9034B6BC26}.Debug|x86.ActiveCfg = Debug|x86
 		{DD6572C7-EB53-4847-9DBE-7D9034B6BC26}.Debug|x86.Build.0 = Debug|x86
 		{DD6572C7-EB53-4847-9DBE-7D9034B6BC26}.Release|Mixed Platforms.ActiveCfg = Release|x86
