@@ -114,9 +114,6 @@ static bool ReadLight (std::wifstream& inputStream, Light& light)
 {
 	Vec3 position;
 	Color color;
-	double ambient;
-	double diffuse;
-	double specular;
 
 	if (!ReadNamedVec3 (inputStream, L"position", position)) { return false; }
 	if (!ReadNamedColor (inputStream, L"color", color)) { return false; }
