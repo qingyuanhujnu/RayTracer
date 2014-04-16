@@ -15,6 +15,7 @@ public:
 
 	const Vec3&		GetPosition () const;
 	const Color&	GetColor () const;
+	double			GetRadius () const;
 
 private:
 	Vec3			position;

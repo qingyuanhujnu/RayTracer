@@ -242,6 +242,7 @@ bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& ligh
 				error = true;
 			}
 		} else {
+			DBGERROR (true);		// other fluff in the file
 			error = true;
 		}
 	}

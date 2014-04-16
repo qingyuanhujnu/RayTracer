@@ -28,3 +28,8 @@ const Color& Light::GetColor () const
 {
 	return color;
 }
+
+double Light::GetRadius () const
+{
+	return 2.0;		// TODO: should this be a constant or come from the config file?
+}

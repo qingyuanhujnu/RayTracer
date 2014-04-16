@@ -1,7 +1,9 @@
 #include "interface.hpp"
 #include "configfile.hpp"
 #include "raytracer.hpp"
+#include "pathtracer.hpp"
 #include "export.hpp"
+#include <memory>
 
 int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resolutionX, int resolutionY, double distance)
 {
@@ -32,10 +34,12 @@ int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resoluti
 		return 2;
 	}
 
-	RayTracer rayTracer (model, camera, light);
-	RayTracer::Parameters parameters (resolutionX, resolutionY, distance);
-	RayTracer::ResultImage resultImage;
-	rayTracer.Render (parameters, resultImage);
+	
+	//std::unique_ptr<Renderer> renderer (new RayTracer (model, camera, light));
+	std::unique_ptr<Renderer> renderer (new PathTracer (model, camera, light));
+	Renderer::Parameters parameters (resolutionX, resolutionY, distance);
+	Renderer::ResultImage resultImage;
+	renderer->Render (parameters, resultImage);	
 	
 	if (DBGERROR (!Export::ExportImage (resultImage, resultFile, L"image/png"))) {
 		return 4;
