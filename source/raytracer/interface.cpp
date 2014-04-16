@@ -3,45 +3,45 @@
 #include "raytracer.hpp"
 #include "export.hpp"
 
-bool RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resolutionX, int resolutionY, double distance)
+int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resolutionX, int resolutionY, double distance)
 {
 	if (DBGERROR (resolutionX < 0)) {
-		return false;
+		return 1;
 	}
 
 	if (DBGERROR (resolutionY < 0)) {
-		return false;
+		return 1;
 	}
 
 	if (DBGERROR (!IsPositive (distance))) {
-		return false;
+		return 1;
 	}
 
 	if (DBGERROR (configFile == NULL)) {
-		return false;
+		return 1;
 	}
 
 	if (DBGERROR (resultFile == NULL)) {
-		return false;
+		return 1;
 	}
 
 	Camera camera;
 	Light light;
 	Model model;
 	if (DBGERROR (!ConfigFile::Read (configFile, camera, light, model))) {
-		return false;
+		return 2;
 	}
 
 	RayTracer rayTracer (model, camera, light);
 	RayTracer::Parameters parameters (resolutionX, resolutionY, distance);
 	RayTracer::ResultImage resultImage;
 	if (!rayTracer.Do (parameters, resultImage)) {
-		return false;
+		return 3;
 	}
 	
 	if (DBGERROR (!Export::ExportImage (resultImage, resultFile, L"image/png"))) {
-		return false;
+		return 4;
 	}	
 
-	return true;
+	return 0;
 }

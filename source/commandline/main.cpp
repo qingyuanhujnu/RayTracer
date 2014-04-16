@@ -64,7 +64,7 @@ int wmain (int argc, wchar_t **argv)
 		return 1;
 	}
 
-	if (!rayTraceFunction (configFile.c_str (), resultFile.c_str (), resolutionX, resolutionY, distance)) {
+	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), resolutionX, resolutionY, distance) != 0) {
 		return 1;
 	}
 	return 0;

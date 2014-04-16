@@ -120,11 +120,8 @@ static bool ReadLight (std::wifstream& inputStream, Light& light)
 
 	if (!ReadNamedVec3 (inputStream, L"position", position)) { return false; }
 	if (!ReadNamedColor (inputStream, L"color", color)) { return false; }
-	if (!ReadNamedDouble (inputStream, L"ambient", ambient)) { return false; }
-	if (!ReadNamedDouble (inputStream, L"diffuse", diffuse)) { return false; }
-	if (!ReadNamedDouble (inputStream, L"specular", specular)) { return false; }
 
-	light.Set (position, color, ambient, diffuse, specular);
+	light.Set (position, color);
 	return true;
 }
 
