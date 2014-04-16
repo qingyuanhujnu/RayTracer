@@ -35,9 +35,7 @@ int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resoluti
 	RayTracer rayTracer (model, camera, light);
 	RayTracer::Parameters parameters (resolutionX, resolutionY, distance);
 	RayTracer::ResultImage resultImage;
-	if (!rayTracer.Do (parameters, resultImage)) {
-		return 3;
-	}
+	rayTracer.Render (parameters, resultImage);
 	
 	if (DBGERROR (!Export::ExportImage (resultImage, resultFile, L"image/png"))) {
 		return 4;
