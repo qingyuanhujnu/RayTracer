@@ -60,7 +60,6 @@ UIndex Mesh::AddVertex (const Vec3& position)
 UIndex Mesh::AddTriangle (const Triangle& triangle)
 {
 	triangles.push_back (triangle);
-	triangleNormals.push_back (CalculateTriangleNormal (triangles.size () - 1));
 	return triangles.size () - 1;
 }
 
@@ -73,13 +72,16 @@ void Mesh::Transform (const Transformation& transformation)
 
 void Mesh::Finalize ()
 {
+	triangleNormals.clear ();
+	vertexNormals.clear ();
+
 	bool needVertexNormals = false;
 	for (UIndex i = 0; i < triangles.size (); i++) {
 		const Triangle& triangle = triangles[i];
 		if (triangle.curveGroup != Mesh::NonCurved) {
 			needVertexNormals = true;
-			break;
 		}
+		triangleNormals.push_back (CalculateTriangleNormal (i));
 	}
 
 	if (needVertexNormals) {
@@ -217,8 +219,6 @@ Vec3 Mesh::CalculateTriangleNormal (UIndex index)
 
 void Mesh::CalculateVertexNormals ()
 {
-	vertexNormals.clear ();
-
 	std::vector<std::vector<UIndex>> vertexToTriangle;
 	vertexToTriangle.resize (vertices.size ());
 
