@@ -14,7 +14,7 @@ void PathTracer::Render (const Parameters& parameters, ResultImage& result)
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 1);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
-	const int sampleNum = 512; // per pixel
+	const int sampleNum = 32; // per pixel
 
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
@@ -81,6 +81,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	{
 		// Loop over any lights. This code only works for spherical lights right now but it could be modified to work with any bound box. 
 		// Note that path tracing works without this but shooting rays towards the light's sphere makes it converge in less samples.
+
 		//for (int i = 0; i<lights; i++){		// right now there is only one light
 		// Start a random ray toward light sphere.
 		Vec3 sw = light.GetPosition () - isect.position;
@@ -96,7 +97,8 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 		l = Normalize (l);
 		Vec3 lightIsect;
 		if (RayCast (InfiniteRay (isect.position, l), lightIsect) == PathTracer::XLight) {		// TODO: when we have more than one light we need to know if we hit the one we intended to hit!
-			color += GetPhongShading (material, light, isect.position, normal) * INV_PI;
+			double omega = 2 * PI * (1 - cos_a_max);
+			color += GetPhongShading (material, light, isect.position, normal) * omega /** INV_PI*/;	// TODO: I need to research BRDF to decide if the 1/PI is needed here or not.
 		}
 		//}
 	}

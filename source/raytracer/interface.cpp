@@ -35,8 +35,8 @@ int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resoluti
 	}
 
 	
-	//std::unique_ptr<Renderer> renderer (new RayTracer (model, camera, light));
-	std::unique_ptr<Renderer> renderer (new PathTracer (model, camera, light));
+	std::unique_ptr<Renderer> renderer (new RayTracer (model, camera, light));
+	//std::unique_ptr<Renderer> renderer (new PathTracer (model, camera, light));
 	Renderer::Parameters parameters (resolutionX, resolutionY, distance);
 	Renderer::ResultImage resultImage;
 	renderer->Render (parameters, resultImage);	
