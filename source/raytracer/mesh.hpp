@@ -36,6 +36,7 @@ public:
 	~Mesh ();
 
 	UIndex					AddVertex (const Vec3& position);
+	void					SetVertex (UIndex index, const Vec3& position);
 	UIndex					AddTriangle (const Triangle& triangle);
 	void					Transform (const Transformation& transformation);
 

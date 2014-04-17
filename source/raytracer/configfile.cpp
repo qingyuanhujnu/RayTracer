@@ -11,6 +11,14 @@ static bool ReadString (std::wifstream& inputStream, std::wstring& val)
 	return false;
 }
 
+static bool ReadNamedString (std::wifstream& inputStream, const std::wstring& name, std::wstring& val)
+{
+	std::wstring readName;
+	if (!ReadString (inputStream, readName) || readName != name) { return false; }
+	if (!ReadString (inputStream, val)) { return false; }
+	return true;
+}
+
 static bool ReadDouble (std::wifstream& inputStream, double& val)
 {
 	if (inputStream >> val) {
@@ -250,6 +258,39 @@ static bool ReadSphere (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
+static bool ReadSolid (std::wifstream& inputStream, Model& model)
+{
+	std::wstring type;
+	double radius;
+	Vec3 offset;
+	Vec3 rotation;
+	UIndex material;
+
+	if (!ReadNamedString (inputStream, L"type", type)) { return false; }
+	if (!ReadNamedDouble (inputStream, L"radius", radius)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
+	if (!ReadNamedUIndex (inputStream, L"material", material)) { return false; }
+	
+	Generator::SolidType solidType;
+	if (type == L"tetrahedron") {
+		solidType = Generator::Tetrahedron;
+	} else if (type == L"hexahedron") {
+		solidType = Generator::Hexahedron;
+	} else if (type == L"octahedron") {
+		solidType = Generator::Octahedron;
+	} else if (type == L"dodecahedron") {
+		solidType = Generator::Dodecahedron;
+	} else if (type == L"icosahedron") {
+		solidType = Generator::Icosahedron;
+	} else {
+		DBGERROR (true);
+		return false;
+	}
+	Generator::GenerateSolid (model, solidType, radius, offset, rotation * DEGRAD, material);
+	return true;
+}
+
 bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& parameters, Camera& camera, Model& model)
 {
 	std::wifstream inputStream (fileName.c_str ());
@@ -298,6 +339,10 @@ bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& param
 			}
 		} else if (commandName == L"sphere") {
 			if (DBGERROR (!ReadSphere (inputStream, model))) {
+				error = true;
+			}
+		} else if (commandName == L"solid") {
+			if (DBGERROR (!ReadSolid (inputStream, model))) {
 				error = true;
 			}
 		} else {
