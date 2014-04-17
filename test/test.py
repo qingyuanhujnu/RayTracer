@@ -74,6 +74,7 @@ def Main ():
 	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, 'config03.txt')
 	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, 'config04.txt')
 	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, 'config05.txt')
+	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, 'config06.txt')
 	
 	if failCount == 0:
 		DeleteFolder (resultFolder)

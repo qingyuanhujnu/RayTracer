@@ -59,6 +59,22 @@ static bool ReadNamedUIndex (std::wifstream& inputStream, const std::wstring& na
 	return true;
 }
 
+static bool ReadVec2 (std::wifstream& inputStream, Vec3& val)
+{
+	if (!ReadDouble (inputStream, val.x)) { return false; }
+	if (!ReadDouble (inputStream, val.y)) { return false; }
+	val.z = 0.0;
+	return true;
+}
+
+static bool ReadNamedVec2 (std::wifstream& inputStream, const std::wstring& name, Vec3& val)
+{
+	std::wstring readName;
+	if (!ReadString (inputStream, readName) || readName != name) { return false; }
+	if (!ReadVec2 (inputStream, val)) { return false; }
+	return true;
+}
+
 static bool ReadVec3 (std::wifstream& inputStream, Vec3& val)
 {
 	if (!ReadDouble (inputStream, val.x)) { return false; }
@@ -158,6 +174,22 @@ static bool ReadMaterial (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
+static bool ReadRectangle (std::wifstream& inputStream, Model& model)
+{
+	Vec3 size;
+	Vec3 offset;
+	Vec3 rotation;
+	UIndex material;
+
+	if (!ReadNamedVec2 (inputStream, L"size", size)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
+	if (!ReadNamedUIndex (inputStream, L"material", material)) { return false; }
+	
+	Generator::GenerateRectangle (model, size.x, size.y, offset, rotation * DEGRAD, material);
+	return true;
+}
+
 static bool ReadCuboid (std::wifstream& inputStream, Model& model, Generator::Facing facing)
 {
 	Vec3 size;
@@ -246,6 +278,10 @@ bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& param
 		} else if (commandName == L"material") {
 			Material material;
 			if (DBGERROR (!ReadMaterial (inputStream, model))) {
+				error = true;
+			}
+		} else if (commandName == L"rectangle") {
+			if (DBGERROR (!ReadRectangle (inputStream, model))) {
 				error = true;
 			}
 		} else if (commandName == L"cuboid") {

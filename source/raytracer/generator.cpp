@@ -68,6 +68,29 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 	model.AddMesh (mesh);
 }
 
+void Generator::GenerateRectangle (Model& model, double xSize, double ySize, const Vec3& offset, const Vec3& rotation, UIndex material)
+{
+	Mesh mesh;
+
+	double x = xSize / 2.0;
+	double y = ySize / 2.0;
+
+	mesh.AddVertex (Vec3 (-x, -y, 0.0));
+	mesh.AddVertex (Vec3 (x, -y, 0.0));
+	mesh.AddVertex (Vec3 (x, y, 0.0));
+	mesh.AddVertex (Vec3 (-x, y, 0.0));
+
+	AddQuadrangle (mesh, 0, 1, 2, 3, material, Mesh::NonCurved);
+
+	Transformation tr;
+	tr.AppendRotationXYZ (rotation);
+	tr.AppendTranslation (offset);
+	mesh.Transform (tr);
+
+	mesh.Finalize ();
+	model.AddMesh (mesh);
+}
+
 void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
 	GenerateCuboidBase (model, xSize, ySize, zSize, offset, rotation, material, Inside);
