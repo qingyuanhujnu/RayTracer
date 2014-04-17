@@ -45,8 +45,8 @@ bool RayTracer::Render (const Parameters& parameters, ResultImage& result)
 Color RayTracer::RayCast (const Ray& ray, int depth) const
 {
 	if (depth <= 10) {
-		Ray::ModelIntersection intersection;
-		if (ray.GetModelIntersection (model, &intersection)) {
+		Ray::ObjectIntersection intersection;
+		if (ray.GetObjectIntersection (model, &intersection)) {
 			return RayTrace (ray, intersection, depth);
 		}
 	}
@@ -55,7 +55,7 @@ Color RayTracer::RayCast (const Ray& ray, int depth) const
 	return black;
 }
 
-Color RayTracer::RayTrace (const Ray& ray, const Ray::ModelIntersection& intersection, int depth) const
+Color RayTracer::RayTrace (const Ray& ray, const Ray::ObjectIntersection& intersection, int depth) const
 {
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
