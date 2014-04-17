@@ -28,7 +28,7 @@ public:
 	bool					Check () const;
 
 private:
-	std::vector<Mesh>		meshes;
+	std::vector<Mesh>		geometry;
 	std::vector<Material>	materials;
 	std::vector<Light>		lights;
 };

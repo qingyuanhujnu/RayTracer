@@ -25,7 +25,7 @@ Ray::LightIntersection::LightIntersection () :
 {
 }
 
-Ray::ObjectIntersection::ObjectIntersection () :
+Ray::GeometryIntersection::GeometryIntersection () :
 	MeshIntersection (),
 	mesh (InvalidIndex)
 {
@@ -159,10 +159,10 @@ bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection)
 	return found;
 }
 
-bool Ray::GetObjectIntersection (const Model& model, ObjectIntersection* intersection) const
+bool Ray::GetGeometryIntersection (const Model& model, GeometryIntersection* intersection) const
 {
 	bool found = false;
-	ObjectIntersection minIntersection;
+	GeometryIntersection minIntersection;
 
 	for (UIndex i = 0; i < model.MeshCount (); i++) {
 		const Mesh& mesh = model.GetMesh (i);
@@ -172,7 +172,7 @@ bool Ray::GetObjectIntersection (const Model& model, ObjectIntersection* interse
 				break;
 			}
 		} else {
-			ObjectIntersection currentIntersection;
+			GeometryIntersection currentIntersection;
 			if (GetMeshIntersection (mesh, &currentIntersection)) {
 				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
 					minIntersection = currentIntersection;
@@ -224,11 +224,11 @@ bool Ray::GetLightIntersection (const Model& model, LightIntersection* intersect
 bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersection) const
 {
 	if (intersection == NULL) {
-		return GetObjectIntersection (model, NULL) || GetLightIntersection (model, NULL);
+		return GetGeometryIntersection (model, NULL) || GetLightIntersection (model, NULL);
 	}
 	else {
 		bool wasIsect = false;
-		wasIsect |= GetObjectIntersection (model, &intersection->objectIntersection);
+		wasIsect |= GetGeometryIntersection (model, &intersection->objectIntersection);
 		wasIsect |= GetLightIntersection (model, &intersection->lightIntersection);
 
 		if (!wasIsect) {
@@ -237,7 +237,7 @@ bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersect
 		}
 
 		intersection->iSectType = intersection->objectIntersection.distance < intersection->lightIntersection.distance ?
-										ModelIntersection::Object :
+										ModelIntersection::Geometry :
 										ModelIntersection::Light;
 	}
 

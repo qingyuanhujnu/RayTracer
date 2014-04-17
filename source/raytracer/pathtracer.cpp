@@ -50,8 +50,8 @@ bool PathTracer::Render (const Parameters& parameters, ResultImage& result)
 // based on smallpt
 Color PathTracer::Radiance (const Ray& ray, int depth) const
 {
-	Ray::ObjectIntersection isect;
-	if (!ray.GetObjectIntersection (model, &isect)) {			// TODO: this is a bug because I need to do a ModelIntersection here
+	Ray::GeometryIntersection isect;
+	if (!ray.GetGeometryIntersection (model, &isect)) {			// TODO: this is a bug because I need to do a ModelIntersection here
 		return Color (0.0, 0.0, 0.0);
 	}
 
@@ -144,8 +144,8 @@ PathTracer::IntersectionType PathTracer::RayCast (const Ray& ray, Vec3& isect) c
 	ray.GetSphereIntersection (lightSphere, &lightIsect);
 
 	// Is anything in the model in ray's path?
-	Ray::ObjectIntersection modelIsect;
-	ray.GetObjectIntersection (model, &modelIsect);
+	Ray::GeometryIntersection modelIsect;
+	ray.GetGeometryIntersection (model, &modelIsect);
 
 	if ((lightIsect.distance < INF) && (lightIsect.distance < modelIsect.distance)) {		// light hit!
 		isect = lightIsect.position;

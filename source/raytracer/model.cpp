@@ -12,8 +12,8 @@ Model::~Model ()
 
 UIndex Model::AddMesh (const Mesh& mesh)
 {
-	meshes.push_back (mesh);
-	return meshes.size () - 1;
+	geometry.push_back (mesh);
+	return geometry.size () - 1;
 }
 
 UIndex Model::AddMaterial (const Material& material)
@@ -30,7 +30,7 @@ UIndex Model::AddLight (const Light& light)
 
 UIndex Model::MeshCount () const
 {
-	return meshes.size ();
+	return geometry.size ();
 }
 
 UIndex Model::MaterialCount () const
@@ -45,7 +45,7 @@ UIndex Model::LightCount () const
 
 const Mesh& Model::GetMesh (UIndex index) const
 {
-	return meshes[index];
+	return geometry[index];
 }
 
 const Material& Model::GetMaterial (UIndex index) const
@@ -61,8 +61,8 @@ const Light& Model::GetLight (UIndex index) const
 bool Model::Check () const
 {
 	UIndex materialCount = materials.size ();
-	for (UIndex i = 0; i < meshes.size (); i++) {
-		if (DBGERROR (!meshes[i].Check (materialCount))) {
+	for (UIndex i = 0; i < geometry.size (); i++) {
+		if (DBGERROR (!geometry[i].Check (materialCount))) {
 			return false;
 		}
 	}
