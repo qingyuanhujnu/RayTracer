@@ -23,7 +23,7 @@ int RayTrace (const wchar_t* configFile, const wchar_t* resultFile)
 	}
 	
 	std::unique_ptr<Renderer> renderer (new RayTracer (model, camera));
-	//std::unique_ptr<Renderer> renderer (new PathTracer (model, camera, light));
+	//std::unique_ptr<Renderer> renderer (new PathTracer (model, camera));
 	Renderer::ResultImage resultImage;
 	if (DBGERROR (!renderer->Render (parameters, resultImage))) {
 		return 3;

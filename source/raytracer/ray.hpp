@@ -49,7 +49,7 @@ public:
 		};
 
 		IntersectionType iSectType;
-		GeometryIntersection objectIntersection;
+		GeometryIntersection geometryIntersection;
 		LightIntersection lightIntersection;
 	};
 

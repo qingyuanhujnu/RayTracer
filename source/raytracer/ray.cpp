@@ -228,7 +228,7 @@ bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersect
 	}
 	else {
 		bool wasIsect = false;
-		wasIsect |= GetGeometryIntersection (model, &intersection->objectIntersection);
+		wasIsect |= GetGeometryIntersection (model, &intersection->geometryIntersection);
 		wasIsect |= GetLightIntersection (model, &intersection->lightIntersection);
 
 		if (!wasIsect) {
@@ -236,7 +236,7 @@ bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersect
 			return false;
 		}
 
-		intersection->iSectType = intersection->objectIntersection.distance < intersection->lightIntersection.distance ?
+		intersection->iSectType = intersection->geometryIntersection.distance < intersection->lightIntersection.distance ?
 										ModelIntersection::Geometry :
 										ModelIntersection::Light;
 	}

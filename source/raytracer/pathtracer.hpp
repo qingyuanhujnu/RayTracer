@@ -12,14 +12,8 @@ public:
 	bool		Render (const Parameters& parameters, ResultImage& result) override;
 
 private:
-	enum IntersectionType {
-		XNothing,
-		XModel,
-		XLight
-	};
-
-	Color				Radiance (const Ray& ray, int depth) const;
-	IntersectionType	RayCast (const Ray& ray, Vec3& isect) const;
+	Color		Radiance (const Ray& ray, int depth) const;
+	Color		RayCastTowardsLights (const Vec3& position, const Vec3& normal, const Material& material) const;
 };
 
 #endif
