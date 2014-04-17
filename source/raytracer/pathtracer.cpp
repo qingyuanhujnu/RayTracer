@@ -4,13 +4,17 @@
 #include "shading.hpp"
 #include <omp.h>
 
-PathTracer::PathTracer (const Model& model, const Camera& camera, const Light& light) :
-	Renderer (model, camera, light)
+PathTracer::PathTracer (const Model& model, const Camera& camera) :
+	Renderer (model, camera)
 {
 }
 
-void PathTracer::Render (const Parameters& parameters, ResultImage& result)
+bool PathTracer::Render (const Parameters& parameters, ResultImage& result)
 {
+	if (DBGERROR (model.LightCount () == 0)) {
+		return false;
+	}
+
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 1);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
@@ -38,6 +42,8 @@ void PathTracer::Render (const Parameters& parameters, ResultImage& result)
 		}
 		result.SetColor (x, y, fieldColor);
 	}
+
+	return true;
 }
 
 // based on smallpt
@@ -54,7 +60,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	const Vec3& normal = mesh.GetNormal (isect.triangle, isect.position);
 
 	Color colDiffuse = material.GetDiffuseColor ();
-	double cDiffIntensity = std::fmax (std::fmax (colDiffuse.r, colDiffuse.g), colDiffuse.b);
+	double cDiffIntensity = std::max (std::max (colDiffuse.r, colDiffuse.g), colDiffuse.b);
 
 	if (++depth > 5) {
 		double p = random ();
@@ -66,6 +72,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	// Diffuse reflection
 	// Get random direction in the hemisphere given by hit surface's normal
 	Color color;
+	const Light& light = model.GetLight (0);
 
 	double r1 = random () * 2 * PI;		// random angle around
 	double r2 = cos (random () * INV_PI * 0.5);		// distance that is weighted towards normals direction
@@ -84,6 +91,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 
 		//for (int i = 0; i<lights; i++){		// right now there is only one light
 		// Start a random ray toward light sphere.
+
 		Vec3 sw = light.GetPosition () - isect.position;
 		Vec3 su = Normalize ((fabs (sw.x) > .1 ? Vec3 (0, 1, 0) : Vec3 (1, 0, 0)) ^ sw);
 		Vec3 sv = sw ^ su;
@@ -130,6 +138,7 @@ PathTracer::IntersectionType PathTracer::RayCast (const Ray& ray, Vec3& isect) c
 {
 	// Is there a light in ray's path?
 	Ray::ShapeIntersection lightIsect;
+	const Light& light = model.GetLight (0);
 	Sphere lightSphere (light.GetPosition (), light.GetRadius ());	
 	ray.GetSphereIntersection (lightSphere, &lightIsect);
 

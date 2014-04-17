@@ -91,6 +91,20 @@ static bool ReadNamedColor (std::wifstream& inputStream, const std::wstring& nam
 	return true;
 }
 
+static bool ReadParameters (std::wifstream& inputStream, Renderer::Parameters& parameters)
+{
+	int resolutionX;
+	int resolutionY;
+	double imageDistance;
+
+	if (!ReadNamedInteger (inputStream, L"xresolution", resolutionX)) { return false; }
+	if (!ReadNamedInteger (inputStream, L"yresolution", resolutionY)) { return false; }
+	if (!ReadNamedDouble (inputStream, L"imagedistance", imageDistance)) { return false; }
+	
+	parameters.Set (resolutionX, resolutionY, imageDistance);
+	return true;
+}
+
 static bool ReadCamera (std::wifstream& inputStream, Camera& camera)
 {
 	Vec3	eye;
@@ -110,7 +124,7 @@ static bool ReadCamera (std::wifstream& inputStream, Camera& camera)
 	return true;
 }
 
-static bool ReadLight (std::wifstream& inputStream, Light& light)
+static bool ReadLight (std::wifstream& inputStream, Model& model)
 {
 	Vec3 position;
 	Color color;
@@ -118,7 +132,9 @@ static bool ReadLight (std::wifstream& inputStream, Light& light)
 	if (!ReadNamedVec3 (inputStream, L"position", position)) { return false; }
 	if (!ReadNamedColor (inputStream, L"color", color)) { return false; }
 
+	Light light;
 	light.Set (position, color);
+	model.AddLight (light);
 	return true;
 }
 
@@ -202,22 +218,29 @@ static bool ReadSphere (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
-bool ConfigFile::Read (const std::wstring& fileName, Camera& camera, Light& light, Model& model)
+bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& parameters, Camera& camera, Model& model)
 {
 	std::wifstream inputStream (fileName.c_str ());
 	if (DBGERROR (!inputStream)) {
 		return false;
 	}
 
+	int version;
+	if (!ReadNamedInteger (inputStream, L"version", version)) { return false; }
+
 	bool error = false;
 	std::wstring commandName;
 	while (!error && ReadString (inputStream, commandName)) {
-		if (commandName == L"camera") {
+		if (commandName == L"parameters") {
+			if (DBGERROR (!ReadParameters (inputStream, parameters))) {
+				return false;
+			}
+		} else if (commandName == L"camera") {
 			if (DBGERROR (!ReadCamera (inputStream, camera))) {
 				error = true;
 			}
 		} else if (commandName == L"light") {
-			if (DBGERROR (!ReadLight (inputStream, light))) {
+			if (DBGERROR (!ReadLight (inputStream, model))) {
 				error = true;
 			}
 		} else if (commandName == L"material") {

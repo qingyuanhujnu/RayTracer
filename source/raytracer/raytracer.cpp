@@ -7,13 +7,17 @@
 #include <omp.h>
 
 
-RayTracer::RayTracer (const Model& model, const Camera& camera, const Light& light) :
-	Renderer (model, camera, light)
+RayTracer::RayTracer (const Model& model, const Camera& camera) :
+	Renderer (model, camera)
 {
 }
 
-void RayTracer::Render (const Parameters& parameters, ResultImage& result)
+bool RayTracer::Render (const Parameters& parameters, ResultImage& result)
 {
+	if (DBGERROR (model.LightCount () == 0)) {
+		return false;
+	}
+
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 3);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 	
@@ -34,6 +38,8 @@ void RayTracer::Render (const Parameters& parameters, ResultImage& result)
 		}
 		result.SetColor (x, y, averageColor.Get ());
 	}
+
+	return true;
 }
 
 Color RayTracer::RayCast (const Ray& ray, int depth) const
@@ -57,7 +63,8 @@ Color RayTracer::RayTrace (const Ray& ray, const Ray::ModelIntersection& interse
 	const Vec3& normal = mesh.GetNormal (intersection.triangle, intersection.position);
 
 	Color color;
-	if (!IsInShadow (intersection.position)) {
+	const Light& light = model.GetLight (0);
+	if (!IsInShadow (intersection.position, light)) {
 		color += GetPhongShading (material, light, intersection.position, normal);
 	} else {
 		color = material.GetAmbientColor ();
@@ -73,7 +80,7 @@ Color RayTracer::RayTrace (const Ray& ray, const Ray::ModelIntersection& interse
 	return Clamp (color);
 }
 
-bool RayTracer::IsInShadow (const Vec3& position) const
+bool RayTracer::IsInShadow (const Vec3& position, const Light& light) const
 {
 	SectorRay shadowRay (position, light.GetPosition ());
 	return shadowRay.GetModelIntersection (model, NULL);

@@ -73,28 +73,27 @@ bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v
 
 	Vec3 edgeDir1 = v1 - v0;
 	Vec3 edgeDir2 = v2 - v0;
-
-	Vec3 p = direction ^ edgeDir2;
-	double determinant = edgeDir1 * p;
+	Vec3 pVector = direction ^ edgeDir2;
+	double determinant = edgeDir1 * pVector;
 	if (!IsPositive (determinant)) {
 		return false;
 	}
 
 	double invDeterminant = 1.0 / determinant;
-	Vec3 originToTriangle = origin - v0;
 
-	double u = (originToTriangle * p) * invDeterminant;
+	Vec3 tVector = origin - v0;
+	double u = (tVector * pVector) * invDeterminant;
 	if (IsLower (u, 0.0) || IsGreater (u, 1.0)) {
 		return false;
 	}
 
-	Vec3 q = originToTriangle ^ edgeDir1;
-	double v = (direction * q) * invDeterminant;
+	Vec3 qVector = tVector ^ edgeDir1;
+	double v = (direction * qVector) * invDeterminant;
 	if (IsLower (v, 0.0) || IsGreater (u + v, 1.0)) {
 		return false;
 	}
  
-	double distance = (edgeDir2 * q) * invDeterminant;
+	double distance = (edgeDir2 * qVector) * invDeterminant;
 	if (!IsPositive (distance)) {
 		return false;
 	}

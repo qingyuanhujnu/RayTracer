@@ -7,9 +7,9 @@
 class PathTracer : public Renderer 
 {
 public:
-	PathTracer (const Model& model, const Camera& camera, const Light& light);
+	PathTracer (const Model& model, const Camera& camera);
 
-	void		Render (const Parameters& parameters, ResultImage& result) override;
+	bool		Render (const Parameters& parameters, ResultImage& result) override;
 
 private:
 	enum IntersectionType {

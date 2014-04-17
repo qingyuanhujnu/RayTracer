@@ -22,6 +22,12 @@ UIndex Model::AddMaterial (const Material& material)
 	return materials.size () - 1;
 }
 
+UIndex Model::AddLight (const Light& light)
+{
+	lights.push_back (light);
+	return lights.size () - 1;
+}
+
 UIndex Model::MeshCount () const
 {
 	return meshes.size ();
@@ -32,6 +38,11 @@ UIndex Model::MaterialCount () const
 	return materials.size ();
 }
 
+UIndex Model::LightCount () const
+{
+	return lights.size ();
+}
+
 const Mesh& Model::GetMesh (UIndex index) const
 {
 	return meshes[index];
@@ -40,6 +51,11 @@ const Mesh& Model::GetMesh (UIndex index) const
 const Material& Model::GetMaterial (UIndex index) const
 {
 	return materials[index];
+}
+
+const Light& Model::GetLight (UIndex index) const
+{
+	return lights[index];
 }
 
 bool Model::Check () const
