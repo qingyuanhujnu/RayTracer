@@ -83,5 +83,5 @@ Color RayTracer::RayTrace (const Ray& ray, const Ray::ObjectIntersection& inters
 bool RayTracer::IsInShadow (const Vec3& position, const Light& light) const
 {
 	SectorRay shadowRay (position, light.GetPosition ());
-	return shadowRay.GetModelIntersection (model, NULL);
+	return shadowRay.GetObjectIntersection (model, NULL);
 }
