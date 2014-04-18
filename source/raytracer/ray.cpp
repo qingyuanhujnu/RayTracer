@@ -19,9 +19,20 @@ Ray::MeshIntersection::MeshIntersection () :
 {
 }
 
-Ray::ModelIntersection::ModelIntersection () :
+Ray::LightIntersection::LightIntersection () :
+	ShapeIntersection (),
+	light (InvalidIndex)
+{
+}
+
+Ray::GeometryIntersection::GeometryIntersection () :
 	MeshIntersection (),
 	mesh (InvalidIndex)
+{
+}
+
+Ray::ModelIntersection::ModelIntersection () :
+	iSectType (Nothing)
 {
 }
 
@@ -73,28 +84,27 @@ bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v
 
 	Vec3 edgeDir1 = v1 - v0;
 	Vec3 edgeDir2 = v2 - v0;
-
-	Vec3 p = direction ^ edgeDir2;
-	double determinant = edgeDir1 * p;
+	Vec3 pVector = direction ^ edgeDir2;
+	double determinant = edgeDir1 * pVector;
 	if (!IsPositive (determinant)) {
 		return false;
 	}
 
 	double invDeterminant = 1.0 / determinant;
-	Vec3 originToTriangle = origin - v0;
 
-	double u = (originToTriangle * p) * invDeterminant;
+	Vec3 tVector = origin - v0;
+	double u = (tVector * pVector) * invDeterminant;
 	if (IsLower (u, 0.0) || IsGreater (u, 1.0)) {
 		return false;
 	}
 
-	Vec3 q = originToTriangle ^ edgeDir1;
-	double v = (direction * q) * invDeterminant;
+	Vec3 qVector = tVector ^ edgeDir1;
+	double v = (direction * qVector) * invDeterminant;
 	if (IsLower (v, 0.0) || IsGreater (u + v, 1.0)) {
 		return false;
 	}
  
-	double distance = (edgeDir2 * q) * invDeterminant;
+	double distance = (edgeDir2 * qVector) * invDeterminant;
 	if (!IsPositive (distance)) {
 		return false;
 	}
@@ -149,10 +159,10 @@ bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection)
 	return found;
 }
 
-bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersection) const
+bool Ray::GetGeometryIntersection (const Model& model, GeometryIntersection* intersection) const
 {
 	bool found = false;
-	ModelIntersection minIntersection;
+	GeometryIntersection minIntersection;
 
 	for (UIndex i = 0; i < model.MeshCount (); i++) {
 		const Mesh& mesh = model.GetMesh (i);
@@ -162,7 +172,7 @@ bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersect
 				break;
 			}
 		} else {
-			ModelIntersection currentIntersection;
+			GeometryIntersection currentIntersection;
 			if (GetMeshIntersection (mesh, &currentIntersection)) {
 				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
 					minIntersection = currentIntersection;
@@ -177,6 +187,61 @@ bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersect
 		*intersection = minIntersection;
 	}
 	return found;
+}
+
+bool Ray::GetLightIntersection (const Model& model, LightIntersection* intersection) const
+{
+	bool found = false;
+	LightIntersection minIntersection;
+
+	for (UIndex i = 0; i < model.LightCount (); i++) {
+		const Light& light = model.GetLight (i);
+		Sphere sphere (light.GetPosition (), light.GetRadius ());
+		if (intersection == NULL) {
+			if (GetSphereIntersection (sphere, NULL)) {
+				found = true;
+				break;
+			}
+		}
+		else {
+			LightIntersection currentIntersection;
+			if (GetSphereIntersection (sphere, &currentIntersection)) {
+				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
+					minIntersection = currentIntersection;
+					minIntersection.light = i;
+					found = true;
+				}
+			}
+		}
+	}
+
+	if (found && intersection != NULL) {
+		*intersection = minIntersection;
+	}
+	return found;
+}
+
+bool Ray::GetModelIntersection (const Model& model, ModelIntersection* intersection) const
+{
+	if (intersection == NULL) {
+		return GetGeometryIntersection (model, NULL) || GetLightIntersection (model, NULL);
+	}
+	else {
+		bool wasIsect = false;
+		wasIsect |= GetGeometryIntersection (model, &intersection->geometryIntersection);
+		wasIsect |= GetLightIntersection (model, &intersection->lightIntersection);
+
+		if (!wasIsect) {
+			intersection->iSectType = ModelIntersection::Nothing;
+			return false;
+		}
+
+		intersection->iSectType = intersection->geometryIntersection.distance < intersection->lightIntersection.distance ?
+										ModelIntersection::Geometry :
+										ModelIntersection::Light;
+	}
+
+	return true;
 }
 
 SectorRay::SectorRay (const Vec3& startPoint, const Vec3& endPoint) :

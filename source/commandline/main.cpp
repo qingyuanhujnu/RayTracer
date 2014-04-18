@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-typedef bool (*RayTraceFunction) (const wchar_t* configFile, const wchar_t* resultFile, int resolutionX, int resolutionY, double distance);
+typedef bool (*RayTraceFunction) (const wchar_t* configFile, const wchar_t* resultFile);
 
 class LibraryGuard
 {
@@ -32,39 +32,24 @@ int wmain (int argc, wchar_t **argv)
 		return 1;
 	}
 
-	if (argc != 6) {
+	if (argc != 3) {
 		// development mode
 		std::wstring configFileName = L"config01.txt";
-		rayTraceFunction (L"config01.txt", L"result.png", 400, 400, 1.0);
+		rayTraceFunction (L"config01.txt", L"result.png");
 		return 1;
 	}
 
-	int resolutionX = _wtoi (argv[1]);
-	if (resolutionX < 0) {
-		return 1;
-	}
-
-	int resolutionY = _wtoi (argv[2]);
-	if (resolutionY < 0) {
-		return 1;
-	}
-
-	double distance = _wtof (argv[3]);
-	if (distance <= 0) {
-		return 1;
-	}
-
-	std::wstring configFile (argv[4]);
+	std::wstring configFile (argv[1]);
 	if (configFile.empty ()) {
 		return 1;
 	}
 
-	std::wstring resultFile (argv[5]);
+	std::wstring resultFile (argv[2]);
 	if (resultFile.empty ()) {
 		return 1;
 	}
 
-	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), resolutionX, resolutionY, distance) != 0) {
+	if (rayTraceFunction (configFile.c_str (), resultFile.c_str ()) != 0) {
 		return 1;
 	}
 	return 0;

@@ -1,16 +1,25 @@
 #include "renderer.hpp"
 
-Renderer::Parameters::Parameters (int resolutionX, int resolutionY, double imageDistance) :
-resolutionX (resolutionX),
-resolutionY (resolutionY),
-imageDistance (imageDistance)
+Renderer::Parameters::Parameters ()
 {
+	Set (100, 100, 1.0);
+}
 
+Renderer::Parameters::Parameters (int resolutionX, int resolutionY, double imageDistance)
+{
+	Set (resolutionX, resolutionY, imageDistance);
 }
 
 Renderer::Parameters::~Parameters ()
 {
 
+}
+
+void Renderer::Parameters::Set (int resolutionX, int resolutionY, double imageDistance)
+{
+	this->resolutionX = resolutionX;
+	this->resolutionY = resolutionY;
+	this->imageDistance = imageDistance;
 }
 
 int Renderer::Parameters::GetResolutionX () const
@@ -70,10 +79,9 @@ const Color& Renderer::ResultImage::GetColor (int x, int y) const
 	return image[y * resolutionX + x];
 }
 
-Renderer::Renderer (const Model& model, const Camera& camera, const Light& light) :
+Renderer::Renderer (const Model& model, const Camera& camera) :
 	model (model),
-	camera (camera),
-	light (light)
+	camera (camera)
 {
 }
 

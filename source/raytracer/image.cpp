@@ -1,5 +1,6 @@
 #include "image.hpp"
 #include "common.hpp"
+#include "random.hpp"
 
 #include <math.h>
 
@@ -26,6 +27,14 @@ Vec3 Image::Field::GetSample (int index) const
 	Vec3 result = fieldBottomLeft;
 	result = Offset (result, xDirection, x * sampleWidth + sampleWidth / 2.0);
 	result = Offset (result, yDirection, y * sampleHeight + sampleHeight / 2.0);
+	return result;
+}
+
+Vec3 Image::Field::GetRandomSample () const
+{
+	Vec3 result = fieldBottomLeft;
+	result = Offset (result, xDirection, sampleRes * sampleWidth * random ());
+	result = Offset (result, yDirection, sampleRes * sampleHeight *random ());
 	return result;
 }
 

@@ -24,11 +24,33 @@ public:
 		UIndex triangle;
 	};
 
-	struct ModelIntersection : public MeshIntersection
+	struct LightIntersection : public ShapeIntersection
+	{
+		LightIntersection ();
+
+		UIndex light;
+	};
+
+	struct GeometryIntersection : public MeshIntersection
+	{
+		GeometryIntersection ();
+
+		UIndex mesh;
+	};
+
+	struct ModelIntersection 
 	{
 		ModelIntersection ();
 
-		UIndex mesh;
+		enum IntersectionType {
+			Light,
+			Geometry,
+			Nothing
+		};
+
+		IntersectionType iSectType;
+		GeometryIntersection geometryIntersection;
+		LightIntersection lightIntersection;
 	};
 
 	const Vec3&		GetDirection () const;
@@ -37,6 +59,8 @@ public:
 	bool			GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const;
 	bool			GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, ShapeIntersection* intersection) const;
 	bool			GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const;
+	bool			GetGeometryIntersection (const Model& model, GeometryIntersection* intersection) const;
+	bool			GetLightIntersection (const Model& model, LightIntersection* intersection) const;
 	bool			GetModelIntersection (const Model& model, ModelIntersection* intersection) const;
 
 protected:

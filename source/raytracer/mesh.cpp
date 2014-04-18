@@ -57,6 +57,11 @@ UIndex Mesh::AddVertex (const Vec3& position)
 	return vertices.size () - 1;
 }
 
+void Mesh::SetVertex (UIndex index, const Vec3& position)
+{
+	vertices[index] = position;
+}
+
 UIndex Mesh::AddTriangle (const Triangle& triangle)
 {
 	triangles.push_back (triangle);

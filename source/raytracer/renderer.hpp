@@ -11,8 +11,11 @@ public:
 	class Parameters
 	{
 	public:
+		Parameters ();
 		Parameters (int resolutionX, int resolutionY, double imageDistance);
 		~Parameters ();
+
+		void	Set (int resolutionX, int resolutionY, double imageDistance);
 
 		int		GetResolutionX () const;
 		int		GetResolutionY () const;
@@ -43,15 +46,14 @@ public:
 		std::vector<Color>	image;
 	};
 
-	Renderer (const Model& model, const Camera& camera, const Light& light);
+	Renderer (const Model& model, const Camera& camera);
 	virtual ~Renderer ();
 
-	virtual void	Render (const Parameters& parameters, ResultImage& result) = 0;
+	virtual bool	Render (const Parameters& parameters, ResultImage& result) = 0;
 
 protected:
 	Model			model;
 	Camera			camera;
-	Light			light;
 };
 
 #endif

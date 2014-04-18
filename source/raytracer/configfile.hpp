@@ -6,11 +6,12 @@
 #include "camera.hpp"
 #include "light.hpp"
 #include "model.hpp"
+#include "renderer.hpp"
 
 class ConfigFile
 {
 public:
-	static bool Read (const std::wstring& fileName, Camera& camera, Light& light, Model& model);
+	static bool Read (const std::wstring& fileName, Renderer::Parameters& parameters, Camera& camera, Model& model);
 };
 
 #endif

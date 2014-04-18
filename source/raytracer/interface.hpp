@@ -2,5 +2,5 @@
 
 extern "C"
 {
-	DLLEXPORT int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int resolutionX, int resolutionY, double distance);
+	DLLEXPORT int RayTrace (const wchar_t* configFile, const wchar_t* resultFile);
 }

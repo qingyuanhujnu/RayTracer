@@ -14,6 +14,7 @@ public:
 
 		int		SampleCount () const;
 		Vec3	GetSample (int index) const;
+		Vec3	GetRandomSample () const;
 
 	private:
 		Vec3	fieldBottomLeft;
