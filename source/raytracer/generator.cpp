@@ -371,7 +371,15 @@ void Generator::GenerateSolid (Model& model, SolidType type, double radius, cons
 		return;
 	}
 
+	if (DBGERROR (mesh.VertexCount () == 0)) {
+		return;
+	}
+
 	double currentRadius = Distance (Vec3 (0.0, 0.0, 0.0), mesh.GetVertex (0));
+	if (DBGERROR (IsZero (currentRadius))) {
+		return;
+	}
+
 	double scale = radius / currentRadius;
 	for (UIndex i = 0; i < mesh.VertexCount (); i++) {
 		mesh.SetVertex (i, mesh.GetVertex (i) * scale);
