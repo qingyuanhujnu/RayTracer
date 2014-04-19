@@ -79,13 +79,13 @@ Color RayTracer::RayTrace (const Ray& ray, const Ray::GeometryIntersection& inte
 	Color color;
 	const Light& light = model.GetLight (0);
 	if (!IsInShadow (intersection.position, light)) {
-		color += GetPhongShading (material, light, intersection.position, ray, normal);
+		color += GetPhongShading (material, light, intersection.position, normal, ray);
 	} else {
 		color = material.GetAmbientColor ();
 	}
 
 	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = ray.GetReflectedDirection (normal);
+		Vec3 reflectedDirection = Reflect (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 		Color reflectedColor = RayCast (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
