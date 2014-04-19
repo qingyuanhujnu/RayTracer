@@ -1,0 +1,49 @@
+version 1
+parameters
+	xresolution 500
+	yresolution 500
+	imagedistance 1.0
+camera
+	eye 5.0 3.0 4.0
+	center 0.0 0.0 0.5
+	up 0.0 0.0 1.0
+	xfov 45.0
+	yfov 45.0
+light
+	position 3.0 3.5 5.5
+	color 0.7 0.7 0.7
+material
+	color 1.0 0.0 0.0
+	ambient 0.2
+	diffuse 0.8
+	specular 0.0
+	reflection 0.5
+material
+	color 0.0 1.0 0.0
+	ambient 0.2
+	diffuse 0.8
+	specular 0.0
+	reflection 0.0
+material
+	color 0.0 0.0 1.0
+	ambient 0.2
+	diffuse 0.8
+	specular 0.0
+	reflection 0.0
+material
+	color 1.0 1.0 1.0
+	ambient 0.2
+	diffuse 0.8
+	specular 0.0
+	reflection 0.0
+solid
+	type dodecahedron
+	radius 1.5
+	offset 0.0 0.0 1.5
+	rotation 0.0 0.0 {{0+1.0}}
+	material 0
+insideoutcuboid
+	size 12.0 12.0 12.0
+	offset 0.0 0.0 6.0
+	rotation 0.0 0.0 0.0
+	material 3

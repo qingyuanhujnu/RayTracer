@@ -8,6 +8,15 @@
 
 class Renderer {
 public:
+	class IProgress
+	{
+	public:
+		IProgress ();
+		virtual ~IProgress ();
+
+		virtual void OnProgress (double progress) const = 0;
+	};
+
 	class Parameters
 	{
 	public:
@@ -49,7 +58,7 @@ public:
 	Renderer (const Model& model, const Camera& camera);
 	virtual ~Renderer ();
 
-	virtual bool	Render (const Parameters& parameters, ResultImage& result) = 0;
+	virtual bool	Render (const Parameters& parameters, ResultImage& result, IProgress& progress) = 0;
 
 protected:
 	Model			model;

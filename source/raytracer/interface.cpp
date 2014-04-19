@@ -5,7 +5,26 @@
 #include "export.hpp"
 #include <memory>
 
-int RayTrace (const wchar_t* configFile, const wchar_t* resultFile)
+class Progress : public RayTracer::IProgress
+{
+public:
+	Progress (ProgressCallback progressCallback) :
+		RayTracer::IProgress (),
+		progressCallback (progressCallback)
+	{
+
+	}
+
+	virtual void OnProgress (double progress) const
+	{
+		progressCallback (progress);
+	}
+
+private:
+	ProgressCallback progressCallback;
+};
+
+int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
 {
 	if (DBGERROR (configFile == NULL)) {
 		return 1;
@@ -22,10 +41,12 @@ int RayTrace (const wchar_t* configFile, const wchar_t* resultFile)
 		return 2;
 	}
 	
+	Progress progress (progressCallback);
+
 	std::unique_ptr<Renderer> renderer (new RayTracer (model, camera));
 	//std::unique_ptr<Renderer> renderer (new PathTracer (model, camera));
 	Renderer::ResultImage resultImage;
-	if (DBGERROR (!renderer->Render (parameters, resultImage))) {
+	if (DBGERROR (!renderer->Render (parameters, resultImage, progress))) {
 		return 3;
 	}
 	

@@ -1,5 +1,15 @@
 #include "renderer.hpp"
 
+Renderer::IProgress::IProgress ()
+{
+
+}
+
+Renderer::IProgress::~IProgress ()
+{
+
+}
+
 Renderer::Parameters::Parameters ()
 {
 	Set (100, 100, 1.0);

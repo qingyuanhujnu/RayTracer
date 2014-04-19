@@ -12,7 +12,7 @@ RayTracer::RayTracer (const Model& model, const Camera& camera) :
 {
 }
 
-bool RayTracer::Render (const Parameters& parameters, ResultImage& result)
+bool RayTracer::Render (const Parameters& parameters, ResultImage& result, IProgress& progress)
 {
 	if (DBGERROR (model.LightCount () == 0)) {
 		return false;
@@ -20,9 +20,13 @@ bool RayTracer::Render (const Parameters& parameters, ResultImage& result)
 
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 3);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
-	
+
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
+
+	const int reportInterval = 1000;
+	int finishedPixels = 0;
+	int lastFinishedPixels = -reportInterval;
 
 	const int procs = omp_get_num_procs ();		// logical cores
 #pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
@@ -37,6 +41,16 @@ bool RayTracer::Render (const Parameters& parameters, ResultImage& result)
 			averageColor.Add (RayCast (cameraRay, 0));
 		}
 		result.SetColor (x, y, averageColor.Get ());
+
+		#pragma omp critical
+		{
+			finishedPixels++;
+
+			if (finishedPixels > lastFinishedPixels + reportInterval) {
+				progress.OnProgress ((double) finishedPixels / (double) (resX * resY));
+				lastFinishedPixels = finishedPixels;
+			}
+		}
 	}
 
 	return true;

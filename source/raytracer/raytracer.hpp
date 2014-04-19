@@ -10,7 +10,7 @@ class RayTracer : public Renderer
 public:
 	RayTracer (const Model& model, const Camera& camera);
 	
-	bool		Render (const Parameters& parameters, ResultImage& result) override;
+	bool		Render (const Parameters& parameters, ResultImage& result, IProgress& progress) override;
 
 private:
 	Color		RayCast (const Ray& ray, int depth) const;

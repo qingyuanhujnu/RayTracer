@@ -2,5 +2,6 @@
 
 extern "C"
 {
-	DLLEXPORT int RayTrace (const wchar_t* configFile, const wchar_t* resultFile);
+	typedef void (*ProgressCallback) (double progress);
+	DLLEXPORT int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback);
 }

@@ -2,7 +2,8 @@
 #include <iostream>
 #include <string>
 
-typedef bool (*RayTraceFunction) (const wchar_t* configFile, const wchar_t* resultFile);
+typedef void (*ProgressCallback) (double progress);
+typedef bool (*RayTraceFunction) (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback);
 
 class LibraryGuard
 {
@@ -20,6 +21,11 @@ public:
 	HMODULE module;
 };
 
+static void OnProgress (double progress)
+{
+	//printf ("%f\n", progress);
+}
+
 int wmain (int argc, wchar_t **argv)
 {
 	LibraryGuard rayTracerModule (L"RayTracer.dll");
@@ -35,7 +41,7 @@ int wmain (int argc, wchar_t **argv)
 	if (argc != 3) {
 		// development mode
 		std::wstring configFileName = L"config01.txt";
-		rayTraceFunction (L"config01.txt", L"result.png");
+		rayTraceFunction (L"config01.txt", L"result.png", OnProgress);
 		return 1;
 	}
 
@@ -49,7 +55,7 @@ int wmain (int argc, wchar_t **argv)
 		return 1;
 	}
 
-	if (rayTraceFunction (configFile.c_str (), resultFile.c_str ()) != 0) {
+	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), OnProgress) != 0) {
 		return 1;
 	}
 	return 0;

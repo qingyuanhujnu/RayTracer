@@ -21,19 +21,48 @@ namespace UserInterface {
 		public MainForm ()
 		{
 			InitializeComponent ();
-			ConfigTextBox.SelectionTabs = new int[] { 15, 30, 45, 60, 75 };
-            menuItemCount = FileMenu.DropDownItems.Count;
+            
+			configTextBox.SelectionTabs = new int[] { 15, 30, 45, 60, 75 };
+            menuItemCount = fileMenu.DropDownItems.Count;
 
             history.Read ();
-            history.AddAllMenuItems (FileMenu.DropDownItems, menuItemCount, this.HistoryClick);
+            history.AddAllMenuItems (fileMenu.DropDownItems, menuItemCount, this.HistoryClick);
+            UpdateControlsForEdit ();
 		}
+
+        public void UpdateControlsForRender ()
+        {
+            menuStrip.Enabled = false;
+            configTextBox.Enabled = false;
+            pictureBox.Visible = false;
+            progressBar.Visible = true;
+            progressBar.Value = 0;
+        }
+
+        public void UpdateControlsForEdit ()
+        {
+            menuStrip.Enabled = true;
+            configTextBox.Enabled = true;
+            pictureBox.Visible = true;
+            progressBar.Visible = false;
+        }
+
+        public void SetProgressBarValue (Int32 val)
+        {
+            progressBar.Value = val;
+        }
+
+        public void SetPictureBoxImage (Image image)
+        {
+            pictureBox.Image = image;
+        }
 
 		private void FileMenuOpen_Click (object sender, EventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog ();
 			if (dialog.ShowDialog () == DialogResult.OK) {
 				OpenFile (dialog.FileName);
-                history.AddMenuItem (FileMenu.DropDownItems, menuItemCount, dialog.FileName, this.HistoryClick);
+                history.AddMenuItem (fileMenu.DropDownItems, menuItemCount, dialog.FileName, this.HistoryClick);
                 history.AddItem (dialog.FileName);
             }
 		}
@@ -43,7 +72,7 @@ namespace UserInterface {
             if (openedFile != null) {
                 try {
                     StreamWriter writer = new StreamWriter (openedFile);
-                    writer.Write (ConfigTextBox.Text);
+                    writer.Write (configTextBox.Text);
                     writer.Close ();
                 } catch {
                 }
@@ -57,15 +86,15 @@ namespace UserInterface {
 
         private void RenderMenu_Click (object sender, EventArgs e)
         {
-            RayTracer rayTracer = new RayTracer ();
-            rayTracer.Do (ConfigTextBox.Text, PictureBox);
+            RayTracer rayTracer = new RayTracer (this);
+            rayTracer.Start (configTextBox.Text);
         }
         
         private void OpenFile (String fileName)
 		{
 			try {
 				StreamReader reader = new StreamReader (fileName);
-				ConfigTextBox.Text = reader.ReadToEnd ();
+				configTextBox.Text = reader.ReadToEnd ();
 				reader.Close ();
                 openedFile = fileName;
 			} catch {

@@ -9,7 +9,7 @@ class PathTracer : public Renderer
 public:
 	PathTracer (const Model& model, const Camera& camera);
 
-	bool		Render (const Parameters& parameters, ResultImage& result) override;
+	bool		Render (const Parameters& parameters, ResultImage& result, IProgress& progress) override;
 
 private:
 	Color		Radiance (const Ray& ray, int depth) const;

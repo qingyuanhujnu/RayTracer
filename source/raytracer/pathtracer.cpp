@@ -10,8 +10,10 @@ PathTracer::PathTracer (const Model& model, const Camera& camera) :
 {
 }
 
-bool PathTracer::Render (const Parameters& parameters, ResultImage& result)
+bool PathTracer::Render (const Parameters& parameters, ResultImage& result, IProgress& progress)
 {
+	(void) progress; // TODO: implement progress interface
+
 	if (DBGERROR (model.LightCount () == 0)) {
 		return false;
 	}
