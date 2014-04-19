@@ -144,7 +144,7 @@ static bool ReadCamera (std::wifstream& inputStream, Camera& camera)
 	if (!ReadNamedDouble (inputStream, L"xfov", xFov)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"yfov", yFov)) { return false; }
 
-	camera.Set (eye, center, up, xFov, yFov);
+	camera.Set (eye, center, up, xFov * DEGRAD, yFov * DEGRAD);
 	return true;
 }
 

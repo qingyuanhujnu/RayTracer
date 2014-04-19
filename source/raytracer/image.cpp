@@ -42,8 +42,8 @@ Image::Image (const Camera& camera, int resolutionX, int resolutionY, double dis
 {
 	sampleRes = sampleResolution;
 
-	double imageWidth = distance * tan (camera.GetXFov () * DEGRAD) * distance;
-	double imageHeight = distance * tan (camera.GetYFov () * DEGRAD) * distance;
+	double imageWidth = distance * tan (camera.GetXFov ()) * distance;
+	double imageHeight = distance * tan (camera.GetYFov ()) * distance;
 	fieldWidth = imageWidth / (double) resolutionX;
 	fieldHeight = imageHeight / (double) resolutionY;
 
