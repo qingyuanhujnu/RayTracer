@@ -57,7 +57,7 @@ def Main ():
 	
 	configPath = os.path.abspath ('animconfig.txt')
 	tempConfigPath = os.path.abspath ('temp.txt')
-	for i in range (0, 100):
+	for i in range (0, 360):
 		print 'create frame image'
 		WriteTempConfigFile (configPath, tempConfigPath, i)
 		indexStr = str (i)
