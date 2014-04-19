@@ -34,7 +34,6 @@ int wmain (int argc, wchar_t **argv)
 
 	if (argc != 3) {
 		// development mode
-		std::wstring configFileName = L"config01.txt";
 		rayTraceFunction (L"config01.txt", L"result.png");
 		return 1;
 	}
