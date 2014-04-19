@@ -79,7 +79,7 @@ Color RayTracer::RayTrace (const Ray& ray, const Ray::GeometryIntersection& inte
 	Color color;
 	const Light& light = model.GetLight (0);
 	if (!IsInShadow (intersection.position, light)) {
-		color += GetPhongShading (material, light, intersection.position, normal);
+		color += GetPhongShading (material, light, intersection.position, ray, normal);
 	} else {
 		color = material.GetAmbientColor ();
 	}
