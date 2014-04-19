@@ -22,6 +22,9 @@ public:
 	double	z;
 };
 
+Vec3	operator* (double scalar, const Vec3 vec);
+Vec3	operator/ (double scalar, const Vec3 vec);
+
 Vec3	Normalize (const Vec3& vec);
 double	Distance (const Vec3& avec, const Vec3& bvec);
 Vec3	Offset (const Vec3& vec, const Vec3& direction, double distance);

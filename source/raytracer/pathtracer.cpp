@@ -90,7 +90,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 
 	if (shadowRayIsect.iSectType == Ray::ModelIntersection::Light) {		// light hit!
 		const Light& light = model.GetLight (shadowRayIsect.lightIntersection.light);
-		color += GetPhongShading (material, light, isect.position, normal);
+		color += GetPhongShading (material, light, isect.position, ray, normal);
 	}
 	else if (shadowRayIsect.iSectType == Ray::ModelIntersection::Geometry) {
 		color += Radiance (shadowRay, depth) * cDiffIntensity;
@@ -137,7 +137,7 @@ Color PathTracer::RayCastTowardsLights (const Vec3& position, const Vec3& normal
 			iSect.iSectType == Ray::ModelIntersection::Light &&
 			iSect.lightIntersection.light == i) {		// If hit then also check if we hit the light we intended to hit.
 			double omega = 2 * PI * (1 - cos_a_max);
-			color += GetPhongShading (material, light, position, normal) * omega /** INV_PI*/;	// TODO: I need to research BRDF to decide if the 1/PI is needed here or not.
+			color += GetPhongShading (material, light, position, ray, normal) * omega /** INV_PI*/;	// TODO: I need to research BRDF to decide if the 1/PI is needed here or not.
 		}
 	}
 
