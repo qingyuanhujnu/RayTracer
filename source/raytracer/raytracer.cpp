@@ -4,43 +4,24 @@
 #include "common.hpp"
 #include "average.hpp"
 #include "shading.hpp"
-#include <omp.h>
-
 
 RayTracer::RayTracer (const Model& model, const Camera& camera) :
 	Renderer (model, camera)
 {
 }
 
-bool RayTracer::Render (const Parameters& parameters, ResultImage& result, IProgress& progress)
+Color RayTracer::GetFieldColor (const Image::Field& field)
 {
-	if (DBGERROR (model.LightCount () == 0)) {
-		return false;
-	}
-
-	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 3);
-	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
-
-	const int resX = parameters.GetResolutionX ();
-	const int resY = parameters.GetResolutionY ();
-
 	const int reportInterval = 1000;
 	int finishedPixels = 0;
 	int lastFinishedPixels = -reportInterval;
 
-	const int procs = omp_get_num_procs ();		// logical cores
-#pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
-	for (int pix = 0; pix < (resX * resY); ++pix) {
-		int x = pix % resX;
-		int y = pix / resX;
-
-		Average<Color> averageColor;
-		Image::Field field = image.GetField (x, y);
-		for (int i = 0; i < field.SampleCount (); i++) {
-			InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
-			averageColor.Add (RayCast (cameraRay, 0));
-		}
-		result.SetColor (x, y, averageColor.Get ());
+	Average<Color> averageColor;
+	for (int i = 0; i < field.SampleCount (); i++) {
+		InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
+		averageColor.Add (RayCast (cameraRay, 0));
+	}
+	return averageColor.Get ();
 
 		#pragma omp critical
 		{
@@ -51,9 +32,6 @@ bool RayTracer::Render (const Parameters& parameters, ResultImage& result, IProg
 				lastFinishedPixels = finishedPixels;
 			}
 		}
-	}
-
-	return true;
 }
 
 Color RayTracer::RayCast (const Ray& ray, int depth) const

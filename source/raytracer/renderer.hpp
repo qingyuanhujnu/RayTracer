@@ -5,6 +5,7 @@
 #include "model.hpp"
 #include "camera.hpp"
 #include "light.hpp"
+#include "image.hpp"
 
 class Renderer {
 public:
@@ -25,6 +26,7 @@ public:
 		~Parameters ();
 
 		void	Set (int resolutionX, int resolutionY, double imageDistance);
+		bool	Check () const;
 
 		int		GetResolutionX () const;
 		int		GetResolutionY () const;
@@ -58,9 +60,11 @@ public:
 	Renderer (const Model& model, const Camera& camera);
 	virtual ~Renderer ();
 
-	virtual bool	Render (const Parameters& parameters, ResultImage& result, IProgress& progress) = 0;
+	virtual bool	Render (const Parameters& parameters, ResultImage& result);
 
 protected:
+	virtual Color	GetFieldColor (const Image::Field& field) = 0;
+
 	Model			model;
 	Camera			camera;
 };

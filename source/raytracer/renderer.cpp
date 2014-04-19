@@ -1,4 +1,5 @@
 #include "renderer.hpp"
+#include <omp.h>
 
 Renderer::IProgress::IProgress ()
 {
@@ -30,6 +31,17 @@ void Renderer::Parameters::Set (int resolutionX, int resolutionY, double imageDi
 	this->resolutionX = resolutionX;
 	this->resolutionY = resolutionY;
 	this->imageDistance = imageDistance;
+}
+
+bool Renderer::Parameters::Check () const
+{
+	if (resolutionX <= 0 || resolutionY <= 0) {
+		return false;
+	}
+	if (!IsPositive (imageDistance)) {
+		return false;
+	}
+	return true;
 }
 
 int Renderer::Parameters::GetResolutionX () const
@@ -97,4 +109,38 @@ Renderer::Renderer (const Model& model, const Camera& camera) :
 
 Renderer::~Renderer ()
 {
+}
+
+bool Renderer::Render (const Parameters& parameters, ResultImage& result)
+{
+	if (DBGERROR (!parameters.Check ())) {
+		return false;
+	}
+
+	if (DBGERROR (!model.Check ())) {
+		return false;
+	}
+
+	if (DBGERROR (model.LightCount () == 0)) {
+		return false;
+	}
+
+	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 3);
+	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
+
+	const int resX = parameters.GetResolutionX ();
+	const int resY = parameters.GetResolutionY ();
+
+	const int procs = omp_get_num_procs ();		// logical cores
+#pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
+	for (int pix = 0; pix < (resX * resY); ++pix) {
+		int x = pix % resX;
+		int y = pix / resX;
+
+		Image::Field field = image.GetField (x, y);
+		Color fieldColor = GetFieldColor (field);
+		result.SetColor (x, y, fieldColor);
+	}
+
+	return true;
 }
