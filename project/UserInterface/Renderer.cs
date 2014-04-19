@@ -27,7 +27,7 @@ namespace UserInterface {
             ProgressCallback progressCallback);
     }
 
-	class RayTracer
+	class Renderer
     {
         public enum RenderMode
         {
@@ -35,7 +35,59 @@ namespace UserInterface {
             PathTraceMode
         };
 
-        private class RayTracerWorker
+        public Renderer (MainForm mainForm, RenderMode renderMode)
+		{
+            this.mainForm = mainForm;
+            this.renderMode = renderMode;
+		}
+
+        public void Start (String configString)
+        {
+            try {
+                mainForm.UpdateControlsForRender ();
+                mainForm.SetPictureBoxImage (null);
+
+                tempFileName = "temp.txt";
+                tempResultFileName = "temp.png";
+
+                StreamWriter writer = new StreamWriter (tempFileName);
+                writer.Write (configString);
+                writer.Close ();
+
+                RenderWorker worker = new RenderWorker ();
+                worker.Start (renderMode, tempFileName, tempResultFileName, Progress, Finish);
+            } catch {
+
+            }
+        }
+
+        private void Progress (int progress)
+        {
+            mainForm.SetProgressBarValue (progress);
+        }
+
+        private void Finish (int result)
+        {
+            if (result == 0) {
+                MemoryStream memoryStream = new MemoryStream (File.ReadAllBytes (tempResultFileName));
+                Image image = Image.FromStream (memoryStream);
+                mainForm.SetPictureBoxImage (image);
+            } else {
+                mainForm.SetPictureBoxImage (null);
+            }
+
+            File.Delete (tempFileName);
+            File.Delete (tempResultFileName);
+
+            mainForm.UpdateControlsForEdit ();
+        }
+
+        private MainForm mainForm;
+        private RenderMode renderMode;
+        private String tempFileName;
+        private String tempResultFileName;
+        
+        private class RenderWorker
         {
             private BackgroundWorker backgroundWorker = new BackgroundWorker ();
 
@@ -48,7 +100,7 @@ namespace UserInterface {
 
             int result = -1;
 
-            public RayTracerWorker ()
+            public RenderWorker ()
             {
                 backgroundWorker.WorkerReportsProgress = true;
                 backgroundWorker.DoWork += new DoWorkEventHandler (DoRayTrace);
@@ -68,7 +120,7 @@ namespace UserInterface {
 
             private void NativeRayTracerProgressCallback (double progress)
             {
-                backgroundWorker.ReportProgress ((Int32) (progress * 100.0));
+                backgroundWorker.ReportProgress ((Int32)(progress * 100.0));
             }
 
             private void DoRayTrace (object sender, DoWorkEventArgs e)
@@ -90,58 +142,6 @@ namespace UserInterface {
             {
                 finishedCallback (result);
             }
-        }
-
-        private MainForm mainForm;
-        private RenderMode renderMode;
-        private String tempFileName;
-        private String tempResultFileName;
-
-        public RayTracer (MainForm mainForm, RenderMode renderMode)
-		{
-            this.mainForm = mainForm;
-            this.renderMode = renderMode;
-		}
-
-        public void Start (String configString)
-        {
-            try {
-                mainForm.UpdateControlsForRender ();
-                mainForm.SetPictureBoxImage (null);
-
-                tempFileName = "temp.txt";
-                tempResultFileName = "temp.png";
-
-                StreamWriter writer = new StreamWriter (tempFileName);
-                writer.Write (configString);
-                writer.Close ();
-
-                RayTracerWorker worker = new RayTracerWorker ();
-                worker.Start (renderMode, tempFileName, tempResultFileName, ProgressCallback, FinishedCallback);
-            } catch {
-
-            }
-        }
-
-        private void ProgressCallback (int progress)
-        {
-            mainForm.SetProgressBarValue (progress);
-        }
-
-        private void FinishedCallback (int result)
-        {
-            if (result == 0) {
-                MemoryStream memoryStream = new MemoryStream (File.ReadAllBytes (tempResultFileName));
-                Image image = Image.FromStream (memoryStream);
-                mainForm.SetPictureBoxImage (image);
-            } else {
-                mainForm.SetPictureBoxImage (null);
-            }
-
-            File.Delete (tempFileName);
-            File.Delete (tempResultFileName);
-
-            mainForm.UpdateControlsForEdit ();
-        }
-	}
+        }    
+    }
 }

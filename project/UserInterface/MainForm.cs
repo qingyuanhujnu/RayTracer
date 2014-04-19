@@ -86,13 +86,13 @@ namespace UserInterface {
 
         private void rayTraceMenu_Click (object sender, EventArgs e)
         {
-            RayTracer rayTracer = new RayTracer (this, RayTracer.RenderMode.RayTraceMode);
+            Renderer rayTracer = new Renderer (this, Renderer.RenderMode.RayTraceMode);
             rayTracer.Start (configTextBox.Text);
         }
 
         private void pathTraceMenu_Click (object sender, EventArgs e)
         {
-            RayTracer rayTracer = new RayTracer (this, RayTracer.RenderMode.PathTraceMode);
+            Renderer rayTracer = new Renderer (this, Renderer.RenderMode.PathTraceMode);
             rayTracer.Start (configTextBox.Text);
         }
         
