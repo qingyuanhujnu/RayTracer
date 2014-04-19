@@ -111,7 +111,7 @@ Renderer::~Renderer ()
 {
 }
 
-bool Renderer::Render (const Parameters& parameters, ResultImage& result)
+bool Renderer::Render (const Parameters& parameters, ResultImage& result, const IProgress& progress)
 {
 	if (DBGERROR (!parameters.Check ())) {
 		return false;
@@ -128,11 +128,15 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result)
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 3);
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
+	const int reportInterval = 1000;
+	int finishedPixels = 0;
+	int lastFinishedPixels = -reportInterval;
+
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
 
 	const int procs = omp_get_num_procs ();		// logical cores
-#pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
+	#pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
 	for (int pix = 0; pix < (resX * resY); ++pix) {
 		int x = pix % resX;
 		int y = pix / resX;
@@ -140,6 +144,16 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result)
 		Image::Field field = image.GetField (x, y);
 		Color fieldColor = GetFieldColor (field);
 		result.SetColor (x, y, fieldColor);
+
+		#pragma omp critical
+		{
+			finishedPixels++;
+
+			if (finishedPixels > lastFinishedPixels + reportInterval) {
+				progress.OnProgress ((double) finishedPixels / (double) (resX * resY));
+				lastFinishedPixels = finishedPixels;
+			}
+		}
 	}
 
 	return true;

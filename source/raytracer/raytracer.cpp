@@ -12,26 +12,12 @@ RayTracer::RayTracer (const Model& model, const Camera& camera) :
 
 Color RayTracer::GetFieldColor (const Image::Field& field)
 {
-	const int reportInterval = 1000;
-	int finishedPixels = 0;
-	int lastFinishedPixels = -reportInterval;
-
 	Average<Color> averageColor;
 	for (int i = 0; i < field.SampleCount (); i++) {
 		InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
 		averageColor.Add (RayCast (cameraRay, 0));
 	}
 	return averageColor.Get ();
-
-		#pragma omp critical
-		{
-			finishedPixels++;
-
-			if (finishedPixels > lastFinishedPixels + reportInterval) {
-				progress.OnProgress ((double) finishedPixels / (double) (resX * resY));
-				lastFinishedPixels = finishedPixels;
-			}
-		}
 }
 
 Color RayTracer::RayCast (const Ray& ray, int depth) const

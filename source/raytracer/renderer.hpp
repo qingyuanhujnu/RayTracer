@@ -60,7 +60,7 @@ public:
 	Renderer (const Model& model, const Camera& camera);
 	virtual ~Renderer ();
 
-	virtual bool	Render (const Parameters& parameters, ResultImage& result);
+	virtual bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress);
 
 protected:
 	virtual Color	GetFieldColor (const Image::Field& field) = 0;

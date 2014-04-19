@@ -14,10 +14,6 @@ Color PathTracer::GetFieldColor (const Image::Field& field)
 {
 	const int sampleNum = 128; // per pixel
 
-	const int reportInterval = 1000;
-	int finishedPixels = 0;
-	int lastFinishedPixels = -reportInterval;
-
 	Color fieldColor;
 	for (int s = 0; s < sampleNum; ++s) {
 		InfiniteRay cameraRay (camera.GetEye (), field.GetRandomSample () - camera.GetEye ());
@@ -25,16 +21,6 @@ Color PathTracer::GetFieldColor (const Image::Field& field)
 		fieldColor += (color / sampleNum);
 	}
 	return fieldColor;
-
-		#pragma omp critical
-		{
-			finishedPixels++;
-
-			if (finishedPixels > lastFinishedPixels + reportInterval) {
-				progress.OnProgress ((double) finishedPixels / (double) (resX * resY));
-				lastFinishedPixels = finishedPixels;
-			}
-		}
 }
 
 // based on smallpt
