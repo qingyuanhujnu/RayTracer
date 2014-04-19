@@ -31,12 +31,13 @@
             this.fileMenuSave = new System.Windows.Forms.ToolStripMenuItem ();
             this.fileMenuExit = new System.Windows.Forms.ToolStripMenuItem ();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator ();
+            this.renderMenu = new System.Windows.Forms.ToolStripMenuItem ();
             this.rayTraceMenu = new System.Windows.Forms.ToolStripMenuItem ();
+            this.pathTraceMenu = new System.Windows.Forms.ToolStripMenuItem ();
             this.splitContainer = new System.Windows.Forms.SplitContainer ();
             this.configTextBox = new System.Windows.Forms.RichTextBox ();
             this.progressBar = new System.Windows.Forms.ProgressBar ();
             this.pictureBox = new System.Windows.Forms.PictureBox ();
-            this.pathTraceMenu = new System.Windows.Forms.ToolStripMenuItem ();
             this.menuStrip.SuspendLayout ();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit ();
             this.splitContainer.Panel1.SuspendLayout ();
@@ -49,8 +50,7 @@
             // 
             this.menuStrip.Items.AddRange (new System.Windows.Forms.ToolStripItem[] {
             this.fileMenu,
-            this.rayTraceMenu,
-            this.pathTraceMenu});
+            this.renderMenu});
             this.menuStrip.Location = new System.Drawing.Point (0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size (584, 24);
@@ -94,12 +94,28 @@
             this.toolStripSeparator.Name = "toolStripSeparator";
             this.toolStripSeparator.Size = new System.Drawing.Size (100, 6);
             // 
+            // renderMenu
+            // 
+            this.renderMenu.DropDownItems.AddRange (new System.Windows.Forms.ToolStripItem[] {
+            this.rayTraceMenu,
+            this.pathTraceMenu});
+            this.renderMenu.Name = "renderMenu";
+            this.renderMenu.Size = new System.Drawing.Size (56, 20);
+            this.renderMenu.Text = "Render";
+            // 
             // rayTraceMenu
             // 
             this.rayTraceMenu.Name = "rayTraceMenu";
-            this.rayTraceMenu.Size = new System.Drawing.Size (70, 20);
+            this.rayTraceMenu.Size = new System.Drawing.Size (152, 22);
             this.rayTraceMenu.Text = "Ray Trace";
             this.rayTraceMenu.Click += new System.EventHandler (this.rayTraceMenu_Click);
+            // 
+            // pathTraceMenu
+            // 
+            this.pathTraceMenu.Name = "pathTraceMenu";
+            this.pathTraceMenu.Size = new System.Drawing.Size (152, 22);
+            this.pathTraceMenu.Text = "Path Trace";
+            this.pathTraceMenu.Click += new System.EventHandler (this.pathTraceMenu_Click);
             // 
             // splitContainer
             // 
@@ -147,13 +163,6 @@
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
             // 
-            // pathTraceMenu
-            // 
-            this.pathTraceMenu.Name = "pathTraceMenu";
-            this.pathTraceMenu.Size = new System.Drawing.Size (75, 20);
-            this.pathTraceMenu.Text = "Path Trace";
-            this.pathTraceMenu.Click += new System.EventHandler (this.pathTraceMenu_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
@@ -186,10 +195,11 @@
 		private System.Windows.Forms.RichTextBox configTextBox;
         private System.Windows.Forms.ToolStripMenuItem fileMenuExit;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator;
-        private System.Windows.Forms.ToolStripMenuItem rayTraceMenu;
 		private System.Windows.Forms.PictureBox pictureBox;
         private System.Windows.Forms.ToolStripMenuItem fileMenuSave;
         private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.ToolStripMenuItem renderMenu;
+        private System.Windows.Forms.ToolStripMenuItem rayTraceMenu;
         private System.Windows.Forms.ToolStripMenuItem pathTraceMenu;
 	}
 }
