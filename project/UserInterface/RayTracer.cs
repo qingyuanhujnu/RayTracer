@@ -19,16 +19,29 @@ namespace UserInterface {
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
             ProgressCallback progressCallback);
-	}
+
+        [DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int PathTrace (
+            [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
+            [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
+            ProgressCallback progressCallback);
+    }
 
 	class RayTracer
     {
-        class RayTracerWorker
+        public enum RenderMode
+        {
+            RayTraceMode,
+            PathTraceMode
+        };
+
+        private class RayTracerWorker
         {
             private BackgroundWorker backgroundWorker = new BackgroundWorker ();
 
             private String tempFileName;
             private String tempResultFileName;
+            private RenderMode renderMode;
 
             private Action<int> progressCallback;
             private Action<int> finishedCallback;
@@ -43,8 +56,9 @@ namespace UserInterface {
                 backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler (RayTraceCompleted);
             }
 
-            public void Start (String tempFileName, String tempResultFileName, Action<int> progressCallback, Action<int> finishedCallback)
+            public void Start (RenderMode renderMode, String tempFileName, String tempResultFileName, Action<int> progressCallback, Action<int> finishedCallback)
             {
+                this.renderMode = renderMode;
                 this.tempFileName = tempFileName;
                 this.tempResultFileName = tempResultFileName;
                 this.progressCallback = progressCallback;
@@ -60,7 +74,11 @@ namespace UserInterface {
             private void DoRayTrace (object sender, DoWorkEventArgs e)
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
-                result = Win32Functions.RayTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
+                if (renderMode == RenderMode.RayTraceMode) {
+                    result = Win32Functions.RayTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
+                } else if (renderMode == RenderMode.PathTraceMode) {
+                    result = Win32Functions.PathTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
+                }
             }
 
             private void RayTraceProgressChanged (object sender, ProgressChangedEventArgs e)
@@ -75,12 +93,14 @@ namespace UserInterface {
         }
 
         private MainForm mainForm;
+        private RenderMode renderMode;
         private String tempFileName;
         private String tempResultFileName;
 
-		public RayTracer (MainForm mainForm)
+        public RayTracer (MainForm mainForm, RenderMode renderMode)
 		{
             this.mainForm = mainForm;
+            this.renderMode = renderMode;
 		}
 
         public void Start (String configString)
@@ -97,7 +117,7 @@ namespace UserInterface {
                 writer.Close ();
 
                 RayTracerWorker worker = new RayTracerWorker ();
-                worker.Start (tempFileName, tempResultFileName, ProgressCallback, FinishedCallback);
+                worker.Start (renderMode, tempFileName, tempResultFileName, ProgressCallback, FinishedCallback);
             } catch {
 
             }

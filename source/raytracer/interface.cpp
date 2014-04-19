@@ -24,7 +24,13 @@ private:
 	ProgressCallback progressCallback;
 };
 
-int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
+enum RenderMode
+{
+	RayTraceMode,
+	PathTraceMode
+};
+
+static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
 {
 	if (DBGERROR (configFile == NULL)) {
 		return 1;
@@ -41,18 +47,35 @@ int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCall
 		return 2;
 	}
 	
-	Progress progress (progressCallback);
+	std::unique_ptr<Renderer> renderer = NULL;
+	if (mode == RayTraceMode) {
+		renderer.reset (new RayTracer (model, camera));
+	} else if (mode == PathTraceMode) {
+		renderer.reset (new PathTracer (model, camera));
+	}
+	if (DBGERROR (renderer == NULL)) {
+		return 3;
+	}
 
-	std::unique_ptr<Renderer> renderer (new RayTracer (model, camera));
-	//std::unique_ptr<Renderer> renderer (new PathTracer (model, camera));
+	Progress progress (progressCallback);
 	Renderer::ResultImage resultImage;
 	if (DBGERROR (!renderer->Render (parameters, resultImage, progress))) {
-		return 3;
+		return 4;
 	}
 	
 	if (DBGERROR (!Export::ExportImage (resultImage, resultFile, L"image/png"))) {
-		return 4;
+		return 5;
 	}	
 
 	return 0;
+}
+
+int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
+{
+	return Render (RayTraceMode, configFile, resultFile, progressCallback);
+}
+
+int PathTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
+{
+	return Render (PathTraceMode, configFile, resultFile, progressCallback);
 }

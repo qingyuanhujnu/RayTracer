@@ -84,9 +84,15 @@ namespace UserInterface {
             Close ();
         }
 
-        private void RenderMenu_Click (object sender, EventArgs e)
+        private void rayTraceMenu_Click (object sender, EventArgs e)
         {
-            RayTracer rayTracer = new RayTracer (this);
+            RayTracer rayTracer = new RayTracer (this, RayTracer.RenderMode.RayTraceMode);
+            rayTracer.Start (configTextBox.Text);
+        }
+
+        private void pathTraceMenu_Click (object sender, EventArgs e)
+        {
+            RayTracer rayTracer = new RayTracer (this, RayTracer.RenderMode.PathTraceMode);
             rayTracer.Start (configTextBox.Text);
         }
         
@@ -111,5 +117,5 @@ namespace UserInterface {
         {
             history.Write ();
         }
-	}
+    }
 }

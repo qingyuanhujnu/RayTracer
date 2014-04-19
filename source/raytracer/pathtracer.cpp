@@ -12,8 +12,6 @@ PathTracer::PathTracer (const Model& model, const Camera& camera) :
 
 bool PathTracer::Render (const Parameters& parameters, ResultImage& result, IProgress& progress)
 {
-	(void) progress; // TODO: implement progress interface
-
 	if (DBGERROR (model.LightCount () == 0)) {
 		return false;
 	}
@@ -26,12 +24,16 @@ bool PathTracer::Render (const Parameters& parameters, ResultImage& result, IPro
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
 
+	const int reportInterval = 1000;
+	int finishedPixels = 0;
+	int lastFinishedPixels = -reportInterval;
+
 	const int procs = omp_get_num_procs ();		// logical cores
 #pragma omp parallel for schedule(dynamic, 4) num_threads (procs - 1)	// leave one core for other programs :)
 	for (int pix = 0; pix < (resX * resY); ++pix) {
 
-		float progress = float (pix) / (resX * resY) * 100;
-		printf ("%.3f%%\n", progress);
+		//float progress = float (pix) / (resX * resY) * 100;
+		//printf ("%.3f%%\n", progress);
 
 		int x = pix % resX;
 		int y = pix / resX;
@@ -44,6 +46,16 @@ bool PathTracer::Render (const Parameters& parameters, ResultImage& result, IPro
 			fieldColor += (color / sampleNum);
 		}
 		result.SetColor (x, y, fieldColor);
+
+		#pragma omp critical
+		{
+			finishedPixels++;
+
+			if (finishedPixels > lastFinishedPixels + reportInterval) {
+				progress.OnProgress ((double) finishedPixels / (double) (resX * resY));
+				lastFinishedPixels = finishedPixels;
+			}
+		}
 	}
 
 	return true;
