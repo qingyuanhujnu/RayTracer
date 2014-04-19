@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using Microsoft.Win32;
 using System.Collections;
+using System.Drawing.Imaging;
 
 namespace UserInterface {
 	public partial class MainForm : Form
@@ -69,14 +70,15 @@ namespace UserInterface {
 
         private void FileMenuSave_Click (object sender, EventArgs e)
         {
-            if (openedFile != null) {
-                try {
-                    StreamWriter writer = new StreamWriter (openedFile);
-                    writer.Write (configTextBox.Text);
-                    writer.Close ();
-                } catch {
-                }
+            if (pictureBox.Image == null) {
+                return;
             }
+
+            SaveFileDialog dialog = new SaveFileDialog ();
+            dialog.Filter = "PNG files (*.png)|*.png";
+            if (dialog.ShowDialog () == DialogResult.OK) {
+                pictureBox.Image.Save (dialog.FileName, ImageFormat.Png);
+            }            
         }
         
         private void FileMenuExit_Click (object sender, EventArgs e)
