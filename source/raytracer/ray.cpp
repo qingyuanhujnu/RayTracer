@@ -41,12 +41,6 @@ const Vec3& Ray::GetDirection () const
 	return direction;
 }
 
-Vec3 Ray::GetReflectedDirection (const Vec3& normal) const
-{
-	double dotProduct = -(normal * direction);
-	return direction + (normal * 2.0 * dotProduct);
-}
-
 bool Ray::GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const
 {
 	Vec3 sphereToRay = origin - sphere.origin;

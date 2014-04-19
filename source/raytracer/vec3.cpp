@@ -108,14 +108,20 @@ Vec3 Offset (const Vec3& vec, const Vec3& direction, double distance)
 	return result;
 }
 
-double Distance (const Vec3& avec, const Vec3& bvec)
+Vec3 Reflect (const Vec3& direction, const Vec3& normal)
 {
-	double x1 = avec.x;
-	double y1 = avec.y;
-	double z1 = avec.z;
-	double x2 = bvec.x;
-	double y2 = bvec.y;
-	double z2 = bvec.z;
+	double dotProduct = normal * direction;
+	return direction - (2.0 * normal * dotProduct);
+}
+
+double Distance (const Vec3& aVec, const Vec3& bVec)
+{
+	double x1 = aVec.x;
+	double y1 = aVec.y;
+	double z1 = aVec.z;
+	double x2 = bVec.x;
+	double y2 = bVec.y;
+	double z2 = bVec.z;
 
 	return sqrt ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
 }

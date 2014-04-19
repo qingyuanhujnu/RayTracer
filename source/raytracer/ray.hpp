@@ -54,7 +54,6 @@ public:
 	};
 
 	const Vec3&		GetDirection () const;
-	Vec3			GetReflectedDirection (const Vec3& normal) const;
 
 	bool			GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const;
 	bool			GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, ShapeIntersection* intersection) const;
