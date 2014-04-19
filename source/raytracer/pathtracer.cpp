@@ -34,7 +34,7 @@ bool PathTracer::Render (const Parameters& parameters, ResultImage& result, IPro
 		printf ("%.3f%%\n", progress);
 
 		int x = pix % resX;
-		int y = pix / resY;
+		int y = pix / resX;
 
 		Color fieldColor;
 		Image::Field field = image.GetField (x, y);

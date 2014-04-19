@@ -32,7 +32,7 @@ bool RayTracer::Render (const Parameters& parameters, ResultImage& result, IProg
 #pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
 	for (int pix = 0; pix < (resX * resY); ++pix) {
 		int x = pix % resX;
-		int y = pix / resY;
+		int y = pix / resX;
 
 		Average<Color> averageColor;
 		Image::Field field = image.GetField (x, y);
