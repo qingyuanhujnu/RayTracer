@@ -10,41 +10,17 @@ PathTracer::PathTracer (const Model& model, const Camera& camera) :
 {
 }
 
-bool PathTracer::Render (const Parameters& parameters, ResultImage& result)
+Color PathTracer::GetFieldColor (const Image::Field& field)
 {
-	if (DBGERROR (model.LightCount () == 0)) {
-		return false;
-	}
-
-	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 1);
-	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
-
 	const int sampleNum = 128; // per pixel
 
-	const int resX = parameters.GetResolutionX ();
-	const int resY = parameters.GetResolutionY ();
-
-	const int procs = omp_get_num_procs ();		// logical cores
-#pragma omp parallel for schedule(dynamic, 4) num_threads (procs - 1)	// leave one core for other programs :)
-	for (int pix = 0; pix < (resX * resY); ++pix) {
-
-		float progress = float (pix) / (resX * resY) * 100;
-		printf ("%.3f%%\n", progress);
-
-		int x = pix % resX;
-		int y = pix / resX;
-
-		Color fieldColor;
-		Image::Field field = image.GetField (x, y);
-		for (int s = 0; s < sampleNum; ++s) {
-			InfiniteRay cameraRay (camera.GetEye (), field.GetRandomSample () - camera.GetEye ());
-			Color color = Clamp (Radiance (cameraRay, 0));
-			fieldColor += (color / sampleNum);
-		}
-		result.SetColor (x, y, fieldColor);
+	Color fieldColor;
+	for (int s = 0; s < sampleNum; ++s) {
+		InfiniteRay cameraRay (camera.GetEye (), field.GetRandomSample () - camera.GetEye ());
+		Color color = Clamp (Radiance (cameraRay, 0));
+		fieldColor += (color / sampleNum);
 	}
-
-	return true;
+	return fieldColor;
 }
 
 // based on smallpt
