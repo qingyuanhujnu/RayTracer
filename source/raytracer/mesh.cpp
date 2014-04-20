@@ -262,11 +262,11 @@ void Mesh::CalculateBoundingSphere ()
 	}
 	boundingSphere.origin = (min + max) / 2.0;
 
-	double maxDistance = INF;
+	double maxDistance = -INF;
 	for (UIndex i = 0; i < vertices.size (); i++) {
 		const Vec3& position = vertices[i];
 		double currentDistance = Distance (position, boundingSphere.origin);
-		if (currentDistance < maxDistance) {
+		if (currentDistance > maxDistance) {
 			maxDistance = currentDistance;
 		}
 	}
