@@ -43,31 +43,22 @@ const Vec3& Ray::GetDirection () const
 
 bool Ray::GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const
 {
-	Vec3 sphereToRay = origin - sphere.origin;
-	double b = (direction * sphereToRay) * 2.0;
-	double c = sphereToRay * sphereToRay - sphere.radius * sphere.radius;
-	double discriminant = b * b - 4.0 * c;
+	Vec3 rayToSphere = sphere.origin - origin;
+	double v = rayToSphere * direction;
+
+	double discriminant = sphere.radius * sphere.radius - (rayToSphere * rayToSphere - v * v);
 	if (IsNegative (discriminant)) {
 		return false;
 	}
 
+	double distance = v - sqrt (discriminant);
+	if (IsLengthReached (distance)) {
+		return false;
+	}
+
 	if (intersection != NULL) {
-		double distance = 0;
-		if (IsZero (discriminant)) {
-			distance = -b / 2.0;
-		} else {
-			double s = sqrt (b * b - 4.0 * c);
-			distance = std::min ((-b + s) / 2.0, (-b - s) / 2.0);
-		}
-
-		if (IsLengthReached (distance)) {
-			return false;
-		}
-
-		if (intersection != NULL) {
-			intersection->position = origin + direction * distance;
-			intersection->distance = distance;
-		}
+		intersection->position = origin + direction * distance;
+		intersection->distance = distance;
 	}
 	return true;
 }
