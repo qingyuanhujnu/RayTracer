@@ -260,6 +260,28 @@ static bool ReadSphere (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
+static bool ReadTorus (std::wifstream& inputStream, Model& model)
+{
+	double outerRadius;
+	double innerRadius;
+	int outerSegmentation;
+	int innerSegmentation;
+	Vec3 offset;
+	Vec3 rotation;
+	UIndex material;
+
+	if (!ReadNamedDouble (inputStream, L"outerradius", outerRadius)) { return false; }
+	if (!ReadNamedDouble (inputStream, L"innerradius", innerRadius)) { return false; }
+	if (!ReadNamedInteger (inputStream, L"outersegmentation", outerSegmentation)) { return false; }
+	if (!ReadNamedInteger (inputStream, L"innersegmentation", innerSegmentation)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
+	if (!ReadNamedUIndex (inputStream, L"material", material)) { return false; }
+	
+	Generator::GenerateTorus (model, outerRadius, innerRadius, outerSegmentation, innerSegmentation, offset, rotation * DEGRAD, material);
+	return true;
+}
+
 static bool ReadSolid (std::wifstream& inputStream, Model& model)
 {
 	std::wstring type;
@@ -341,6 +363,10 @@ bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& param
 			}
 		} else if (commandName == L"sphere") {
 			if (DBGERROR (!ReadSphere (inputStream, model))) {
+				error = true;
+			}
+		} else if (commandName == L"torus") {
+			if (DBGERROR (!ReadTorus (inputStream, model))) {
 				error = true;
 			}
 		} else if (commandName == L"solid") {

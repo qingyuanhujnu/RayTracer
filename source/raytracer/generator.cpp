@@ -236,6 +236,78 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 	model.AddMesh (mesh);
 }
 
+static Vec3 PolarToCartesian (double radius, double theta)
+{
+	Vec3 result;
+	result.x = radius * cos (theta);
+	result.y = radius * sin (theta);
+	result.z = 0.0;
+	return result;
+};
+
+static Vec3 CoordRotateZ (const Vec3& coord, double angle)
+{
+	Transformation tr;
+	tr.SetRotationZ (angle);
+	return tr.Apply (coord);
+};
+
+void Generator::GenerateTorus (Model& model, double outerRadius, double innerRadius, int outerSegmentation, int innerSegmentation, const Vec3& offset, const Vec3& rotation, UIndex material)
+{
+	Mesh mesh;
+
+	double theta = 0.0;
+	double step = 2.0 * PI / innerSegmentation;
+	
+	std::vector<Vec3> circle;
+	for (int i = 0; i < innerSegmentation; i++) {
+		Vec3 coord2D = PolarToCartesian (innerRadius, theta);
+		Vec3 coord (coord2D.x + outerRadius, 0.0, coord2D.y);
+		circle.push_back (coord);
+		theta += step;
+	}
+
+	step = (2.0 * PI) / outerSegmentation;
+	for (int i = 0; i < outerSegmentation; i++) {
+		for (int j = 0; j < innerSegmentation; j++) {
+			Vec3 rotated = CoordRotateZ (circle[j], -i * step);
+			mesh.AddVertex (rotated);
+		}
+	}
+
+	for (int i = 0; i < outerSegmentation; i++) {
+		for (int j = 0; j < innerSegmentation; j++) {
+			UIndex current = i * innerSegmentation + j;
+			UIndex next = current + innerSegmentation;
+			UIndex top = current + 1;
+			UIndex ntop = next + 1;
+			
+			if (j == innerSegmentation - 1) {
+				top = (i * innerSegmentation);
+				ntop = (i + 1) * innerSegmentation;
+			}
+
+			if (i == outerSegmentation - 1) {
+				next = j;
+				ntop = j + 1;
+				if (j == innerSegmentation - 1) {
+					ntop = 0;
+				}
+			}
+
+			AddPolygon (mesh, current, next, ntop, top, material, 0);
+		}
+	}
+
+	Transformation tr;
+	tr.AppendRotationXYZ (rotation);
+	tr.AppendTranslation (offset);
+	mesh.Transform (tr);
+
+	mesh.Finalize ();
+	model.AddMesh (mesh);
+}
+
 void Generator::GenerateSolid (Model& model, SolidType type, double radius, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
 	Mesh mesh;
