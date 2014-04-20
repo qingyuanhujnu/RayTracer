@@ -43,6 +43,8 @@ const Vec3& Ray::GetDirection () const
 
 bool Ray::GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const
 {
+	// from Graphic GEMS
+
 	Vec3 rayToSphere = sphere.origin - origin;
 	double v = rayToSphere * direction;
 
