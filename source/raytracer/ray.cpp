@@ -65,6 +65,113 @@ bool Ray::GetSphereIntersection (const Sphere& sphere, ShapeIntersection* inters
 	return true;
 }
 
+enum Quadrant
+{
+	Left,
+	Right,
+	Middle
+};
+
+static void Vec3ToArray (const Vec3& vec, double arr[3])
+{
+	arr[0] = vec.x;
+	arr[1] = vec.y;
+	arr[2] = vec.z;
+}
+
+static void ArrayToVec3 (const double arr[3], Vec3& vec)
+{
+	vec.x = arr[0];
+	vec.y = arr[1];
+	vec.z = arr[2];
+}
+
+bool Ray::GetBoxIntersection (const Box& box, ShapeIntersection* intersection) const
+{
+	// from Graphic GEMS
+
+	double rayOrigin[3];
+	double rayDirection[3];
+	double minB[3];
+	double maxB[3];
+
+	Vec3ToArray (origin, rayOrigin);
+	Vec3ToArray (direction, rayDirection);
+	Vec3ToArray (box.min, minB);
+	Vec3ToArray (box.max, maxB);
+
+	Quadrant quadrant[3];
+	double candidatePlane[3];
+
+	bool originInBox = true;
+	for (int i = 0; i < 3; i++) {
+		if (IsLower (rayOrigin[i], minB[i])) {
+			quadrant[i] = Left;
+			candidatePlane[i] = minB[i];
+			originInBox = false;
+		} else if (IsGreater (rayOrigin[i], maxB[i])) {
+			quadrant[i] = Right;
+			candidatePlane[i] = maxB[i];
+			originInBox = false;
+		} else {
+			quadrant[i] = Middle;
+		}
+	}
+
+	if (originInBox) {
+		if (intersection != NULL) {
+			intersection->position = origin;
+			intersection->distance = 0.0;
+		}
+		return true;
+	}
+
+	double maxT[3];
+	for (int i = 0; i < 3; i++) {
+		if (quadrant[i] != Middle && !IsZero (rayDirection[i])) {
+			maxT[i] = (candidatePlane[i] - rayOrigin[i]) / rayDirection[i];
+		} else {
+			maxT[i] = -1.0;
+		}
+	}
+
+	int whichPlane = 0;
+	for (int i = 1; i < 3; i++) {
+		if (IsLower (maxT[whichPlane], maxT[i])) {
+			whichPlane = i;
+		}
+	}
+
+	if (IsNegative (maxT[whichPlane])) {
+		return false;
+	}
+
+	double xCoord[3];
+	for (int i = 0; i < 3; i++) {
+		if (whichPlane != i) {
+			xCoord[i] = rayOrigin[i] + maxT[whichPlane] * rayDirection[i];
+			if (IsLower (xCoord[i], minB[i]) || IsGreater (xCoord[i], maxB[i])) {
+				return false;
+			}
+		} else {
+			xCoord[i] = candidatePlane[i];
+		}
+	}
+
+	Vec3 intersectionCoord;
+	ArrayToVec3 (xCoord, intersectionCoord);
+	double distance = Distance (origin, intersectionCoord);
+	if (IsLengthReached (distance)) {
+		return false;
+	}
+
+	if (intersection != NULL) {
+		intersection->position = intersectionCoord;
+		intersection->distance = distance;
+	}
+	return true;
+}
+
 bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, ShapeIntersection* intersection) const
 {
 	// Moller-Trumbore algorithm

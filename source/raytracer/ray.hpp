@@ -3,6 +3,8 @@
 
 #include "common.hpp"
 #include "model.hpp"
+#include "box.hpp"
+#include "sphere.hpp"
 
 class Ray
 {
@@ -56,7 +58,9 @@ public:
 	const Vec3&		GetDirection () const;
 
 	bool			GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const;
+	bool			GetBoxIntersection (const Box& box, ShapeIntersection* intersection) const;
 	bool			GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v2, ShapeIntersection* intersection) const;
+
 	bool			GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const;
 	bool			GetGeometryIntersection (const Model& model, GeometryIntersection* intersection) const;
 	bool			GetLightIntersection (const Model& model, LightIntersection* intersection) const;
