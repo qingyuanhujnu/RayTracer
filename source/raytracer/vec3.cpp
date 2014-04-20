@@ -83,11 +83,6 @@ Vec3	operator* (double scalar, const Vec3 vec)
 	return vec.operator* (scalar);
 }
 
-Vec3	operator/ (double scalar, const Vec3 vec)
-{
-	return vec.operator/ (scalar);
-}
-
 Vec3 Normalize (const Vec3& vec)
 {
 	double length = sqrt (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
