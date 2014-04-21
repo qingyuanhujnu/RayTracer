@@ -78,7 +78,7 @@ Vec3 Vec3::operator/ (double scalar) const
 	return result;
 }
 
-Vec3	operator* (double scalar, const Vec3 vec)
+Vec3 operator* (double scalar, const Vec3& vec)
 {
 	return vec.operator* (scalar);
 }
