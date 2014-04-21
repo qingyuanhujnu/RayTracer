@@ -22,7 +22,7 @@ public:
 	double	z;
 };
 
-Vec3	operator* (double scalar, const Vec3 vec);
+Vec3	operator* (double scalar, const Vec3& vec);
 
 Vec3	Normalize (const Vec3& vec);
 double	Distance (const Vec3& aVec, const Vec3& bVec);
