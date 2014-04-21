@@ -93,7 +93,8 @@ void Mesh::Finalize ()
 		CalculateVertexNormals ();
 	}
 
-	CalculateBoundingSphere ();
+	CalculateBoundingShapes ();
+	CalculateOctree ();
 }
 
 UIndex Mesh::VertexCount () const
@@ -166,9 +167,19 @@ Vec3 Mesh::GetNormal (UIndex index, const Vec3& coord) const
 	return Normalize (normal);
 }
 
+const Box& Mesh::GetBoundingBox () const
+{
+	return boundingBox;
+}
+
 const Sphere& Mesh::GetBoundingSphere () const
 {
 	return boundingSphere;
+}
+
+const Octree& Mesh::GetOctree () const
+{
+	return octree;
 }
 
 bool Mesh::Check (UIndex materialCount) const
@@ -247,7 +258,7 @@ void Mesh::CalculateVertexNormals ()
 	}
 }
 
-void Mesh::CalculateBoundingSphere ()
+void Mesh::CalculateBoundingShapes ()
 {
 	Vec3 min (INF, INF, INF);
 	Vec3 max (-INF, -INF, -INF);
@@ -260,6 +271,8 @@ void Mesh::CalculateBoundingSphere ()
 		if (position.y > max.y) { max.y = position.y; };
 		if (position.z > max.z) { max.z = position.z; };
 	}
+	boundingBox.min = min;
+	boundingBox.max = max;
 	boundingSphere.origin = (min + max) / 2.0;
 
 	double maxDistance = -INF;
@@ -271,4 +284,16 @@ void Mesh::CalculateBoundingSphere ()
 		}
 	}
 	boundingSphere.radius = maxDistance;
+}
+
+void Mesh::CalculateOctree ()
+{
+	octree.Set (boundingBox);
+	for (UIndex i = 0; i < triangles.size (); i++) {
+		const Triangle& triangle = triangles[i];
+		const Vec3& vertex0 = vertices[triangle.vertex0];
+		const Vec3& vertex1 = vertices[triangle.vertex1];
+		const Vec3& vertex2 = vertices[triangle.vertex2];
+		octree.AddTriangle (i, vertex0, vertex1, vertex2);
+	}
 }

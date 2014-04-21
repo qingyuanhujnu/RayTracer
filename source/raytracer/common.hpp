@@ -3,6 +3,10 @@
 
 #pragma warning(disable: 4481)
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 #define EPS		0.000001
 #define INF		9999999999
 #define PI		3.14159265359

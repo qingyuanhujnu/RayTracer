@@ -4,7 +4,9 @@
 #include "common.hpp"
 #include "vec3.hpp"
 #include "transformation.hpp"
+#include "box.hpp"
 #include "sphere.hpp"
+#include "octree.hpp"
 #include <vector>
 
 class Mesh
@@ -49,20 +51,26 @@ public:
 	const Triangle&			GetTriangle (UIndex index) const;
 
 	Vec3					GetNormal (UIndex index, const Vec3& coord) const;
+	const Box&				GetBoundingBox () const;
 	const Sphere&			GetBoundingSphere () const;
+	const Octree&			GetOctree () const;
 
 	bool					Check (UIndex materialCount) const;
 
 private:
 	Vec3					CalculateTriangleNormal (UIndex index);
 	void					CalculateVertexNormals ();
-	void					CalculateBoundingSphere ();
+	void					CalculateBoundingShapes ();
+	void					CalculateOctree ();
 
 	std::vector<Vec3>		vertices;
 	std::vector<Triangle>	triangles;
 	std::vector<Vec3>		triangleNormals;
 	std::vector<Vec3>		vertexNormals;
+	
+	Box						boundingBox;
 	Sphere					boundingSphere;
+	Octree					octree;
 };
 
 #endif

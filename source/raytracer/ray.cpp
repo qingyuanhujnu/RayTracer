@@ -1,6 +1,5 @@
 #include "ray.hpp"
 #include "common.hpp"
-#include <algorithm>
 
 Ray::Ray (const Vec3& startPoint, const Vec3& rayDirection) :
 	origin (startPoint),
@@ -215,17 +214,48 @@ bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v
 	return true;
 }
 
+static void GetCandidateTriangles (const Ray& ray, const Octree::Node& node, std::vector<UIndex>& candidateTriangles)
+{
+	const Box& box = node.GetBox ();
+	if (!ray.GetBoxIntersection (box, NULL)) {
+		return;
+	}
+
+	const std::vector<UIndex>& triangles = node.GetTriangles ();
+	for (UIndex i = 0; i < triangles.size (); i++) {
+		candidateTriangles.push_back (triangles[i]);
+	}
+
+	const std::vector<Octree::Node>& children = node.GetChildren ();
+	for (UIndex i = 0; i < children.size (); i++) {
+		GetCandidateTriangles (ray, children[i], candidateTriangles);
+	}
+}
+
 bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection) const
 {
 	if (!GetSphereIntersection (mesh.GetBoundingSphere (), NULL)) {
 		return false;
 	}
 
+	std::vector<UIndex> candidateTriangles;
+
+	static bool useOctree = true;
+	if (useOctree) {
+		const Octree& octree = mesh.GetOctree ();
+		GetCandidateTriangles (*this, octree.GetStartNode (), candidateTriangles);
+	} else {
+		for (UIndex i = 0; i < mesh.TriangleCount (); i++) {
+			candidateTriangles.push_back (i);
+		}
+	}
+
 	bool found = false;
 	MeshIntersection minIntersection;
 
-	for (UIndex i = 0; i < mesh.TriangleCount (); i++) {
-		const Mesh::Triangle& triangle = mesh.GetTriangle (i);
+	for (UIndex i = 0; i < candidateTriangles.size (); i++) {
+		UIndex triangleIndex = candidateTriangles[i];
+		const Mesh::Triangle& triangle = mesh.GetTriangle (triangleIndex);
 		const Vec3& vertex0 = mesh.GetVertex (triangle.vertex0);
 		const Vec3& vertex1 = mesh.GetVertex (triangle.vertex1);
 		const Vec3& vertex2 = mesh.GetVertex (triangle.vertex2);
@@ -240,7 +270,7 @@ bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection)
 			if (GetTriangleIntersection (vertex0, vertex1, vertex2, &currentIntersection)) {
 				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
 					minIntersection = currentIntersection;
-					minIntersection.triangle = i;
+					minIntersection.triangle = triangleIndex;
 					found = true;
 				}
 			}
