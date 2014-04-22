@@ -50,7 +50,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	// Diffuse reflection
 	// Get random direction in the hemisphere given by hit surface's normal
 	double r1 = random () * 2 * PI;		// random angle around
-	double r2 = cos (random () * INV_PI * 0.5);		// distance that is weighted towards normals direction
+	double r2 = cos (random () * PI * 0.5);		// distance that is weighted towards normals direction
 	double r2s = sqrt (r2);
 
 	Vec3 w = normal;
