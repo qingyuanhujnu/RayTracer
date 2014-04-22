@@ -45,3 +45,13 @@ bool IsGreater (double a, double b)
 {
 	return a - b > EPS;
 }
+
+bool IsLowerOrEqual (double a, double b)
+{
+	return !IsGreater (a, b);
+}
+
+bool IsGreaterOrEqual (double a, double b)
+{
+	return !IsLower (a, b);
+}

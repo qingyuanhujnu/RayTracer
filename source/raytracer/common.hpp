@@ -36,5 +36,7 @@ bool IsNegative (double a);
 bool IsEqual (double a, double b);
 bool IsLower (double a, double b);
 bool IsGreater (double a, double b);
+bool IsLowerOrEqual (double a, double b);
+bool IsGreaterOrEqual (double a, double b);
 
 #endif

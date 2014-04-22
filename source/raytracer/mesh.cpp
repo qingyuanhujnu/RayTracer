@@ -288,7 +288,7 @@ void Mesh::CalculateBoundingShapes ()
 
 void Mesh::CalculateOctree ()
 {
-	octree.Set (boundingBox);
+	octree.SetBox (boundingBox);
 	for (UIndex i = 0; i < triangles.size (); i++) {
 		const Triangle& triangle = triangles[i];
 		const Vec3& vertex0 = vertices[triangle.vertex0];

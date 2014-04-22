@@ -7,7 +7,7 @@ Octree::Node::Node ()
 
 Octree::Node::Node (const Box& box)
 {
-	Set (box);
+	SetBox (box);
 }
 
 Octree::Node::~Node ()
@@ -15,7 +15,7 @@ Octree::Node::~Node ()
 
 }
 
-void Octree::Node::Set (const Box& box)
+void Octree::Node::SetBox (const Box& box)
 {
 	this->box = box;
 }
@@ -54,14 +54,14 @@ bool Octree::Node::AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const
 	if (children.empty ()) {
 		children.resize (8);
 		Vec3 offset = (box.max - box.min) / 2.0;
-		children[0].Set (ConstructBox (box.min + Vec3 (0.0, 0.0, 0.0), offset));
-		children[1].Set (ConstructBox (box.min + Vec3 (offset.x, 0.0, 0.0), offset));
-		children[2].Set (ConstructBox (box.min + Vec3 (0.0, offset.y, 0.0), offset));
-		children[3].Set (ConstructBox (box.min + Vec3 (offset.x, offset.y, 0.0), offset));
-		children[4].Set (ConstructBox (box.min + Vec3 (0.0, 0.0, offset.z), offset));
-		children[5].Set (ConstructBox (box.min + Vec3 (offset.x, 0.0, offset.z), offset));
-		children[6].Set (ConstructBox (box.min + Vec3 (0.0, offset.y, offset.z), offset));
-		children[7].Set (ConstructBox (box.min + Vec3 (offset.x, offset.y, offset.z), offset));
+		children[0].SetBox (ConstructBox (box.min + Vec3 (0.0, 0.0, 0.0), offset));
+		children[1].SetBox (ConstructBox (box.min + Vec3 (offset.x, 0.0, 0.0), offset));
+		children[2].SetBox (ConstructBox (box.min + Vec3 (0.0, offset.y, 0.0), offset));
+		children[3].SetBox (ConstructBox (box.min + Vec3 (offset.x, offset.y, 0.0), offset));
+		children[4].SetBox (ConstructBox (box.min + Vec3 (0.0, 0.0, offset.z), offset));
+		children[5].SetBox (ConstructBox (box.min + Vec3 (offset.x, 0.0, offset.z), offset));
+		children[6].SetBox (ConstructBox (box.min + Vec3 (0.0, offset.y, offset.z), offset));
+		children[7].SetBox (ConstructBox (box.min + Vec3 (offset.x, offset.y, offset.z), offset));
 		childrenCreated = true;
 	}
 
@@ -104,9 +104,9 @@ Octree::~Octree ()
 	
 }
 
-void Octree::Set (const Box& box)
+void Octree::SetBox (const Box& box)
 {
-	startNode.Set (box);
+	startNode.SetBox (box);
 }
 
 bool Octree::AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const Vec3& v2)

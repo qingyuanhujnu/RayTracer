@@ -55,6 +55,7 @@ public:
 		LightIntersection lightIntersection;
 	};
 
+	const Vec3&		GetOrigin () const;
 	const Vec3&		GetDirection () const;
 
 	bool			GetSphereIntersection (const Sphere& sphere, ShapeIntersection* intersection) const;

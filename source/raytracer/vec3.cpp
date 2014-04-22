@@ -60,6 +60,24 @@ double Vec3::operator* (const Vec3& vec) const
 	return x * vec.x + y * vec.y + z * vec.z;
 }
 
+Vec3 Vec3::operator+ (double scalar) const
+{
+	Vec3 result;
+	result.x = x + scalar;
+	result.y = y + scalar;
+	result.z = z + scalar;
+	return result;
+}
+
+Vec3 Vec3::operator- (double scalar) const
+{
+	Vec3 result;
+	result.x = x - scalar;
+	result.y = y - scalar;
+	result.z = z - scalar;
+	return result;
+}
+
 Vec3 Vec3::operator* (double scalar) const
 {
 	Vec3 result;

@@ -15,7 +15,7 @@ public:
 		Node (const Box& box);
 		~Node ();
 
-		void						Set (const Box& box);
+		void						SetBox (const Box& box);
 		bool						AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const Vec3& v2);
 
 		const Box&					GetBox () const;
@@ -31,7 +31,7 @@ public:
 	Octree ();
 	~Octree ();
 
-	void			Set (const Box& box);
+	void			SetBox (const Box& box);
 	bool			AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const Vec3& v2);
 
 	const Node&		GetStartNode () const;

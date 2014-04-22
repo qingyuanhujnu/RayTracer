@@ -35,6 +35,11 @@ Ray::ModelIntersection::ModelIntersection () :
 {
 }
 
+const Vec3& Ray::GetOrigin () const
+{
+	return origin;
+}
+
 const Vec3& Ray::GetDirection () const
 {
 	return direction;
@@ -214,7 +219,7 @@ bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v
 	return true;
 }
 
-static void GetCandidateTriangles (const Ray& ray, const Octree::Node& node, std::vector<UIndex>& candidateTriangles)
+static void GetCandidateTriangles (const Ray& ray, const Octree::Node& node, std::vector<UIndex>& candidateTriangles, unsigned int& candidateTriangleCount)
 {
 	const Box& box = node.GetBox ();
 	if (!ray.GetBoxIntersection (box, NULL)) {
@@ -223,12 +228,13 @@ static void GetCandidateTriangles (const Ray& ray, const Octree::Node& node, std
 
 	const std::vector<UIndex>& triangles = node.GetTriangles ();
 	for (UIndex i = 0; i < triangles.size (); i++) {
-		candidateTriangles.push_back (triangles[i]);
+		candidateTriangles[candidateTriangleCount] = triangles[i];
+		candidateTriangleCount++;
 	}
 
 	const std::vector<Octree::Node>& children = node.GetChildren ();
 	for (UIndex i = 0; i < children.size (); i++) {
-		GetCandidateTriangles (ray, children[i], candidateTriangles);
+		GetCandidateTriangles (ray, children[i], candidateTriangles, candidateTriangleCount);
 	}
 }
 
@@ -239,21 +245,25 @@ bool Ray::GetMeshIntersection (const Mesh& mesh, MeshIntersection* intersection)
 	}
 
 	std::vector<UIndex> candidateTriangles;
+	unsigned int candidateTriangleCount = 0;
+	candidateTriangles.resize (mesh.TriangleCount ());
 
 	static bool useOctree = true;
 	if (useOctree) {
 		const Octree& octree = mesh.GetOctree ();
-		GetCandidateTriangles (*this, octree.GetStartNode (), candidateTriangles);
+		const Octree::Node& startNode = octree.GetStartNode ();
+		GetCandidateTriangles (*this, startNode, candidateTriangles, candidateTriangleCount);
 	} else {
-		for (UIndex i = 0; i < mesh.TriangleCount (); i++) {
-			candidateTriangles.push_back (i);
+		candidateTriangleCount = mesh.TriangleCount ();
+		for (UIndex i = 0; i < candidateTriangleCount; i++) {
+			candidateTriangles[i] = i;
 		}
 	}
 
 	bool found = false;
 	MeshIntersection minIntersection;
 
-	for (UIndex i = 0; i < candidateTriangles.size (); i++) {
+	for (UIndex i = 0; i < candidateTriangleCount; i++) {
 		UIndex triangleIndex = candidateTriangles[i];
 		const Mesh::Triangle& triangle = mesh.GetTriangle (triangleIndex);
 		const Vec3& vertex0 = mesh.GetVertex (triangle.vertex0);
