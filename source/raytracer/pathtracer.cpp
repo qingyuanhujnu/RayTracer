@@ -39,7 +39,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	const Vec3& normal = mesh.GetNormal (isect.triangle, isect.position);
 
 	Color colDiffuse = material.GetDiffuseColor ();
-	double cDiffIntensity = std::max (std::max (colDiffuse.r, colDiffuse.g), colDiffuse.b);
+	double cDiffIntensity = (colDiffuse.r + colDiffuse.g + colDiffuse.b) / 3.0;
 
 	if (++depth > 5 && cDiffIntensity < random ()) {
 		return color;				// russian roulette: what a suicidal path we took!
