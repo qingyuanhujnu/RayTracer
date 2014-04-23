@@ -27,7 +27,7 @@ def RayTrace (binaryPath, configFile, resultFile):
 def EqualFile (aFile, bFile):
 	return filecmp.cmp (aFile, bFile)
 
-def Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, configFile):
+def Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, configFile, tabPosition):
 	def IncreaseResolution (originalConfigFile, tempConfigFile):
 		file = open (originalConfigFile, 'rb')
 		content = file.read ()
@@ -38,10 +38,15 @@ def Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResol
 		file.write (content)
 		file.close ()
 
-	def WriteMessage (message, time):
-		print message + ' (' + str (time) + ')'
+	def WriteStartMessage (message, tabPosition):
+		while len (message) < tabPosition:
+			message += ' '
+		sys.stdout.write (message)
+		
+	def WriteEndMessage (message, time):
+		sys.stdout.write (message + ' (' + str (time) + ')\n')
 
-	sys.stdout.write (configFile + '...')
+	WriteStartMessage (configFile, tabPosition)
 
 	start = time.time ()
 	rayTraceResult = 1
@@ -61,21 +66,21 @@ def Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResol
 	}
 	
 	if rayTraceResult != 0:
-		WriteMessage ('ray tracing failed', elapsedTime)
+		WriteEndMessage ('ray tracing failed', elapsedTime)
 		return result
 
 	referenceFile = GetImageFileName (referenceFolder, configFile)
 	resultFile = GetImageFileName (resultFolder, configFile)
 	if not os.path.exists (referenceFile):
-		WriteMessage ('no reference file', elapsedTime)
+		WriteEndMessage ('no reference file', elapsedTime)
 		return result
 	if not os.path.exists (resultFile):
-		WriteMessage ('no result file', elapsedTime)
+		WriteEndMessage ('no result file', elapsedTime)
 		return result
 	if not EqualFile (referenceFile, resultFile):
-		WriteMessage ('failed', elapsedTime)
+		WriteEndMessage ('failed', elapsedTime)
 		return result
-	WriteMessage ('succeeded', elapsedTime)
+	WriteEndMessage ('succeeded', elapsedTime)
 	result['success'] = True
 	return result
 	
@@ -100,14 +105,22 @@ def Main ():
 		print 'no release binary found'
 		return
 
+	fileNames = os.listdir (sourceFolder)
+	maxFileNameLength = 0
+	for fileName in fileNames:
+		currentLength = len (fileName)
+		if currentLength > maxFileNameLength:
+			maxFileNameLength = currentLength
+	
 	success = True
 	elapsedTime = 0
-	for fileName in os.listdir (sourceFolder):
-		result = Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, fileName)
+	for fileName in fileNames:
+		result = Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, fileName, maxFileNameLength + 1)
 		if not result['success']:
 			success = False
 		elapsedTime += result['time']
 	
+	print ''
 	print 'full time: ' + str (elapsedTime)
 	if success:
 		DeleteFolder (resultFolder)
