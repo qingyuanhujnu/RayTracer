@@ -465,3 +465,24 @@ void Generator::GenerateSolid (Model& model, SolidType type, double radius, cons
 	mesh.Finalize ();
 	model.AddMesh (mesh);
 }
+
+void Generator::GenerateMesh (Model& model, const std::vector<Vec3>& vertices, const std::vector<Mesh::Triangle>& triangles, const Vec3& offset, const Vec3& rotation)
+{
+	Mesh mesh;
+
+	for (UIndex i = 0; i < vertices.size (); i++) {
+		mesh.AddVertex (vertices[i]);
+	}
+
+	for (UIndex i = 0; i < triangles.size (); i++) {
+		mesh.AddTriangle (triangles[i]);
+	}
+
+	Transformation tr;
+	tr.AppendRotationXYZ (rotation);
+	tr.AppendTranslation (offset);
+	mesh.Transform (tr);
+
+	mesh.Finalize ();
+	model.AddMesh (mesh);	
+}

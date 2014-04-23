@@ -28,6 +28,7 @@ public:
 	static void GenerateSphere (Model& model, double radius, int segmentation, const Vec3& offset, const Vec3& rotation, UIndex material);
 	static void GenerateTorus (Model& model, double outerRadius, double innerRadius, int outerSegmentation, int innerSegmentation, const Vec3& offset, const Vec3& rotation, UIndex material);
 	static void GenerateSolid (Model& model, SolidType type, double radius, const Vec3& offset, const Vec3& rotation, UIndex material);
+	static void GenerateMesh (Model& model, const std::vector<Vec3>& vertices, const std::vector<Mesh::Triangle>& triangles, const Vec3& offset, const Vec3& rotation);
 };
 
 #endif

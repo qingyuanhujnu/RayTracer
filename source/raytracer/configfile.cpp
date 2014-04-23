@@ -315,6 +315,60 @@ static bool ReadSolid (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
+static bool ReadMesh (std::wifstream& inputStream, Model& model)
+{
+	std::wstring command;
+	if (!ReadString (inputStream, command) || command != L"vertices") {
+		return false;
+	}
+
+	UIndex vertexCount = 0;
+	if (!ReadUIndex (inputStream, vertexCount)) {
+		return false;
+	}
+
+	std::vector<Vec3> vertices;
+	for (UIndex i = 0; i < vertexCount; i++) {
+		Vec3 vertex;
+		if (!ReadVec3 (inputStream, vertex)) {
+			return false;
+		}
+		vertices.push_back (vertex);
+	}
+
+	if (!ReadString (inputStream, command) || command != L"triangles") {
+		return false;
+	}
+
+	UIndex triangleCount = 0;
+	if (!ReadUIndex (inputStream, triangleCount)) {
+		return false;
+	}
+
+	std::vector<Mesh::Triangle> triangles;
+	for (UIndex i = 0; i < triangleCount; i++) {
+		UIndex v0;
+		UIndex v1;
+		UIndex v2;
+		UIndex material;
+		UIndex curveGroup;
+		if (!ReadUIndex (inputStream, v0)) { return false; }
+		if (!ReadUIndex (inputStream, v1)) { return false; }
+		if (!ReadUIndex (inputStream, v2)) { return false; }
+		if (!ReadUIndex (inputStream, material)) { return false; }
+		if (!ReadUIndex (inputStream, curveGroup)) { return false; }
+		triangles.push_back (Mesh::Triangle (v0, v1, v2, material, curveGroup));
+	}
+
+	Vec3 offset;
+	Vec3 rotation;
+	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
+
+	Generator::GenerateMesh (model, vertices, triangles, offset, rotation * DEGRAD);
+	return true;
+}
+
 bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& parameters, Camera& camera, Model& model)
 {
 	std::wifstream inputStream (fileName.c_str ());
@@ -371,6 +425,10 @@ bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& param
 			}
 		} else if (commandName == L"solid") {
 			if (DBGERROR (!ReadSolid (inputStream, model))) {
+				error = true;
+			}
+		} else if (commandName == L"mesh") {
+			if (DBGERROR (!ReadMesh (inputStream, model))) {
 				error = true;
 			}
 		} else {
