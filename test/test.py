@@ -54,24 +54,30 @@ def Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResol
 		rayTraceResult = RayTrace (binaryPath, os.path.join (sourceFolder, configFile), GetImageFileName (resultFolder, configFile))
 	end = time.time ()
 	elapsedTime = end - start
-
+	
+	result = {
+		'success' : False,
+		'time' : elapsedTime
+	}
+	
 	if rayTraceResult != 0:
 		WriteMessage ('ray tracing failed', elapsedTime)
-		return 1
+		return result
 
 	referenceFile = GetImageFileName (referenceFolder, configFile)
 	resultFile = GetImageFileName (resultFolder, configFile)
 	if not os.path.exists (referenceFile):
 		WriteMessage ('no reference file', elapsedTime)
-		return 1
+		return result
 	if not os.path.exists (resultFile):
 		WriteMessage ('no result file', elapsedTime)
-		return 1
+		return result
 	if not EqualFile (referenceFile, resultFile):
 		WriteMessage ('failed', elapsedTime)
-		return 1
+		return result
 	WriteMessage ('succeeded', elapsedTime)
-	return 0
+	result['success'] = True
+	return result
 	
 def Main ():
 	currentPath = os.path.dirname (os.path.abspath (__file__))
@@ -94,18 +100,16 @@ def Main ():
 		print 'no release binary found'
 		return
 
-	failCount = 0
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config01.txt')
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config02.txt')
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config03.txt')
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config04.txt')
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config05.txt')
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config06.txt')
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config07.txt')
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config08.txt')
-	failCount += Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, 'config09.txt')
+	success = True
+	elapsedTime = 0
+	for fileName in os.listdir (sourceFolder):
+		result = Test (binaryPath, sourceFolder, resultFolder, referenceFolder, increaseResolution, fileName)
+		if not result['success']:
+			success = False
+		elapsedTime += result['time']
 	
-	if failCount == 0:
+	print 'full time: ' + str (elapsedTime)
+	if success:
 		DeleteFolder (resultFolder)
 		print 'all tests succeeded'
 		return
