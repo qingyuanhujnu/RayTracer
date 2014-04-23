@@ -23,8 +23,8 @@ Color RayTracer::GetFieldColor (const Image::Field& field)
 Color RayTracer::RayCast (const Ray& ray, int depth) const
 {
 	if (depth <= 10) {
-		Ray::GeometryIntersection intersection;
-		if (ray.GetGeometryIntersection (model, &intersection)) {
+		Intersection::GeometryIntersection intersection;
+		if (Intersection::RayGeometry (ray, model, &intersection)) {
 			return RayTrace (ray, intersection, depth);
 		}
 	}
@@ -33,7 +33,7 @@ Color RayTracer::RayCast (const Ray& ray, int depth) const
 	return black;
 }
 
-Color RayTracer::RayTrace (const Ray& ray, const Ray::GeometryIntersection& intersection, int depth) const
+Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersection& intersection, int depth) const
 {
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
@@ -63,5 +63,5 @@ Color RayTracer::RayTrace (const Ray& ray, const Ray::GeometryIntersection& inte
 bool RayTracer::IsInShadow (const Vec3& position, const Light& light) const
 {
 	SectorRay shadowRay (position, light.GetPosition ());
-	return shadowRay.GetGeometryIntersection (model, NULL);
+	return Intersection::RayGeometry (shadowRay, model, NULL);
 }

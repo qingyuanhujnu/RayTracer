@@ -88,6 +88,9 @@
     <ClCompile Include="..\..\source\raytracer\octree.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\raytracer\intersection.cpp">
+      <Filter>RayTracer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer\raytracer.hpp">
@@ -161,6 +164,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\raytracer\octree.hpp">
       <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\raytracer\intersection.hpp">
+      <Filter>RayTracer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

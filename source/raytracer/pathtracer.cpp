@@ -2,6 +2,7 @@
 #include "image.hpp"
 #include "random.hpp"
 #include "shading.hpp"
+#include "intersection.hpp"
 #include <omp.h>
 #include <algorithm>
 
@@ -28,8 +29,8 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 {
 	Color color;
 
-	Ray::GeometryIntersection isect;
-	if (!ray.GetGeometryIntersection (model, &isect)) {			// TODO: this is a bug because I need to do a ModelIntersection here
+	Intersection::GeometryIntersection isect;
+	if (!Intersection::RayGeometry (ray, model, &isect)) {			// TODO: this is a bug because I need to do a ModelIntersection here
 		return color;
 	}
 
@@ -61,14 +62,14 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Vec3 randomDir = Normalize (u*cos (r1)*r2s + v*sin (r1)*r2s + w*sqrt (1 - r2));		// Random direction in hemisphere
 
 	InfiniteRay shadowRay (isect.position, randomDir);
-	Ray::ModelIntersection shadowRayIsect;
-	shadowRay.GetModelIntersection (model, &shadowRayIsect);
+	Intersection::ModelIntersection shadowRayIsect;
+	Intersection::RayModel (shadowRay, model, &shadowRayIsect);
 
-	if (shadowRayIsect.iSectType == Ray::ModelIntersection::Light) {		// light hit!
+	if (shadowRayIsect.iSectType == Intersection::ModelIntersection::Light) {		// light hit!
 		const Light& light = model.GetLight (shadowRayIsect.lightIntersection.light);
 		color += GetPhongShading (material, light, isect.position, normal, ray);
 	}
-	else if (shadowRayIsect.iSectType == Ray::ModelIntersection::Geometry) {
+	else if (shadowRayIsect.iSectType == Intersection::ModelIntersection::Geometry) {
 		color += Radiance (shadowRay, depth) * cDiffIntensity;
 	}
 
@@ -108,9 +109,9 @@ Color PathTracer::RayCastTowardsLights (const Vec3& position, const Vec3& normal
 
 		Vec3 lightIsect;
 		InfiniteRay ray (position, l);
-		Ray::ModelIntersection iSect;		
-		if (ray.GetModelIntersection (model, &iSect) && 
-			iSect.iSectType == Ray::ModelIntersection::Light &&
+		Intersection::ModelIntersection iSect;		
+		if (Intersection::RayModel (ray, model, &iSect) && 
+			iSect.iSectType == Intersection::ModelIntersection::Light &&
 			iSect.lightIntersection.light == i) {		// If hit then also check if we hit the light we intended to hit.
 			double omega = 2 * PI * (1 - cos_a_max);
 			color += GetPhongShading (material, light, position, normal, ray) * omega /** INV_PI*/;	// TODO: I need to research BRDF to decide if the 1/PI is needed here or not.

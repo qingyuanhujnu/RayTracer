@@ -17,6 +17,7 @@
     <ClCompile Include="..\..\source\raytracer\common.cpp" />
     <ClCompile Include="..\..\source\raytracer\configfile.cpp" />
     <ClCompile Include="..\..\source\raytracer\interface.cpp" />
+    <ClCompile Include="..\..\source\raytracer\intersection.cpp" />
     <ClCompile Include="..\..\source\raytracer\octree.cpp" />
     <ClCompile Include="..\..\source\raytracer\pathtracer.cpp" />
     <ClCompile Include="..\..\source\raytracer\random.cpp" />
@@ -44,6 +45,7 @@
     <ClInclude Include="..\..\source\raytracer\common.hpp" />
     <ClInclude Include="..\..\source\raytracer\configfile.hpp" />
     <ClInclude Include="..\..\source\raytracer\interface.hpp" />
+    <ClInclude Include="..\..\source\raytracer\intersection.hpp" />
     <ClInclude Include="..\..\source\raytracer\octree.hpp" />
     <ClInclude Include="..\..\source\raytracer\pathtracer.hpp" />
     <ClInclude Include="..\..\source\raytracer\random.hpp" />
