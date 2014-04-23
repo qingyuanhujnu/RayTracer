@@ -41,11 +41,13 @@ Color RayTracer::RayTrace (const Ray& ray, const Ray::GeometryIntersection& inte
 	const Vec3& normal = mesh.GetNormal (intersection.triangle, intersection.position);
 
 	Color color;
-	const Light& light = model.GetLight (0);
-	if (!IsInShadow (intersection.position, light)) {
-		color += GetPhongShading (material, light, intersection.position, normal, ray);
-	} else {
-		color = material.GetAmbientColor ();
+	for (UIndex i = 0; i < model.LightCount (); i++) {
+		const Light& light = model.GetLight (i);
+		if (!IsInShadow (intersection.position, light)) {
+			color += GetPhongShading (material, light, intersection.position, normal, ray);
+		} else {
+			color += material.GetAmbientColor ();
+		}
 	}
 
 	if (material.IsReflective ()) {
