@@ -50,7 +50,6 @@ bool Octree::Node::AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const
 		return false;
 	}
 
-	bool childrenCreated = false;
 	if (children.empty ()) {
 		children.resize (8);
 		Vec3 offset = (box.max - box.min) / 2.0;
@@ -62,7 +61,6 @@ bool Octree::Node::AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const
 		children[5].SetBox (ConstructBox (box.min + Vec3 (offset.x, 0.0, offset.z), offset));
 		children[6].SetBox (ConstructBox (box.min + Vec3 (0.0, offset.y, offset.z), offset));
 		children[7].SetBox (ConstructBox (box.min + Vec3 (offset.x, offset.y, offset.z), offset));
-		childrenCreated = true;
 	}
 
 	for (UIndex i = 0; i < 8; i++) {
@@ -71,12 +69,30 @@ bool Octree::Node::AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const
 		}
 	}
 
-	if (childrenCreated) {
-		children.clear ();
-	}
-
 	triangles.push_back (id);
 	return true;
+}
+
+static bool NodeContainsTriangle (const Octree::Node& node)
+{
+	const std::vector<UIndex>& triangles = node.GetTriangles ();
+	if (!triangles.empty ()) {
+		return true;
+	}
+
+	const std::vector<Octree::Node>& children = node.GetChildren ();
+	for (UIndex i = 0; i < children.size (); i++) {
+		if (NodeContainsTriangle (children[i])) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Octree::Node::ContainsTriangle () const
+{
+	return NodeContainsTriangle (*this);
 }
 
 const Box& Octree::Node::GetBox () const

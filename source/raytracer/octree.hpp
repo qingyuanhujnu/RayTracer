@@ -18,6 +18,7 @@ public:
 		void						SetBox (const Box& box);
 		bool						AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const Vec3& v2);
 
+		bool						ContainsTriangle () const;
 		const Box&					GetBox () const;
 		const std::vector<UIndex>&	GetTriangles () const;
 		const std::vector<Node>&	GetChildren () const;

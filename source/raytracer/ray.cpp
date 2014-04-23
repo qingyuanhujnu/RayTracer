@@ -221,6 +221,10 @@ bool Ray::GetTriangleIntersection (const Vec3& v0, const Vec3& v1, const Vec3& v
 
 static void GetCandidateTriangles (const Ray& ray, const Octree::Node& node, std::vector<UIndex>& candidateTriangles, unsigned int& candidateTriangleCount)
 {
+	if (!node.ContainsTriangle ()) {
+		return;
+	}
+
 	const Box& box = node.GetBox ();
 	if (!ray.GetBoxIntersection (box, NULL)) {
 		return;
