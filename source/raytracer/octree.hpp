@@ -18,7 +18,7 @@ public:
 		void						SetBox (const Box& box);
 		bool						AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const Vec3& v2);
 
-		bool						ContainsTriangle () const;
+		bool						IsEmpty () const;
 		const Box&					GetBox () const;
 		const std::vector<UIndex>&	GetTriangles () const;
 		const std::vector<Node>&	GetChildren () const;
@@ -27,6 +27,7 @@ public:
 		Box							box;
 		std::vector<UIndex>			triangles;
 		std::vector<Node>			children;
+		bool						empty;
 	};
 
 	Octree ();

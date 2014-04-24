@@ -204,7 +204,7 @@ bool Intersection::RayTriangle (const Ray& ray, const Vec3& v0, const Vec3& v1, 
 
 static void GetCandidateTriangles (const Ray& ray, const Octree::Node& node, std::vector<UIndex>& candidateTriangles, unsigned int& candidateTriangleCount)
 {
-	if (!node.ContainsTriangle ()) {
+	if (node.IsEmpty ()) {
 		return;
 	}
 

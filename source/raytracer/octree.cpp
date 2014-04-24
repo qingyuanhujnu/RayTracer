@@ -1,11 +1,13 @@
 #include "octree.hpp"
 
-Octree::Node::Node ()
+Octree::Node::Node () :
+	empty (true)
 {
 
 }
 
-Octree::Node::Node (const Box& box)
+Octree::Node::Node (const Box& box) :
+	empty (true)
 {
 	SetBox (box);
 }
@@ -65,34 +67,19 @@ bool Octree::Node::AddTriangle (UIndex id, const Vec3& v0, const Vec3& v1, const
 
 	for (UIndex i = 0; i < 8; i++) {
 		if (children[i].AddTriangle (id, v0, v1, v2)) {
+			empty = false;
 			return true;
 		}
 	}
 
+	empty = false;
 	triangles.push_back (id);
 	return true;
 }
 
-static bool NodeContainsTriangle (const Octree::Node& node)
+bool Octree::Node::IsEmpty () const
 {
-	const std::vector<UIndex>& triangles = node.GetTriangles ();
-	if (!triangles.empty ()) {
-		return true;
-	}
-
-	const std::vector<Octree::Node>& children = node.GetChildren ();
-	for (UIndex i = 0; i < children.size (); i++) {
-		if (NodeContainsTriangle (children[i])) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool Octree::Node::ContainsTriangle () const
-{
-	return NodeContainsTriangle (*this);
+	return empty;
 }
 
 const Box& Octree::Node::GetBox () const
