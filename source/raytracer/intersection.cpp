@@ -47,9 +47,9 @@ bool Intersection::RaySphere (const Ray& ray, const Sphere& sphere, ShapeInterse
 
 	double q = 0.0;
 	if (IsNegative (b)) {
-		q = (-b - sqrt (disc)) / 2.0;
+		q = (-b - sqrt (disc)) * 0.5;
 	} else {
-		q = (-b + sqrt (disc)) / 2.0;
+		q = (-b + sqrt (disc)) * 0.5;
 	}
 
 	double t0 = q / a;
