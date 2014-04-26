@@ -66,7 +66,8 @@ public:
 	enum FacingMode
 	{
 		OnlyFrontFacing,
-		FrontAndBackFacing
+		OnlyBackFacing,
+		BothFacing
 	};
 
 	static bool		RaySphere (const Ray& ray, const Sphere& sphere, ShapeIntersection* intersection);
