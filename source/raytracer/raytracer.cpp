@@ -15,20 +15,16 @@ Color RayTracer::GetFieldColor (const Image::Field& field)
 	Average<Color> averageColor;
 	for (int i = 0; i < field.SampleCount (); i++) {
 		InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
-		averageColor.Add (RayCast (cameraRay, CameraRay, 0));
+		averageColor.Add (RayCast (cameraRay, 0));
 	}
 	return averageColor.Get ();
 }
 
-Color RayTracer::RayCast (const Ray& ray, RayType rayType, int depth) const
+Color RayTracer::RayCast (const Ray& ray, int depth) const
 {
 	if (depth <= 10) {
 		Intersection::GeometryIntersection intersection;
-		Intersection::FacingMode facingMode = Intersection::OnlyFrontFacing;
-		if (rayType != CameraRay) {
-			facingMode = Intersection::FrontAndBackFacing;
-		}
-		if (Intersection::RayGeometry (ray, model, facingMode, &intersection)) {
+		if (Intersection::RayGeometry (ray, model, &intersection)) {
 			return RayTrace (ray, intersection, depth);
 		}
 	}
@@ -61,14 +57,14 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 	if (material.IsReflective ()) {
 		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-		Color reflectedColor = RayCast (reflectedRay, ReflectedRay, depth + 1);
+		Color reflectedColor = RayCast (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
 	}
 
 	if (material.IsTransparent ()) {
 		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal);
 		InfiniteRay refractedRay (intersection.position, refractedDirection);
-		Color refractedColor = RayCast (refractedRay, RefractedRay, depth + 1);
+		Color refractedColor = RayCast (refractedRay, depth + 1);
 		color += refractedColor * material.GetTransparency ();
 	}
 
