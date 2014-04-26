@@ -37,7 +37,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	const Mesh& mesh = model.GetMesh (isect.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (isect.triangle);
 	const Material& material = model.GetMaterial (triangle.material);
-	const Vec3& normal = mesh.GetNormal (isect.triangle, isect.position);
+	Vec3 normal = mesh.GetNormal (isect.triangle, isect.position);
 
 	Color colDiffuse = material.GetDiffuseColor ();
 	double cDiffIntensity = (colDiffuse.r + colDiffuse.g + colDiffuse.b) / 3.0;

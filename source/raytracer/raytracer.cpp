@@ -38,7 +38,7 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 	const Material& material = model.GetMaterial (triangle.material);
-	const Vec3& normal = mesh.GetNormal (intersection.triangle, intersection.position);
+	Vec3 normal = mesh.GetNormal (intersection.triangle, intersection.position);
 
 	Color color;
 	for (UIndex i = 0; i < model.LightCount (); i++) {
