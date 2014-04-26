@@ -62,6 +62,11 @@ public:
 	static bool		RayGeometry (const Ray& ray, const Model& model, GeometryIntersection* intersection);
 	static bool		RayLight (const Ray& ray, const Model& model, LightIntersection* intersection);
 	static bool		RayModel (const Ray& ray, const Model& model, ModelIntersection* intersection);
+
+	typedef std::pair<const Octree::Node*, Intersection::ShapeIntersection> OctreeNodeWithIntersection;
+
+private:
+	static bool		RayOctree (const Ray& ray, const Octree::Node& node, std::vector<OctreeNodeWithIntersection>& nodesWithIntersections);
 };
 
 #endif

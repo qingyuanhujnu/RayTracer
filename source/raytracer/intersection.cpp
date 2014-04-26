@@ -1,4 +1,5 @@
 #include "intersection.hpp"
+#include <algorithm>
 
 Intersection::ShapeIntersection::ShapeIntersection () :
 	distance (INF)
@@ -202,27 +203,26 @@ bool Intersection::RayTriangle (const Ray& ray, const Vec3& v0, const Vec3& v1, 
 	return true;
 }
 
-static void GetCandidateTriangles (const Ray& ray, const Octree::Node& node, std::vector<UIndex>& candidateTriangles, unsigned int& candidateTriangleCount)
+bool Intersection::RayOctree (const Ray& ray, const Octree::Node& node, std::vector<OctreeNodeWithIntersection>& nodesWithIntersections)
 {
 	if (node.IsEmpty ()) {
-		return;
+		return false;
 	}
 
 	const Box& box = node.GetBox ();
-	if (!Intersection::RayBox (ray, box, NULL)) {
-		return;
+	Intersection::ShapeIntersection intersection;
+	if (!Intersection::RayBox (ray, box, &intersection)) {
+		return false;
 	}
 
-	const std::vector<UIndex>& triangles = node.GetTriangles ();
-	for (UIndex i = 0; i < triangles.size (); i++) {
-		candidateTriangles[candidateTriangleCount] = triangles[i];
-		candidateTriangleCount++;
-	}
+	nodesWithIntersections.push_back (OctreeNodeWithIntersection (&node, intersection));
 
 	const std::vector<Octree::Node>& children = node.GetChildren ();
 	for (UIndex i = 0; i < children.size (); i++) {
-		GetCandidateTriangles (ray, children[i], candidateTriangles, candidateTriangleCount);
+		RayOctree (ray, children[i], nodesWithIntersections);
 	}
+
+	return true;
 }
 
 bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* intersection)
@@ -231,40 +231,41 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* 
 		return false;
 	}
 
-	std::vector<UIndex> candidateTriangles;
-	unsigned int candidateTriangleCount = 0;
-	candidateTriangles.resize (mesh.TriangleCount ());
+	const Octree& octree = mesh.GetOctree ();
+	const Octree::Node& startNode = octree.GetStartNode ();
+	std::vector<OctreeNodeWithIntersection> nodesWithIntersections;
 
-	static bool useOctree = true;
-	if (useOctree) {
-		const Octree& octree = mesh.GetOctree ();
-		const Octree::Node& startNode = octree.GetStartNode ();
-		GetCandidateTriangles (ray, startNode, candidateTriangles, candidateTriangleCount);
-	} else {
-		candidateTriangleCount = mesh.TriangleCount ();
-		for (UIndex i = 0; i < candidateTriangleCount; i++) {
-			candidateTriangles[i] = i;
-		}
-	}
+	// Get all the nodes and that the ray intersects.
+	RayOctree (ray, startNode, nodesWithIntersections);
 
+	// Sort them by distance.
+	auto comparator = [](const Intersection::OctreeNodeWithIntersection& node1, const Intersection::OctreeNodeWithIntersection& node2) {
+		return node1.second.distance < node2.second.distance;
+	};
+	std::sort (nodesWithIntersections.begin (), nodesWithIntersections.end (), comparator);
+
+	// Search for nearest triangle intersections.
 	bool found = false;
-	MeshIntersection minIntersection;
+	Intersection::MeshIntersection minIntersection;
 
-	for (UIndex i = 0; i < candidateTriangleCount; i++) {
-		UIndex triangleIndex = candidateTriangles[i];
-		const Mesh::Triangle& triangle = mesh.GetTriangle (triangleIndex);
-		const Vec3& vertex0 = mesh.GetVertex (triangle.vertex0);
-		const Vec3& vertex1 = mesh.GetVertex (triangle.vertex1);
-		const Vec3& vertex2 = mesh.GetVertex (triangle.vertex2);
-		
-		if (intersection == NULL) {
-			if (RayTriangle (ray, vertex0, vertex1, vertex2, NULL)) {
-				found = true;
-				break;
-			}
-		} else {
+	for (auto it = nodesWithIntersections.begin (); it != nodesWithIntersections.end (); ++it) {
+		if (found && minIntersection.distance < it->second.distance) {	// The next OctreeNode is behind minIntersection, we can stop.
+			break;
+		}
+
+		const std::vector<UIndex>& triangles = it->first->GetTriangles ();
+		for (auto triangleIt = triangles.begin (); triangleIt != triangles.end (); ++triangleIt) {
+			UIndex triangleIndex = *triangleIt;
+			const Mesh::Triangle& triangle = mesh.GetTriangle (triangleIndex);
+			const Vec3& vertex0 = mesh.GetVertex (triangle.vertex0);
+			const Vec3& vertex1 = mesh.GetVertex (triangle.vertex1);
+			const Vec3& vertex2 = mesh.GetVertex (triangle.vertex2);
+
 			Intersection::MeshIntersection currentIntersection;
-			if (RayTriangle (ray, vertex0, vertex1, vertex2, &currentIntersection)) {
+			if (Intersection::RayTriangle (ray, vertex0, vertex1, vertex2, &currentIntersection)) {
+				if (intersection == NULL) {
+					return true;
+				}
 				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
 					minIntersection = currentIntersection;
 					minIntersection.triangle = triangleIndex;
@@ -277,6 +278,7 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* 
 	if (found && intersection != NULL) {
 		*intersection = minIntersection;
 	}
+
 	return found;
 }
 
