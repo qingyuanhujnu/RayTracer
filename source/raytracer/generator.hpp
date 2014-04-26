@@ -23,7 +23,7 @@ public:
 
 	static void GenerateRectangle (Model& model, double xSize, double ySize, const Vec3& offset, const Vec3& rotation, UIndex material);
 	static void GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material);
-	static void GenerateInsideOutCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material);
+	static void GenerateRoomBox (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex materials[6]);
 	static void GenerateCylinder (Model& model, double radius, double height, int segmentation, const Vec3& offset, const Vec3& rotation, UIndex material);
 	static void GenerateSphere (Model& model, double radius, int segmentation, const Vec3& offset, const Vec3& rotation, UIndex material);
 	static void GenerateTorus (Model& model, double outerRadius, double innerRadius, int outerSegmentation, int innerSegmentation, const Vec3& offset, const Vec3& rotation, UIndex material);
