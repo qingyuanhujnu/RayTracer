@@ -41,6 +41,7 @@ public:
 	void					SetVertex (UIndex index, const Vec3& position);
 	UIndex					AddTriangle (const Triangle& triangle);
 	void					Transform (const Transformation& transformation);
+	void					SetDoubleSided (bool isDoubleSided);
 
 	void					Finalize ();
 
@@ -50,6 +51,7 @@ public:
 	const Vec3&				GetVertex (UIndex index) const;
 	const Triangle&			GetTriangle (UIndex index) const;
 
+	bool					IsDoubleSided () const;
 	Vec3					GetNormal (UIndex index, const Vec3& coord) const;
 	const Box&				GetBoundingBox () const;
 	const Sphere&			GetBoundingSphere () const;
@@ -67,7 +69,8 @@ private:
 	std::vector<Triangle>	triangles;
 	std::vector<Vec3>		triangleNormals;
 	std::vector<Vec3>		vertexNormals;
-	
+	bool					doubleSided;
+
 	Box						boundingBox;
 	Sphere					boundingSphere;
 	Octree					octree;

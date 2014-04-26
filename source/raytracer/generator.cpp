@@ -59,10 +59,8 @@ void Generator::GenerateRectangle (Model& model, double xSize, double ySize, con
 }
 
 
-static void GenerateCuboidBase (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex materials[6], Generator::Facing facing)
+static void GenerateCuboidBase (Mesh& mesh, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex materials[6], Generator::Facing facing)
 {
-	Mesh mesh;
-
 	double x = xSize / 2.0;
 	double y = ySize / 2.0;
 	double z = zSize / 2.0;
@@ -100,7 +98,6 @@ static void GenerateCuboidBase (Model& model, double xSize, double ySize, double
 	mesh.Transform (tr);
 
 	mesh.Finalize ();
-	model.AddMesh (mesh);
 }
 
 void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material)
@@ -109,12 +106,17 @@ void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double
 	for (UIndex i = 0; i < 6; i++) {
 		materials[i] = material;
 	}
-	GenerateCuboidBase (model, xSize, ySize, zSize, offset, rotation, materials, Inside);
+	Mesh mesh;
+	GenerateCuboidBase (mesh, xSize, ySize, zSize, offset, rotation, materials, Inside);
+	model.AddMesh (mesh);
 }
 
 void Generator::GenerateRoomBox (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex materials[6])
 {
-	GenerateCuboidBase (model, xSize, ySize, zSize, offset, rotation, materials, Outside);
+	Mesh mesh;
+	GenerateCuboidBase (mesh, xSize, ySize, zSize, offset, rotation, materials, Outside);
+	mesh.SetDoubleSided (false);
+	model.AddMesh (mesh);
 }
 
 static Vec3 CylindricalToCartesian (double radius, double height, double theta)
