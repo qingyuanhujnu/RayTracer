@@ -29,6 +29,7 @@ Vec3	operator* (double scalar, const Vec3& vec);
 Vec3	Normalize (const Vec3& vec);
 double	Distance (const Vec3& aVec, const Vec3& bVec);
 Vec3	Offset (const Vec3& vec, const Vec3& direction, double distance);
-Vec3	Reflect (const Vec3& vec, const Vec3& normal);
+
+Vec3	GetReflectedDirection (const Vec3& vec, const Vec3& normal);
 
 #endif

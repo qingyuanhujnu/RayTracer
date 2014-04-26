@@ -51,7 +51,7 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 	}
 
 	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = Reflect (ray.GetDirection (), normal);
+		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 		Color reflectedColor = RayCast (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();

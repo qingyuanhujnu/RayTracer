@@ -75,7 +75,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 
 	// Ideal reflection
 	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = Reflect (ray.GetDirection (), normal);
+		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (isect.position, reflectedDirection);
 		Color reflectedColor = Radiance (reflectedRay, depth + 1);
 		double reflection = material.GetReflection ();
