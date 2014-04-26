@@ -25,6 +25,8 @@ public:
 };
 
 Vec3	operator* (double scalar, const Vec3& vec);
+void	FastVecSub (const Vec3& op1, const Vec3& op2, Vec3& result);		// Use this at performance critical places because operator- isn't inline on 32 bit :(
+void	FastVecMult (const Vec3& op1, const Vec3& op2, Vec3& result);		// Use this at performance critical places because operator^ isn't inline on 32 bit :(
 
 Vec3	Normalize (const Vec3& vec);
 double	Distance (const Vec3& aVec, const Vec3& bVec);
