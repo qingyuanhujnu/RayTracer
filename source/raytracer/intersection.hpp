@@ -66,17 +66,18 @@ public:
 	enum FacingMode
 	{
 		OnlyFrontFacing,
-		FrontAndBackFacing
+		OnlyBackFacing,
+		BothFacing
 	};
 
 	static bool		RaySphere (const Ray& ray, const Sphere& sphere, ShapeIntersection* intersection);
 	static bool		RayBox (const Ray& ray, const Box& box, ShapeIntersection* intersection);
 	static bool		RayTriangle (const Ray& ray, const Triangle& triangle, FacingMode facing, ShapeIntersection* intersection);
 
-	static bool		RayMesh (const Ray& ray, const Mesh& mesh, FacingMode facing, MeshIntersection* intersection);
-	static bool		RayGeometry (const Ray& ray, const Model& model, FacingMode facing, GeometryIntersection* intersection);
+	static bool		RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* intersection);
+	static bool		RayGeometry (const Ray& ray, const Model& model, GeometryIntersection* intersection);
 	static bool		RayLight (const Ray& ray, const Model& model, LightIntersection* intersection);
-	static bool		RayModel (const Ray& ray, const Model& model, FacingMode facing, ModelIntersection* intersection);
+	static bool		RayModel (const Ray& ray, const Model& model, ModelIntersection* intersection);
 };
 
 #endif

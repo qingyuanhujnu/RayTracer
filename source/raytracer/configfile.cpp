@@ -214,13 +214,34 @@ static bool ReadCuboid (std::wifstream& inputStream, Model& model, Generator::Fa
 	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
 	if (!ReadNamedUIndex (inputStream, L"material", material)) { return false; }
 	
-	if (facing == Generator::Inside) {
-		Generator::GenerateCuboid (model, size.x, size.y, size.z, offset, rotation * DEGRAD, material);
-	} else if (facing == Generator::Outside) {
-		Generator::GenerateInsideOutCuboid (model, size.x, size.y, size.z, offset, rotation * DEGRAD, material);
-	} else {
-		DBGERROR (true);
+	Generator::GenerateCuboid (model, size.x, size.y, size.z, offset, rotation * DEGRAD, material);
+	return true;
+}
+
+static bool ReadRoomBox (std::wifstream& inputStream, Model& model)
+{
+	Vec3 size;
+	Vec3 offset;
+	Vec3 rotation;
+
+	if (!ReadNamedVec3 (inputStream, L"size", size)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
+	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
+
+	std::wstring command;
+	if (!ReadString (inputStream, command) || command != L"materials") {
+		return false;
 	}
+
+	UIndex materials[6];
+	if (!ReadUIndex (inputStream, materials[0])) { return false; }
+	if (!ReadUIndex (inputStream, materials[1])) { return false; }
+	if (!ReadUIndex (inputStream, materials[2])) { return false; }
+	if (!ReadUIndex (inputStream, materials[3])) { return false; }
+	if (!ReadUIndex (inputStream, materials[4])) { return false; }
+	if (!ReadUIndex (inputStream, materials[5])) { return false; }
+
+	Generator::GenerateRoomBox (model, size.x, size.y, size.z, offset, rotation * DEGRAD, materials);
 	return true;
 }
 
@@ -409,8 +430,8 @@ bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& param
 			if (DBGERROR (!ReadCuboid (inputStream, model, Generator::Inside))) {
 				error = true;
 			}
-		} else if (commandName == L"insideoutcuboid") {
-			if (DBGERROR (!ReadCuboid (inputStream, model, Generator::Outside))) {
+		} else if (commandName == L"roombox") {
+			if (DBGERROR (!ReadRoomBox (inputStream, model))) {
 				error = true;
 			}
 		} else if (commandName == L"cylinder") {

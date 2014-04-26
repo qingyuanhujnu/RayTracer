@@ -41,7 +41,8 @@ bool Mesh::Triangle::Check (UIndex materialCount, UIndex vertexCount, UIndex ver
 	return true;
 }
 
-Mesh::Mesh ()
+Mesh::Mesh () :
+	doubleSided (true)
 {
 
 }
@@ -73,6 +74,11 @@ void Mesh::Transform (const Transformation& transformation)
 	for (UIndex i = 0; i < vertices.size (); i++) {
 		vertices[i] = transformation.Apply (vertices[i]);
 	}
+}
+
+void Mesh::SetDoubleSided (bool isDoubleSided)
+{
+	doubleSided = isDoubleSided;
 }
 
 void Mesh::Finalize ()
@@ -142,6 +148,11 @@ static Vec3 BarycentricInterpolation (const Vec3& vertex0, const Vec3& vertex1, 
 
 	Vec3 interpolated = (value0 * area1 + value1 * area2 + value2 * area0) / area;
 	return interpolated;
+}
+
+bool Mesh::IsDoubleSided () const
+{
+	return doubleSided;
 }
 
 Vec3 Mesh::GetNormal (UIndex index, const Vec3& coord) const

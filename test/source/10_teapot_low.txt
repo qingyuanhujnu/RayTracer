@@ -426,33 +426,8 @@ mesh
 		 135 124 136 3 -1
 	offset 0 0 0
 	rotation 0 0 75
-rectangle
-	size 6.0 6.0
-	offset 0.0 0.0 0.0
+roombox
+	size 6.0 6.0 6.0
+	offset 0.0 0.0 3.0
 	rotation 0.0 0.0 0.0
-	material 2
-rectangle
-	size 6.0 6.0
-	offset 0.0 0.0 6.0
-	rotation 180.0 0.0 0.0
-	material 2
-rectangle
-	size 6.0 6.0
-	offset 0.0 -3.0 3.0
-	rotation 90.0 0.0 0.0
-	material 0
-rectangle
-	size 6.0 6.0
-	offset 0.0 3.0 3.0
-	rotation -90.0 0.0 0.0
-	material 1
-rectangle
-	size 6.0 6.0
-	offset -3.0 0.0 3.0
-	rotation 0.0 -90.0 0.0
-	material 2
-rectangle
-	size 6.0 6.0
-	offset 3.0 0.0 3.0
-	rotation 0.0 90.0 0.0
-	material 2
+	materials 0 2 1 2 2 2

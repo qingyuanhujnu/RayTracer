@@ -35,50 +35,6 @@ static void AddPolygon (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex d, UInd
 	AddPolygon (mesh, indices, material, curveGroup);
 }
 
-static void GenerateCuboidBase (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material, Generator::Facing facing)
-{
-	Mesh mesh;
-
-	double x = xSize / 2.0;
-	double y = ySize / 2.0;
-	double z = zSize / 2.0;
-
-	mesh.AddVertex (Vec3 (-x, -y, -z));
-	mesh.AddVertex (Vec3 (x, -y, -z));
-	mesh.AddVertex (Vec3 (x, -y, z));
-	mesh.AddVertex (Vec3 (-x, -y, z));
-	mesh.AddVertex (Vec3 (-x, y, -z));
-	mesh.AddVertex (Vec3 (x, y, -z));
-	mesh.AddVertex (Vec3 (x, y, z));
-	mesh.AddVertex (Vec3 (-x, y, z));
-
-	if (facing == Generator::Inside) {
-		AddPolygon (mesh, 0, 1, 2, 3, material, Mesh::NonCurved);
-		AddPolygon (mesh, 1, 5, 6, 2, material, Mesh::NonCurved);
-		AddPolygon (mesh, 5, 4, 7, 6, material, Mesh::NonCurved);
-		AddPolygon (mesh, 4, 0, 3, 7, material, Mesh::NonCurved);
-		AddPolygon (mesh, 0, 4, 5, 1, material, Mesh::NonCurved);
-		AddPolygon (mesh, 3, 2, 6, 7, material, Mesh::NonCurved);
-	} else if (facing == Generator::Outside) {
-		AddPolygon (mesh, 0, 3, 2, 1, material, Mesh::NonCurved);
-		AddPolygon (mesh, 1, 2, 6, 5, material, Mesh::NonCurved);
-		AddPolygon (mesh, 5, 6, 7, 4, material, Mesh::NonCurved);
-		AddPolygon (mesh, 4, 7, 3, 0, material, Mesh::NonCurved);
-		AddPolygon (mesh, 0, 1, 5, 4, material, Mesh::NonCurved);
-		AddPolygon (mesh, 3, 7, 6, 2, material, Mesh::NonCurved);
-	} else {
-		DBGERROR (true);
-	}
-
-	Transformation tr;
-	tr.AppendRotationXYZ (rotation);
-	tr.AppendTranslation (offset);
-	mesh.Transform (tr);
-
-	mesh.Finalize ();
-	model.AddMesh (mesh);
-}
-
 void Generator::GenerateRectangle (Model& model, double xSize, double ySize, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
 	Mesh mesh;
@@ -102,14 +58,65 @@ void Generator::GenerateRectangle (Model& model, double xSize, double ySize, con
 	model.AddMesh (mesh);
 }
 
-void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material)
+
+static void GenerateCuboidBase (Mesh& mesh, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex materials[6], Generator::Facing facing)
 {
-	GenerateCuboidBase (model, xSize, ySize, zSize, offset, rotation, material, Inside);
+	double x = xSize / 2.0;
+	double y = ySize / 2.0;
+	double z = zSize / 2.0;
+
+	mesh.AddVertex (Vec3 (-x, -y, -z));
+	mesh.AddVertex (Vec3 (x, -y, -z));
+	mesh.AddVertex (Vec3 (x, -y, z));
+	mesh.AddVertex (Vec3 (-x, -y, z));
+	mesh.AddVertex (Vec3 (-x, y, -z));
+	mesh.AddVertex (Vec3 (x, y, -z));
+	mesh.AddVertex (Vec3 (x, y, z));
+	mesh.AddVertex (Vec3 (-x, y, z));
+
+	if (facing == Generator::Inside) {
+		AddPolygon (mesh, 0, 1, 2, 3, materials[0], Mesh::NonCurved);
+		AddPolygon (mesh, 1, 5, 6, 2, materials[1], Mesh::NonCurved);
+		AddPolygon (mesh, 5, 4, 7, 6, materials[2], Mesh::NonCurved);
+		AddPolygon (mesh, 4, 0, 3, 7, materials[3], Mesh::NonCurved);
+		AddPolygon (mesh, 0, 4, 5, 1, materials[4], Mesh::NonCurved);
+		AddPolygon (mesh, 3, 2, 6, 7, materials[5], Mesh::NonCurved);
+	} else if (facing == Generator::Outside) {
+		AddPolygon (mesh, 0, 3, 2, 1, materials[0], Mesh::NonCurved);
+		AddPolygon (mesh, 1, 2, 6, 5, materials[1], Mesh::NonCurved);
+		AddPolygon (mesh, 5, 6, 7, 4, materials[2], Mesh::NonCurved);
+		AddPolygon (mesh, 4, 7, 3, 0, materials[3], Mesh::NonCurved);
+		AddPolygon (mesh, 0, 1, 5, 4, materials[4], Mesh::NonCurved);
+		AddPolygon (mesh, 3, 7, 6, 2, materials[5], Mesh::NonCurved);
+	} else {
+		DBGERROR (true);
+	}
+
+	Transformation tr;
+	tr.AppendRotationXYZ (rotation);
+	tr.AppendTranslation (offset);
+	mesh.Transform (tr);
+
+	mesh.Finalize ();
 }
 
-void Generator::GenerateInsideOutCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material)
+void Generator::GenerateCuboid (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
-	GenerateCuboidBase (model, xSize, ySize, zSize, offset, rotation, material, Outside);
+	UIndex materials[6];
+	for (UIndex i = 0; i < 6; i++) {
+		materials[i] = material;
+	}
+	Mesh mesh;
+	GenerateCuboidBase (mesh, xSize, ySize, zSize, offset, rotation, materials, Inside);
+	model.AddMesh (mesh);
+}
+
+void Generator::GenerateRoomBox (Model& model, double xSize, double ySize, double zSize, const Vec3& offset, const Vec3& rotation, UIndex materials[6])
+{
+	Mesh mesh;
+	GenerateCuboidBase (mesh, xSize, ySize, zSize, offset, rotation, materials, Outside);
+	mesh.SetDoubleSided (false);
+	model.AddMesh (mesh);
 }
 
 static Vec3 CylindricalToCartesian (double radius, double height, double theta)

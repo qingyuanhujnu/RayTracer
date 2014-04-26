@@ -206,7 +206,7 @@ bool Intersection::RayTriangle (const Ray& ray, const Triangle& triangle, Facing
 
 	double determinant = edgeDir1 * pVector;
 	bool isFrontFacing = IsPositive (determinant);
-	if (!isFrontFacing && facing == OnlyFrontFacing) {
+	if ((isFrontFacing && facing == OnlyBackFacing) || (!isFrontFacing && facing == OnlyFrontFacing)) {
 		return false;
 	}
 
@@ -266,7 +266,7 @@ static void RayOctree (const Ray& ray, const Octree::Node& node, std::vector<Oct
 	}
 }
 
-bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, FacingMode facing, MeshIntersection* intersection)
+bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* intersection)
 {
 	if (!RaySphere (ray, mesh.GetBoundingSphere (), NULL)) {
 		return false;
@@ -286,6 +286,11 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, FacingMode facing,
 	std::sort (nodesWithIntersections.begin (), nodesWithIntersections.end (), comparator);
 
 	// Search for nearest triangle intersections.
+	Intersection::FacingMode facingMode = Intersection::BothFacing;
+	if (!mesh.IsDoubleSided ()) {
+		facingMode = Intersection::OnlyFrontFacing;
+	}
+
 	bool found = false;
 	Intersection::MeshIntersection minIntersection;
 
@@ -303,7 +308,7 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, FacingMode facing,
 			const Vec3& vertex2 = mesh.GetVertex (triangle.vertex2);
 
 			Intersection::MeshIntersection currentIntersection;
-			if (Intersection::RayTriangle (ray, Triangle (vertex0, vertex1, vertex2), facing, &currentIntersection)) {
+			if (Intersection::RayTriangle (ray, Triangle (vertex0, vertex1, vertex2), facingMode, &currentIntersection)) {
 				if (intersection == NULL) {
 					return true;
 				}
@@ -323,7 +328,7 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, FacingMode facing,
 	return found;
 }
 
-bool Intersection::RayGeometry (const Ray& ray, const Model& model, FacingMode facing, GeometryIntersection* intersection)
+bool Intersection::RayGeometry (const Ray& ray, const Model& model, GeometryIntersection* intersection)
 {
 	bool found = false;
 	GeometryIntersection minIntersection;
@@ -331,13 +336,13 @@ bool Intersection::RayGeometry (const Ray& ray, const Model& model, FacingMode f
 	for (UIndex i = 0; i < model.MeshCount (); i++) {
 		const Mesh& mesh = model.GetMesh (i);
 		if (intersection == NULL) {
-			if (RayMesh (ray, mesh, facing, NULL)) {
+			if (RayMesh (ray, mesh, NULL)) {
 				found = true;
 				break;
 			}
 		} else {
 			GeometryIntersection currentIntersection;
-			if (RayMesh (ray, mesh, facing, &currentIntersection)) {
+			if (RayMesh (ray, mesh, &currentIntersection)) {
 				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
 					minIntersection = currentIntersection;
 					minIntersection.mesh = i;
@@ -385,14 +390,14 @@ bool Intersection::RayLight (const Ray& ray, const Model& model, LightIntersecti
 	return found;
 }
 
-bool Intersection::RayModel (const Ray& ray, const Model& model, FacingMode facing, ModelIntersection* intersection)
+bool Intersection::RayModel (const Ray& ray, const Model& model, ModelIntersection* intersection)
 {
 	if (intersection == NULL) {
-		return RayGeometry (ray, model, facing, NULL) || RayLight (ray, model, NULL);
+		return RayGeometry (ray, model, NULL) || RayLight (ray, model, NULL);
 	}
 	else {
 		bool wasIsect = false;
-		wasIsect |= RayGeometry (ray, model, facing, &intersection->geometryIntersection);
+		wasIsect |= RayGeometry (ray, model, &intersection->geometryIntersection);
 		wasIsect |= RayLight (ray, model, &intersection->lightIntersection);
 
 		if (!wasIsect) {

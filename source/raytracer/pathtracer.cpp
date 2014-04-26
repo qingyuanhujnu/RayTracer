@@ -30,7 +30,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Color color;
 
 	Intersection::GeometryIntersection isect;
-	if (!Intersection::RayGeometry (ray, model, Intersection::OnlyFrontFacing, &isect)) {			// TODO: this is a bug because I need to do a ModelIntersection here
+	if (!Intersection::RayGeometry (ray, model, &isect)) {			// TODO: this is a bug because I need to do a ModelIntersection here
 		return color;
 	}
 
@@ -63,7 +63,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 
 	InfiniteRay shadowRay (isect.position, randomDir);
 	Intersection::ModelIntersection shadowRayIsect;
-	Intersection::RayModel (shadowRay, model, Intersection::OnlyFrontFacing, &shadowRayIsect);
+	Intersection::RayModel (shadowRay, model, &shadowRayIsect);
 
 	if (shadowRayIsect.iSectType == Intersection::ModelIntersection::Light) {		// light hit!
 		const Light& light = model.GetLight (shadowRayIsect.lightIntersection.light);
@@ -110,7 +110,7 @@ Color PathTracer::RayCastTowardsLights (const Vec3& position, const Vec3& normal
 		Vec3 lightIsect;
 		InfiniteRay ray (position, l);
 		Intersection::ModelIntersection iSect;		
-		if (Intersection::RayModel (ray, model, Intersection::OnlyFrontFacing, &iSect) && 
+		if (Intersection::RayModel (ray, model, &iSect) && 
 			iSect.iSectType == Intersection::ModelIntersection::Light &&
 			iSect.lightIntersection.light == i) {		// If hit then also check if we hit the light we intended to hit.
 			double omega = 2 * PI * (1 - cos_a_max);
