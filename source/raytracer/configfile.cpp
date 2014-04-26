@@ -202,7 +202,7 @@ static bool ReadRectangle (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
-static bool ReadCuboid (std::wifstream& inputStream, Model& model, Generator::Facing facing)
+static bool ReadCuboid (std::wifstream& inputStream, Model& model)
 {
 	Vec3 size;
 	Vec3 offset;
@@ -427,7 +427,7 @@ bool ConfigFile::Read (const std::wstring& fileName, Renderer::Parameters& param
 				error = true;
 			}
 		} else if (commandName == L"cuboid") {
-			if (DBGERROR (!ReadCuboid (inputStream, model, Generator::Inside))) {
+			if (DBGERROR (!ReadCuboid (inputStream, model))) {
 				error = true;
 			}
 		} else if (commandName == L"roombox") {
