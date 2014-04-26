@@ -30,7 +30,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Color color;
 
 	Intersection::GeometryIntersection isect;
-	if (!Intersection::RayGeometry (ray, model, &isect)) {			// TODO: this is a bug because I need to do a ModelIntersection here
+	if (!Intersection::RayGeometry (ray, model, Intersection::OnlyFrontFacing, &isect)) {			// TODO: this is a bug because I need to do a ModelIntersection here
 		return color;
 	}
 
@@ -63,7 +63,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 
 	InfiniteRay shadowRay (isect.position, randomDir);
 	Intersection::ModelIntersection shadowRayIsect;
-	Intersection::RayModel (shadowRay, model, &shadowRayIsect);
+	Intersection::RayModel (shadowRay, model, Intersection::OnlyFrontFacing, &shadowRayIsect);
 
 	if (shadowRayIsect.iSectType == Intersection::ModelIntersection::Light) {		// light hit!
 		const Light& light = model.GetLight (shadowRayIsect.lightIntersection.light);
@@ -75,7 +75,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 
 	// Ideal reflection
 	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = Reflect (ray.GetDirection (), normal);
+		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (isect.position, reflectedDirection);
 		Color reflectedColor = Radiance (reflectedRay, depth + 1);
 		double reflection = material.GetReflection ();
@@ -110,7 +110,7 @@ Color PathTracer::RayCastTowardsLights (const Vec3& position, const Vec3& normal
 		Vec3 lightIsect;
 		InfiniteRay ray (position, l);
 		Intersection::ModelIntersection iSect;		
-		if (Intersection::RayModel (ray, model, &iSect) && 
+		if (Intersection::RayModel (ray, model, Intersection::OnlyFrontFacing, &iSect) && 
 			iSect.iSectType == Intersection::ModelIntersection::Light &&
 			iSect.lightIntersection.light == i) {		// If hit then also check if we hit the light we intended to hit.
 			double omega = 2 * PI * (1 - cos_a_max);

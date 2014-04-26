@@ -24,7 +24,7 @@ Color RayTracer::RayCast (const Ray& ray, int depth) const
 {
 	if (depth <= 10) {
 		Intersection::GeometryIntersection intersection;
-		if (Intersection::RayGeometry (ray, model, &intersection)) {
+		if (Intersection::RayGeometry (ray, model, Intersection::OnlyFrontFacing, &intersection)) {
 			return RayTrace (ray, intersection, depth);
 		}
 	}
@@ -51,7 +51,7 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 	}
 
 	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = Reflect (ray.GetDirection (), normal);
+		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 		Color reflectedColor = RayCast (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
@@ -63,5 +63,5 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 bool RayTracer::IsInShadow (const Vec3& position, const Light& light) const
 {
 	SectorRay shadowRay (position, light.GetPosition ());
-	return Intersection::RayGeometry (shadowRay, model, NULL);
+	return Intersection::RayGeometry (shadowRay, model, Intersection::OnlyFrontFacing, NULL);
 }

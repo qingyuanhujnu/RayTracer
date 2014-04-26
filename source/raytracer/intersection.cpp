@@ -2,7 +2,8 @@
 #include <algorithm>
 
 Intersection::ShapeIntersection::ShapeIntersection () :
-	distance (INF)
+	distance (INF),
+	facing (Unknown)
 {
 }
 
@@ -31,23 +32,49 @@ Intersection::ModelIntersection::ModelIntersection () :
 
 bool Intersection::RaySphere (const Ray& ray, const Sphere& sphere, ShapeIntersection* intersection)
 {
-	// from Graphic GEMS
+	const Vec3& rayOrigin = ray.GetOrigin ();
+	const Vec3& rayDirection = ray.GetDirection ();
 
-	Vec3 rayToSphere = sphere.origin - ray.GetOrigin ();
-	double v = rayToSphere * ray.GetDirection ();
+	Vec3 sphereToRay = rayOrigin - sphere.origin;
+	double a = rayDirection * rayDirection;
+	double b = 2.0 * (sphereToRay * rayDirection);
+	double c = sphereToRay * sphereToRay - sphere.radius * sphere.radius;
 
-	double discriminant = sphere.radius * sphere.radius - (rayToSphere * rayToSphere - v * v);
-	if (IsNegative (discriminant)) {
+	double disc = b * b - 4 * a * c;
+	if (!IsPositive (disc)) {
+		// no intersection
 		return false;
 	}
 
-	double distance = v - sqrt (discriminant);
+	double q = 0.0;
+	if (IsNegative (b)) {
+		q = (-b - sqrt (disc)) * 0.5;
+	} else {
+		q = (-b + sqrt (disc)) * 0.5;
+	}
+
+	double t0 = q / a;
+	double t1 = c / q;
+	double maxT = std::max (t0, t1);
+	if (IsNegative (maxT)) {
+		// object is behind
+		return false;
+	}
+
+	double distance = 0.0;
+	double minT = std::min (t0, t1);
+	if (IsNegative (minT)) {
+		distance = maxT;
+	} else {
+		distance = minT;
+	}
+
 	if (ray.IsLengthReached (distance)) {
 		return false;
 	}
 
 	if (intersection != NULL) {
-		intersection->position = ray.GetOrigin () + ray.GetDirection () * distance;
+		intersection->position = rayOrigin + distance * rayDirection;
 		intersection->distance = distance;
 	}
 	return true;
@@ -78,13 +105,16 @@ bool Intersection::RayBox (const Ray& ray, const Box& box, ShapeIntersection* in
 {
 	// from Graphic GEMS
 
+	const Vec3& rayOriginVec = ray.GetOrigin ();
+	const Vec3& rayDirectionVec = ray.GetDirection ();
+
 	double rayOrigin[3];
 	double rayDirection[3];
 	double minB[3];
 	double maxB[3];
 
-	Vec3ToArray (ray.GetOrigin (), rayOrigin);
-	Vec3ToArray (ray.GetDirection (), rayDirection);
+	Vec3ToArray (rayOriginVec, rayOrigin);
+	Vec3ToArray (rayDirectionVec, rayDirection);
 	Vec3ToArray (box.min, minB);
 	Vec3ToArray (box.max, maxB);
 
@@ -108,7 +138,7 @@ bool Intersection::RayBox (const Ray& ray, const Box& box, ShapeIntersection* in
 
 	if (originInBox) {
 		if (intersection != NULL) {
-			intersection->position = ray.GetOrigin ();
+			intersection->position = rayOriginVec;
 			intersection->distance = 0.0;
 		}
 		return true;
@@ -148,7 +178,7 @@ bool Intersection::RayBox (const Ray& ray, const Box& box, ShapeIntersection* in
 
 	Vec3 intersectionCoord;
 	ArrayToVec3 (xCoord, intersectionCoord);
-	double distance = Distance (ray.GetOrigin (), intersectionCoord);
+	double distance = Distance (rayOriginVec, intersectionCoord);
 	if (ray.IsLengthReached (distance)) {
 		return false;
 	}
@@ -160,28 +190,32 @@ bool Intersection::RayBox (const Ray& ray, const Box& box, ShapeIntersection* in
 	return true;
 }
 
-bool Intersection::RayTriangle (const Ray& ray, const Vec3& v0, const Vec3& v1, const Vec3& v2, ShapeIntersection* intersection)
+bool Intersection::RayTriangle (const Ray& ray, const Triangle& triangle, FacingMode facing, ShapeIntersection* intersection)
 {
 	// Moller-Trumbore algorithm
 
-	Vec3 edgeDir1 = v1 - v0;
-	Vec3 edgeDir2 = v2 - v0;
-	Vec3 pVector = ray.GetDirection () ^ edgeDir2;
+	const Vec3& rayOrigin = ray.GetOrigin ();
+	const Vec3& rayDirection = ray.GetDirection ();
+
+	Vec3 edgeDir1 = triangle.v1 - triangle.v0;
+	Vec3 edgeDir2 = triangle.v2 - triangle.v0;
+	Vec3 pVector = rayDirection ^ edgeDir2;
 	double determinant = edgeDir1 * pVector;
-	if (!IsPositive (determinant)) {
+	bool isFrontFacing = IsPositive (determinant);
+	if (!isFrontFacing && facing == OnlyFrontFacing) {
 		return false;
 	}
 
 	double invDeterminant = 1.0 / determinant;
 
-	Vec3 tVector = ray.GetOrigin () - v0;
+	Vec3 tVector = rayOrigin - triangle.v0;
 	double u = (tVector * pVector) * invDeterminant;
 	if (IsLower (u, 0.0) || IsGreater (u, 1.0)) {
 		return false;
 	}
 
 	Vec3 qVector = tVector ^ edgeDir1;
-	double v = (ray.GetDirection () * qVector) * invDeterminant;
+	double v = (rayDirection * qVector) * invDeterminant;
 	if (IsLower (v, 0.0) || IsGreater (u + v, 1.0)) {
 		return false;
 	}
@@ -196,8 +230,9 @@ bool Intersection::RayTriangle (const Ray& ray, const Vec3& v0, const Vec3& v1, 
 	}
 
 	if (intersection != NULL) {
-		intersection->position = ray.GetOrigin () + ray.GetDirection () * distance;
+		intersection->position = rayOrigin + rayDirection * distance;
 		intersection->distance = distance;
+		intersection->facing = isFrontFacing ? Intersection::ShapeIntersection::Front : Intersection::ShapeIntersection::Back;
 	}
 
 	return true;
@@ -225,7 +260,7 @@ bool Intersection::RayOctree (const Ray& ray, const Octree::Node& node, std::vec
 	return true;
 }
 
-bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* intersection)
+bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, FacingMode facing, MeshIntersection* intersection)
 {
 	if (!RaySphere (ray, mesh.GetBoundingSphere (), NULL)) {
 		return false;
@@ -262,7 +297,7 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* 
 			const Vec3& vertex2 = mesh.GetVertex (triangle.vertex2);
 
 			Intersection::MeshIntersection currentIntersection;
-			if (Intersection::RayTriangle (ray, vertex0, vertex1, vertex2, &currentIntersection)) {
+			if (Intersection::RayTriangle (ray, Triangle (vertex0, vertex1, vertex2), facing, &currentIntersection)) {
 				if (intersection == NULL) {
 					return true;
 				}
@@ -282,7 +317,7 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* 
 	return found;
 }
 
-bool Intersection::RayGeometry (const Ray& ray, const Model& model, GeometryIntersection* intersection)
+bool Intersection::RayGeometry (const Ray& ray, const Model& model, FacingMode facing, GeometryIntersection* intersection)
 {
 	bool found = false;
 	GeometryIntersection minIntersection;
@@ -290,13 +325,13 @@ bool Intersection::RayGeometry (const Ray& ray, const Model& model, GeometryInte
 	for (UIndex i = 0; i < model.MeshCount (); i++) {
 		const Mesh& mesh = model.GetMesh (i);
 		if (intersection == NULL) {
-			if (RayMesh (ray, mesh, NULL)) {
+			if (RayMesh (ray, mesh, facing, NULL)) {
 				found = true;
 				break;
 			}
 		} else {
 			GeometryIntersection currentIntersection;
-			if (RayMesh (ray, mesh, &currentIntersection)) {
+			if (RayMesh (ray, mesh, facing, &currentIntersection)) {
 				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
 					minIntersection = currentIntersection;
 					minIntersection.mesh = i;
@@ -344,14 +379,14 @@ bool Intersection::RayLight (const Ray& ray, const Model& model, LightIntersecti
 	return found;
 }
 
-bool Intersection::RayModel (const Ray& ray, const Model& model, ModelIntersection* intersection)
+bool Intersection::RayModel (const Ray& ray, const Model& model, FacingMode facing, ModelIntersection* intersection)
 {
 	if (intersection == NULL) {
-		return RayGeometry (ray, model, NULL) || RayLight (ray, model, NULL);
+		return RayGeometry (ray, model, facing, NULL) || RayLight (ray, model, NULL);
 	}
 	else {
 		bool wasIsect = false;
-		wasIsect |= RayGeometry (ray, model, &intersection->geometryIntersection);
+		wasIsect |= RayGeometry (ray, model, facing, &intersection->geometryIntersection);
 		wasIsect |= RayLight (ray, model, &intersection->lightIntersection);
 
 		if (!wasIsect) {

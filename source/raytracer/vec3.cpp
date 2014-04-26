@@ -111,22 +111,6 @@ Vec3 Normalize (const Vec3& vec)
 	return vec * (1.0 / length);
 }
 
-Vec3 Offset (const Vec3& vec, const Vec3& direction, double distance)
-{
-	Vec3 normal = Normalize (direction);
-	Vec3 result;
-	result.x = vec.x + normal.x * distance;
-	result.y = vec.y + normal.y * distance;
-	result.z = vec.z + normal.z * distance;
-	return result;
-}
-
-Vec3 Reflect (const Vec3& direction, const Vec3& normal)
-{
-	double dotProduct = normal * direction;
-	return direction - (2.0 * normal * dotProduct);
-}
-
 double Distance (const Vec3& aVec, const Vec3& bVec)
 {
 	double x1 = aVec.x;
@@ -137,4 +121,20 @@ double Distance (const Vec3& aVec, const Vec3& bVec)
 	double z2 = bVec.z;
 
 	return sqrt ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
+}
+
+Vec3 Offset (const Vec3& vec, const Vec3& direction, double distance)
+{
+	Vec3 normal = Normalize (direction);
+	Vec3 result;
+	result.x = vec.x + normal.x * distance;
+	result.y = vec.y + normal.y * distance;
+	result.z = vec.z + normal.z * distance;
+	return result;
+}
+
+Vec3 GetReflectedDirection (const Vec3& direction, const Vec3& normal)
+{
+	double dotProduct = normal * direction;
+	return direction - (2.0 * normal * dotProduct);
 }

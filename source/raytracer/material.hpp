@@ -7,10 +7,10 @@ class Material
 {
 public:
 	Material ();
-	Material (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection);
+	Material (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency);
 	~Material ();
 
-	void			Set (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection);
+	void			Set (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency);
 
 	const Color&	GetColor () const;
 	
@@ -21,6 +21,9 @@ public:
 
 	bool			IsReflective () const;
 	double			GetReflection () const;
+
+	bool			IsTransparent () const;
+	double			GetTransparency () const;
 
 	Color			GetAmbientColor () const;
 	Color			GetDiffuseColor () const;
@@ -35,6 +38,7 @@ private:
 	double  shininess;
 
 	double	reflection;
+	double	transparency;
 };
 
 #endif

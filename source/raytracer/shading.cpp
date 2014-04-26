@@ -6,7 +6,7 @@
 Color GetPhongShading (const Material& material, const Light& light, const Vec3& shadedPoint, const Vec3& shadedPointNormal, const Ray& ray)
 {
 	Vec3 lightDirection = Normalize (light.GetPosition () - shadedPoint);
-	Vec3 reflectionVector = Reflect (lightDirection, shadedPointNormal);
+	Vec3 reflectionVector = GetReflectedDirection (lightDirection, shadedPointNormal);
 
 	double lightNormalProduct = lightDirection * shadedPointNormal;
 	double diffuseCoeff = std::max (lightNormalProduct, 0.0);
