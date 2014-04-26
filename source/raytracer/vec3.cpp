@@ -101,6 +101,20 @@ Vec3 operator* (double scalar, const Vec3& vec)
 	return vec.operator* (scalar);
 }
 
+void	FastVecSub (const Vec3& op1, const Vec3& op2, Vec3& result)
+{
+	result.x = op1.x - op2.x;
+	result.y = op1.y - op2.y;
+	result.z = op1.z - op2.z;
+}
+
+void	FastVecMult (const Vec3& op1, const Vec3& op2, Vec3& result)
+{
+	result.x = op1.y * op2.z - op1.z * op2.y;
+	result.y = op1.z * op2.x - op1.x * op2.z;
+	result.z = op1.x * op2.y - op1.y * op2.x;
+}
+
 Vec3 Normalize (const Vec3& vec)
 {
 	double length = sqrt (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);

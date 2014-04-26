@@ -35,7 +35,9 @@ bool Intersection::RaySphere (const Ray& ray, const Sphere& sphere, ShapeInterse
 	const Vec3& rayOrigin = ray.GetOrigin ();
 	const Vec3& rayDirection = ray.GetDirection ();
 
-	Vec3 sphereToRay = rayOrigin - sphere.origin;
+	Vec3 sphereToRay;
+	FastVecSub (rayOrigin, sphere.origin, sphereToRay);
+
 	double a = rayDirection * rayDirection;
 	double b = 2.0 * (sphereToRay * rayDirection);
 	double c = sphereToRay * sphereToRay - sphere.radius * sphere.radius;
@@ -197,9 +199,11 @@ bool Intersection::RayTriangle (const Ray& ray, const Triangle& triangle, Facing
 	const Vec3& rayOrigin = ray.GetOrigin ();
 	const Vec3& rayDirection = ray.GetDirection ();
 
-	Vec3 edgeDir1 = triangle.v1 - triangle.v0;
-	Vec3 edgeDir2 = triangle.v2 - triangle.v0;
-	Vec3 pVector = rayDirection ^ edgeDir2;
+	Vec3 edgeDir1, edgeDir2, pVector;
+	FastVecSub (triangle.v1, triangle.v0, edgeDir1);
+	FastVecSub (triangle.v2, triangle.v0, edgeDir2);
+	FastVecMult (rayDirection, edgeDir2, pVector);
+
 	double determinant = edgeDir1 * pVector;
 	bool isFrontFacing = IsPositive (determinant);
 	if (!isFrontFacing && facing == OnlyFrontFacing) {
@@ -208,13 +212,15 @@ bool Intersection::RayTriangle (const Ray& ray, const Triangle& triangle, Facing
 
 	double invDeterminant = 1.0 / determinant;
 
-	Vec3 tVector = rayOrigin - triangle.v0;
+	Vec3 tVector;
+	FastVecSub (rayOrigin, triangle.v0, tVector);
 	double u = (tVector * pVector) * invDeterminant;
 	if (IsLower (u, 0.0) || IsGreater (u, 1.0)) {
 		return false;
 	}
 
-	Vec3 qVector = tVector ^ edgeDir1;
+	Vec3 qVector;
+	FastVecMult (tVector, edgeDir1, qVector);
 	double v = (rayDirection * qVector) * invDeterminant;
 	if (IsLower (v, 0.0) || IsGreater (u + v, 1.0)) {
 		return false;
