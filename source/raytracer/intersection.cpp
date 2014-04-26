@@ -238,16 +238,18 @@ bool Intersection::RayTriangle (const Ray& ray, const Triangle& triangle, Facing
 	return true;
 }
 
-bool Intersection::RayOctree (const Ray& ray, const Octree::Node& node, std::vector<OctreeNodeWithIntersection>& nodesWithIntersections)
+typedef std::pair<const Octree::Node*, Intersection::ShapeIntersection> OctreeNodeWithIntersection;
+
+static void RayOctree (const Ray& ray, const Octree::Node& node, std::vector<OctreeNodeWithIntersection>& nodesWithIntersections)
 {
 	if (node.IsEmpty ()) {
-		return false;
+		return;
 	}
 
 	const Box& box = node.GetBox ();
 	Intersection::ShapeIntersection intersection;
 	if (!Intersection::RayBox (ray, box, &intersection)) {
-		return false;
+		return;
 	}
 
 	nodesWithIntersections.push_back (OctreeNodeWithIntersection (&node, intersection));
@@ -256,8 +258,6 @@ bool Intersection::RayOctree (const Ray& ray, const Octree::Node& node, std::vec
 	for (UIndex i = 0; i < children.size (); i++) {
 		RayOctree (ray, children[i], nodesWithIntersections);
 	}
-
-	return true;
 }
 
 bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, FacingMode facing, MeshIntersection* intersection)
@@ -274,7 +274,7 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, FacingMode facing,
 	RayOctree (ray, startNode, nodesWithIntersections);
 
 	// Sort them by distance.
-	auto comparator = [](const Intersection::OctreeNodeWithIntersection& node1, const Intersection::OctreeNodeWithIntersection& node2) {
+	auto comparator = [](const OctreeNodeWithIntersection& node1, const OctreeNodeWithIntersection& node2) {
 		return node1.second.distance < node2.second.distance;
 	};
 	std::sort (nodesWithIntersections.begin (), nodesWithIntersections.end (), comparator);
