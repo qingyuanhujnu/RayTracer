@@ -58,6 +58,59 @@ void Transformation::SetTranslation (const Vec3& translation)
 	matrix[15] = 1.0;
 }
 
+void Transformation::SetRotation  (const Vec3& axis, double angle, const Vec3* origo)
+{
+	Vec3 normal = Normalize (axis);
+
+	double u = normal.x;
+	double v = normal.y;
+	double w = normal.z;
+
+	double u2 = u * u;
+	double v2 = v * v;
+	double w2 = w * w;
+
+	double si = sin (angle);
+	double co = cos (angle);
+	
+	if (origo == NULL) {
+		matrix[0] = u2 + (v2 + w2) * co;
+		matrix[1] = u * v * (1.0 - co) - w * si;
+		matrix[2] = u * w * (1.0 - co) + v * si;
+		matrix[3] = 0.0;
+		matrix[4] = u * v * (1.0 - co) + w * si;
+		matrix[5] = v2 + (u2 + w2) * co;
+		matrix[6] = v * w * (1.0 - co) - u * si;
+		matrix[7] = 0.0;
+		matrix[8] = u * w * (1.0 - co) - v * si;
+		matrix[9] = v * w * (1.0 - co) + u * si;
+		matrix[10] = w2 + (u2 + v2) * co;
+		matrix[11] = 0.0;
+	} else {
+		double a = origo->x;
+		double b = origo->y;
+		double c = origo->z;
+	
+		matrix[0] = u2 + (v2 + w2) * co;
+		matrix[1] = u * v * (1.0 - co) - w * si;
+		matrix[2] = u * w * (1.0 - co) + v * si;
+		matrix[3] = (a * (v2 + w2) - u * (b * v + c * w)) * (1.0 - co) + (b * w - c * v) * si;
+		matrix[4] = u * v * (1.0 - co) + w * si;
+		matrix[5] = v2 + (u2 + w2) * co;
+		matrix[6] = v * w * (1.0 - co) - u * si;
+		matrix[7] = (b * (u2 + w2) - v * (a * u + c * w)) * (1.0 - co) + (c * u - a * w) * si;
+		matrix[8] = u * w * (1.0 - co) - v * si;
+		matrix[9] = v * w * (1.0 - co) + u * si;
+		matrix[10] = w2 + (u2 + v2) * co;
+		matrix[11] = (c * (u2 + v2) - w * (a * u + b * v)) * (1.0 - co) + (a * v - b * u) * si;
+	}
+	
+	matrix[12] = 0.0;
+	matrix[13] = 0.0;
+	matrix[14] = 0.0;
+	matrix[15] = 1.0;
+}
+
 void Transformation::SetRotationX (double angle)
 {
 	double si = sin (angle);

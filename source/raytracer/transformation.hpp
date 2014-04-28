@@ -13,6 +13,7 @@ public:
 	void	SetIdentity ();
 
 	void	SetTranslation (const Vec3& translation);
+	void	SetRotation (const Vec3& axis, double angle, const Vec3* origo);
 	void	SetRotationX (double angle);
 	void	SetRotationY (double angle);
 	void	SetRotationZ (double angle);
