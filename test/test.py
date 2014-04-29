@@ -21,7 +21,7 @@ def GetImageFileName (folder, configFile):
 	return os.path.join (folder, configFile + '.png')
 		
 def RayTrace (binaryPath, configFile, resultFile):
-	command = binaryPath + ' "' + configFile + '" "' + resultFile + '"'
+	command = binaryPath + ' "' + configFile + '" "' + resultFile + '" raytrace'
 	return os.system (command)
 
 def EqualFile (aFile, bFile):

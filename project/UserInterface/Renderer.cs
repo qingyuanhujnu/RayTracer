@@ -25,6 +25,12 @@ namespace UserInterface {
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
             ProgressCallback progressCallback);
+
+        [DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int PathTrace2 (
+            [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
+            [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
+            ProgressCallback progressCallback);
     }
 
 	class Renderer
@@ -32,7 +38,8 @@ namespace UserInterface {
         public enum RenderMode
         {
             RayTraceMode,
-            PathTraceMode
+            PathTraceMode,
+            PathTrace2Mode
         };
 
         public Renderer (MainForm mainForm, RenderMode renderMode)
@@ -130,6 +137,8 @@ namespace UserInterface {
                     result = Win32Functions.RayTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
                 } else if (renderMode == RenderMode.PathTraceMode) {
                     result = Win32Functions.PathTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
+                } else if (renderMode == RenderMode.PathTrace2Mode) {
+                    result = Win32Functions.PathTrace2 (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
                 }
             }
 

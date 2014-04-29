@@ -2,6 +2,7 @@
 #include "configfile.hpp"
 #include "raytracer.hpp"
 #include "pathtracer.hpp"
+#include "pathtracer2.hpp"
 #include "export.hpp"
 #include <memory>
 
@@ -27,7 +28,8 @@ private:
 enum RenderMode
 {
 	RayTraceMode,
-	PathTraceMode
+	PathTraceMode,
+	PathTrace2Mode
 };
 
 static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
@@ -52,6 +54,8 @@ static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* re
 		renderer.reset (new RayTracer (model, camera));
 	} else if (mode == PathTraceMode) {
 		renderer.reset (new PathTracer (model, camera));
+	} else if (mode == PathTrace2Mode) {
+		renderer.reset (new PathTracer2 (model, camera));
 	}
 	if (DBGERROR (renderer == NULL)) {
 		return 3;
@@ -78,4 +82,9 @@ int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCall
 int PathTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
 {
 	return Render (PathTraceMode, configFile, resultFile, progressCallback);
+}
+
+int PathTrace2 (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
+{
+	return Render (PathTrace2Mode, configFile, resultFile, progressCallback);
 }

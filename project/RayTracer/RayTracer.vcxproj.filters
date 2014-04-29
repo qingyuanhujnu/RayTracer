@@ -94,6 +94,9 @@
     <ClCompile Include="..\..\source\raytracer\triangle.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\raytracer\pathtracer2.cpp">
+      <Filter>RayTracer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer\raytracer.hpp">
@@ -173,6 +176,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\raytracer\triangle.hpp">
       <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\raytracer\pathtracer2.hpp">
+      <Filter>RayTracer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

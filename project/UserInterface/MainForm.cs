@@ -97,6 +97,12 @@ namespace UserInterface {
             Renderer rayTracer = new Renderer (this, Renderer.RenderMode.PathTraceMode);
             rayTracer.Start (configTextBox.Text);
         }
+
+        private void pathTrace2Menu_Click (object sender, EventArgs e)
+        {
+            Renderer rayTracer = new Renderer (this, Renderer.RenderMode.PathTrace2Mode);
+            rayTracer.Start (configTextBox.Text);
+        }
         
         private void OpenFile (String fileName)
 		{

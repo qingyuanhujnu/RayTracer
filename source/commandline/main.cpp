@@ -33,13 +33,12 @@ int wmain (int argc, wchar_t **argv)
 		return 1;
 	}
 
-	RayTraceFunction rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "RayTrace");
-	if (rayTraceFunction == NULL) {
-		return 1;
-	}
-
-	if (argc != 3) {
+	if (argc != 4) {
 		// development mode
+		RayTraceFunction rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "RayTrace");
+		if (rayTraceFunction == NULL) {
+			return 1;
+		}
 		rayTraceFunction (L"config01.txt", L"result.png", OnProgress);
 		return 1;
 	}
@@ -51,6 +50,20 @@ int wmain (int argc, wchar_t **argv)
 
 	std::wstring resultFile (argv[2]);
 	if (resultFile.empty ()) {
+		return 1;
+	}
+
+	std::wstring algorithm (argv[3]);
+
+	RayTraceFunction rayTraceFunction = NULL;
+	if (algorithm == L"raytrace") {
+		rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "RayTrace");
+	} else if (algorithm == L"pathtrace") {
+		rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "PathTrace");
+	} else if (algorithm == L"pathtrace2") {
+		rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "PathTrace2");
+	}
+	if (rayTraceFunction == NULL) {
 		return 1;
 	}
 

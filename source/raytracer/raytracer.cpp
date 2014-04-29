@@ -48,7 +48,7 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		if (!IsInShadow (intersection.position, light)) {
-			color += GetPhongShading (material, light, intersection.position, normal, ray);
+			color += GetPhongShading (material, light, intersection.position, normal, ray.GetDirection ());
 		} else {
 			color += material.GetAmbientColor ();
 		}
@@ -59,13 +59,6 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 		Color reflectedColor = RayCast (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
-	}
-
-	if (material.IsTransparent ()) {
-		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal);
-		InfiniteRay refractedRay (intersection.position, refractedDirection);
-		Color refractedColor = RayCast (refractedRay, depth + 1);
-		color += refractedColor * material.GetTransparency ();
 	}
 
 	return Clamp (color);
