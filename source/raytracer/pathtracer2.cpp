@@ -13,7 +13,7 @@ PathTracer2::PathTracer2 (const Model& model, const Camera& camera) :
 Color PathTracer2::GetFieldColor (const Image::Field& field)
 {
 	Average<Color> averageColor;
-	static const int sampleCount = 128;
+	static const int sampleCount = 16;
 	for (int i = 0; i < sampleCount; i++) {
 		InfiniteRay cameraRay (camera.GetEye (), field.GetRandomSample () - camera.GetEye ());
 		averageColor.Add (Trace (cameraRay, 0));
@@ -41,8 +41,9 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 		normal = normal * -1.0;
 	}
 
-	color += SampleLights (material, intersection.position, normal, ray.GetDirection ())  / 2.0;
-	color += SampleGeometry (intersection.position, normal, depth) / 2.0;
+	double materialEmission = 0.4;
+	color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - materialEmission);
+	color += SampleGeometry (intersection.position, normal, depth) * materialEmission;
 
 	if (material.IsReflective ()) {
 		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
@@ -50,7 +51,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 		Color reflectedColor = Trace (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
 	}
-	return color;
+	return Clamp (color);
 }
 
 static double RandomInRange (double min, double max)
@@ -73,22 +74,18 @@ static Vec3 RandomPointInSphereVolume (const Vec3& origin, double radius)
 
 Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection)
 {
-	Average<Color> color;
+	Color color;
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		Vec3 randomLightPoint = RandomPointInSphereVolume (light.GetPosition (), light.GetRadius ());
-		InfiniteRay lightRay (point, randomLightPoint - point);
-		Intersection::ModelIntersection modelIntersection;
-		if (Intersection::RayModel (lightRay, model, &modelIntersection) &&
-			modelIntersection.iSectType == Intersection::ModelIntersection::Light &&
-			modelIntersection.lightIntersection.light == i)	{
-			Color shadedColor = GetPhongShading (material, light, point, normal, viewDirection);
-			color.Add (shadedColor);
+		SectorRay lightRay (point, randomLightPoint);
+		if (!Intersection::RayGeometry (lightRay, model, NULL)) {
+			color += GetPhongShading (material, light, point, normal, viewDirection); // TODO: sulyozni
 		} else {
-			color.Add (material.GetAmbientColor ());
+			color += material.GetAmbientColor ();
 		}
 	}
-	return color.Get ();
+	return Clamp (color);
 }
 
 Vec3 RandomDirectionOnHemisphere (const Vec3& normal)
@@ -127,5 +124,5 @@ Color PathTracer2::SampleGeometry (const Vec3& point, const Vec3& normal, int de
 		modelIntersection.iSectType == Intersection::ModelIntersection::Geometry)	{
 		color = Trace (lightRay, depth + 1);
 	}
-	return color;
+	return Clamp (color);
 }

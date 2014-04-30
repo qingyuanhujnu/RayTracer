@@ -136,7 +136,9 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 	const int resY = parameters.GetResolutionY ();
 
 	const int procs = omp_get_num_procs ();		// logical cores
-	#pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
+#ifndef DEBUG
+	#pragma omp parallel for schedule(dynamic, 4) num_threads (procs - 1)
+#endif
 	for (int pix = 0; pix < (resX * resY); ++pix) {
 		int x = pix % resX;
 		int y = pix / resX;
@@ -144,8 +146,9 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 		Image::Field field = image.GetField (x, y);
 		Color fieldColor = GetFieldColor (field);
 		result.SetColor (x, y, fieldColor);
-
+#ifndef DEBUG
 		#pragma omp critical
+#endif
 		{
 			finishedPixels++;
 
