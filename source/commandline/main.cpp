@@ -3,7 +3,8 @@
 #include <string>
 
 typedef void (*ProgressCallback) (double progress);
-typedef bool (*RayTraceFunction) (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback);
+typedef void (*PixelReadyCallback) (int x, int y, double r, double g, double b, int picWidth, int picHeight);
+typedef bool (*RayTraceFunction) (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, PixelReadyCallback pixelReadyCallback);
 
 class LibraryGuard
 {
@@ -26,6 +27,11 @@ static void OnProgress (double progress)
 	//printf ("%f\n", progress);
 }
 
+static void OnPixelReady (int x, int y, double r, double g, double b, int picWidth, int picHeight)
+{
+
+}
+
 int wmain (int argc, wchar_t **argv)
 {
 	LibraryGuard rayTracerModule (L"RayTracer.dll");
@@ -39,7 +45,7 @@ int wmain (int argc, wchar_t **argv)
 		if (rayTraceFunction == NULL) {
 			return 1;
 		}
-		rayTraceFunction (L"config01.txt", L"result.png", OnProgress);
+		rayTraceFunction (L"config01.txt", L"result.png", OnProgress, OnPixelReady);
 		return 1;
 	}
 
@@ -67,7 +73,7 @@ int wmain (int argc, wchar_t **argv)
 		return 1;
 	}
 
-	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), OnProgress) != 0) {
+	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), OnProgress, OnPixelReady) != 0) {
 		return 1;
 	}
 	return 0;
