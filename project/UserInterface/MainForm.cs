@@ -35,7 +35,7 @@ namespace UserInterface {
         {
             menuStrip.Enabled = false;
             configTextBox.Enabled = false;
-            pictureBox.Visible = false;
+            pictureBox.Visible = true;
             progressBar.Visible = true;
             progressBar.Value = 0;
         }
@@ -57,7 +57,7 @@ namespace UserInterface {
         {
             pictureBox.Image = image;
         }
-
+    
 		private void FileMenuOpen_Click (object sender, EventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog ();

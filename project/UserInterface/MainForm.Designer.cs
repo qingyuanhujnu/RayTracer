@@ -34,11 +34,11 @@
             this.renderMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.rayTraceMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.pathTraceMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.pathTrace2Menu = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.configTextBox = new System.Windows.Forms.RichTextBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.pictureBox = new System.Windows.Forms.PictureBox();
-            this.pathTrace2Menu = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -108,16 +108,23 @@
             // rayTraceMenu
             // 
             this.rayTraceMenu.Name = "rayTraceMenu";
-            this.rayTraceMenu.Size = new System.Drawing.Size(152, 22);
+            this.rayTraceMenu.Size = new System.Drawing.Size(139, 22);
             this.rayTraceMenu.Text = "Ray Trace";
             this.rayTraceMenu.Click += new System.EventHandler(this.rayTraceMenu_Click);
             // 
             // pathTraceMenu
             // 
             this.pathTraceMenu.Name = "pathTraceMenu";
-            this.pathTraceMenu.Size = new System.Drawing.Size(152, 22);
+            this.pathTraceMenu.Size = new System.Drawing.Size(139, 22);
             this.pathTraceMenu.Text = "Path Trace";
             this.pathTraceMenu.Click += new System.EventHandler(this.pathTraceMenu_Click);
+            // 
+            // pathTrace2Menu
+            // 
+            this.pathTrace2Menu.Name = "pathTrace2Menu";
+            this.pathTrace2Menu.Size = new System.Drawing.Size(139, 22);
+            this.pathTrace2Menu.Text = "Path Trace 2";
+            this.pathTrace2Menu.Click += new System.EventHandler(this.pathTrace2Menu_Click);
             // 
             // splitContainer
             // 
@@ -134,7 +141,7 @@
             this.splitContainer.Panel2.Controls.Add(this.progressBar);
             this.splitContainer.Panel2.Controls.Add(this.pictureBox);
             this.splitContainer.Size = new System.Drawing.Size(584, 338);
-            this.splitContainer.SplitterDistance = 193;
+            this.splitContainer.SplitterDistance = 209;
             this.splitContainer.TabIndex = 1;
             // 
             // configTextBox
@@ -144,33 +151,31 @@
             this.configTextBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.configTextBox.Location = new System.Drawing.Point(0, 0);
             this.configTextBox.Name = "configTextBox";
-            this.configTextBox.Size = new System.Drawing.Size(193, 338);
+            this.configTextBox.Size = new System.Drawing.Size(209, 338);
             this.configTextBox.TabIndex = 0;
             this.configTextBox.Text = "";
             this.configTextBox.WordWrap = false;
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(0, 0);
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(0, 315);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(150, 23);
+            this.progressBar.Size = new System.Drawing.Size(371, 23);
             this.progressBar.TabIndex = 1;
             // 
             // pictureBox
             // 
-            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox.Location = new System.Drawing.Point(0, 0);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(387, 338);
+            this.pictureBox.Size = new System.Drawing.Size(371, 335);
+            this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
-            // 
-            // pathTrace2Menu
-            // 
-            this.pathTrace2Menu.Name = "pathTrace2Menu";
-            this.pathTrace2Menu.Size = new System.Drawing.Size(152, 22);
-            this.pathTrace2Menu.Text = "Path Trace 2";
-            this.pathTrace2Menu.Click += new System.EventHandler(this.pathTrace2Menu_Click);
             // 
             // MainForm
             // 

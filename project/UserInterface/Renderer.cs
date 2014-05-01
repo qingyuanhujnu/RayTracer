@@ -14,27 +14,41 @@ namespace UserInterface {
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public delegate void ProgressCallback (double progress);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void SetPixelCallback(int x, int y, double r, double g, double b, int picWidth, int picHeight);
+
 		[DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern int RayTrace (
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
-            ProgressCallback progressCallback);
+            ProgressCallback progressCallback,
+            SetPixelCallback setPixelCallback);
 
         [DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int PathTrace (
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
-            ProgressCallback progressCallback);
+            ProgressCallback progressCallback,
+            SetPixelCallback setPixelCallback);
 
         [DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int PathTrace2 (
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
-            ProgressCallback progressCallback);
+            ProgressCallback progressCallback,
+            SetPixelCallback setPixelCallback);
     }
 
 	class Renderer
     {
+        private MainForm mainForm;
+        private RenderMode renderMode;
+        private String tempFileName;
+        private String tempResultFileName;
+
+        private volatile Bitmap renderImage;
+        private Bitmap copyImage;
+
         public enum RenderMode
         {
             RayTraceMode,
@@ -46,6 +60,8 @@ namespace UserInterface {
 		{
             this.mainForm = mainForm;
             this.renderMode = renderMode;
+            this.renderImage = null;
+            this.copyImage = null;
 		}
 
         public void Start (String configString)
@@ -62,7 +78,7 @@ namespace UserInterface {
                 writer.Close ();
 
                 RenderWorker worker = new RenderWorker ();
-                worker.Start (renderMode, tempFileName, tempResultFileName, Progress, Finish);
+                worker.Start (renderMode, tempFileName, tempResultFileName, Progress, Finish, SetPixel);
             } catch {
 
             }
@@ -70,7 +86,20 @@ namespace UserInterface {
 
         private void Progress (int progress)
         {
-            mainForm.SetProgressBarValue (progress);
+            mainForm.SetProgressBarValue(progress);
+
+            lock (this)
+            {
+                if (renderImage != null)
+                {
+                    if (copyImage != null)
+                    {
+                        copyImage.Dispose();
+                    }
+                    copyImage = new Bitmap(renderImage);
+                    mainForm.SetPictureBoxImage(copyImage);
+                }
+            }
         }
 
         private void Finish (int result)
@@ -78,7 +107,7 @@ namespace UserInterface {
             if (result == 0) {
                 MemoryStream memoryStream = new MemoryStream (File.ReadAllBytes (tempResultFileName));
                 Image image = Image.FromStream (memoryStream);
-                mainForm.SetPictureBoxImage (image);
+                mainForm.SetPictureBoxImage(image);
             } else {
                 mainForm.SetPictureBoxImage (null);
             }
@@ -86,13 +115,28 @@ namespace UserInterface {
             File.Delete (tempFileName);
             File.Delete (tempResultFileName);
 
+            renderImage.Dispose();
+            copyImage.Dispose();
+
             mainForm.UpdateControlsForEdit ();
         }
 
-        private MainForm mainForm;
-        private RenderMode renderMode;
-        private String tempFileName;
-        private String tempResultFileName;
+        private void SetPixel (int x, int y, double r, double g, double b, int picWidth, int picHeight)        
+        {
+            Color color = Color.FromArgb(255,
+                                    Convert.ToByte(r * 255),
+                                    Convert.ToByte(g * 255),
+                                    Convert.ToByte(b * 255));
+
+            lock (this)
+            {
+                if (renderImage == null || picWidth > renderImage.Width || picHeight > renderImage.Height)
+                {
+                    renderImage = new Bitmap(picWidth, picHeight);
+                }
+                renderImage.SetPixel(x, picHeight - 1 - y, color);      // Bitmap.SetPixel is NOT thread safe :(
+            }
+        }
         
         private class RenderWorker
         {
@@ -104,6 +148,7 @@ namespace UserInterface {
 
             private Action<int> progressCallback;
             private Action<int> finishedCallback;
+            private Action<int, int, double, double, double, int, int> setPixelCallback;
 
             int result = -1;
 
@@ -115,13 +160,19 @@ namespace UserInterface {
                 backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler (RayTraceCompleted);
             }
 
-            public void Start (RenderMode renderMode, String tempFileName, String tempResultFileName, Action<int> progressCallback, Action<int> finishedCallback)
+            public void Start (RenderMode renderMode, 
+                                String tempFileName,
+                                String tempResultFileName,
+                                Action<int> progressCallback,
+                                Action<int> finishedCallback,
+                                Action<int, int, double, double, double, int, int> setPixelCallback)
             {
                 this.renderMode = renderMode;
                 this.tempFileName = tempFileName;
                 this.tempResultFileName = tempResultFileName;
                 this.progressCallback = progressCallback;
                 this.finishedCallback = finishedCallback;
+                this.setPixelCallback = setPixelCallback;
                 backgroundWorker.RunWorkerAsync ();
             }
 
@@ -130,15 +181,20 @@ namespace UserInterface {
                 backgroundWorker.ReportProgress ((Int32)(progress * 100.0));
             }
 
+            private void NativeRayTracerSetPixelCallback (int x, int y, double r, double g, double b, int picWidth, int picHeight)
+            {
+                setPixelCallback(x, y, r, g, b, picWidth, picHeight);
+            }
+
             private void DoRayTrace (object sender, DoWorkEventArgs e)
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
                 if (renderMode == RenderMode.RayTraceMode) {
-                    result = Win32Functions.RayTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
+                    result = Win32Functions.RayTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
                 } else if (renderMode == RenderMode.PathTraceMode) {
-                    result = Win32Functions.PathTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
+                    result = Win32Functions.PathTrace(tempFileName, tempResultFileName, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
                 } else if (renderMode == RenderMode.PathTrace2Mode) {
-                    result = Win32Functions.PathTrace2 (tempFileName, tempResultFileName, NativeRayTracerProgressCallback);
+                    result = Win32Functions.PathTrace2(tempFileName, tempResultFileName, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
                 }
             }
 

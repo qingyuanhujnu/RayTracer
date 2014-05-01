@@ -10,7 +10,6 @@ class Progress : public RayTracer::IProgress
 {
 public:
 	Progress (ProgressCallback progressCallback) :
-		RayTracer::IProgress (),
 		progressCallback (progressCallback)
 	{
 
@@ -25,6 +24,24 @@ private:
 	ProgressCallback progressCallback;
 };
 
+class SendPixel : public RayTracer::PixelReady
+{
+public:
+	SendPixel (SetPixelCallback setPixelCallback) :
+		setPixelCallback (setPixelCallback)	
+	{
+
+	}
+
+	virtual void OnPixelReady (int x, int y, double r, double g, double b, int picWidth, int picHeight) const
+	{
+		setPixelCallback (x, y, r, g, b, picWidth, picHeight);
+	}
+
+private:
+	SetPixelCallback setPixelCallback;
+};
+
 enum RenderMode
 {
 	RayTraceMode,
@@ -32,7 +49,7 @@ enum RenderMode
 	PathTrace2Mode
 };
 
-static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
+static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
 {
 	if (DBGERROR (configFile == NULL)) {
 		return 1;
@@ -62,8 +79,9 @@ static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* re
 	}
 
 	Progress progress (progressCallback);
+	SendPixel sendPixel (setPixelCallback);
 	Renderer::ResultImage resultImage;
-	if (DBGERROR (!renderer->Render (parameters, resultImage, progress))) {
+	if (DBGERROR (!renderer->Render (parameters, resultImage, progress, sendPixel))) {
 		return 4;
 	}
 	
@@ -74,17 +92,17 @@ static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* re
 	return 0;
 }
 
-int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
+int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
 {
-	return Render (RayTraceMode, configFile, resultFile, progressCallback);
+	return Render (RayTraceMode, configFile, resultFile, progressCallback, setPixelCallback);
 }
 
-int PathTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
+int PathTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
 {
-	return Render (PathTraceMode, configFile, resultFile, progressCallback);
+	return Render (PathTraceMode, configFile, resultFile, progressCallback, setPixelCallback);
 }
 
-int PathTrace2 (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback)
+int PathTrace2 (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
 {
-	return Render (PathTrace2Mode, configFile, resultFile, progressCallback);
+	return Render (PathTrace2Mode, configFile, resultFile, progressCallback, setPixelCallback);
 }

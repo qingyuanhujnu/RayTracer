@@ -11,6 +11,16 @@ Renderer::IProgress::~IProgress ()
 
 }
 
+Renderer::PixelReady::~PixelReady ()
+{
+
+}
+
+void Renderer::PixelReady::OnPixelReady (int /*x*/, int /*y*/, double /*r*/, double /*g*/, double /*b*/, int /*picWidth*/, int /*picHeight*/) const
+{
+
+}
+
 Renderer::Parameters::Parameters ()
 {
 	Set (100, 100, 1.0);
@@ -111,7 +121,7 @@ Renderer::~Renderer ()
 {
 }
 
-bool Renderer::Render (const Parameters& parameters, ResultImage& result, const IProgress& progress)
+bool Renderer::Render (const Parameters& parameters, ResultImage& result, const IProgress& progress, const PixelReady& pixelReady)
 {
 	if (DBGERROR (!parameters.Check ())) {
 		return false;
@@ -135,17 +145,19 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
 
-	const int procs = omp_get_num_procs ();		// logical cores
 #ifndef DEBUG
+	const int procs = omp_get_num_procs ();		// logical cores
 	#pragma omp parallel for schedule(dynamic, 4) num_threads (procs - 1)
 #endif
 	for (int pix = 0; pix < (resX * resY); ++pix) {
 		int x = pix % resX;
-		int y = pix / resX;
+		int y = resY - (pix / resX) - 1;
 
 		Image::Field field = image.GetField (x, y);
 		Color fieldColor = GetFieldColor (field);
 		result.SetColor (x, y, fieldColor);
+
+		pixelReady.OnPixelReady (x, y, fieldColor.r, fieldColor.g, fieldColor.b, resX, resY);
 #ifndef DEBUG
 		#pragma omp critical
 #endif
