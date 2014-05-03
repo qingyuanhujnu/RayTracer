@@ -145,6 +145,7 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
 
+	progress.OnProgress (0.0);
 #ifndef DEBUG
 	const int procs = omp_get_num_procs ();		// logical cores
 	#pragma omp parallel for schedule(dynamic, 4) num_threads (procs - 1)
@@ -170,6 +171,7 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 			}
 		}
 	}
+	progress.OnProgress (1.0);
 
 	return true;
 }

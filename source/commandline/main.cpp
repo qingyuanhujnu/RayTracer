@@ -24,7 +24,12 @@ public:
 
 static void OnProgress (double progress)
 {
-	//printf ("%f\n", progress);
+
+}
+
+static void OnProgressVerbose (double progress)
+{
+	printf ("%f%%\n", progress * 100.0);
 }
 
 static void OnPixelReady (int x, int y, double r, double g, double b, int picWidth, int picHeight)
@@ -32,7 +37,51 @@ static void OnPixelReady (int x, int y, double r, double g, double b, int picWid
 
 }
 
-int wmain (int argc, wchar_t **argv)
+void WriteHelp ()
+{
+	std::wcout << L"parameters:" << std::endl;
+	std::wcout << L"    --config       Config file path." << std::endl;
+	std::wcout << L"    --result       Result image path." << std::endl;
+	std::wcout << L"    --algorithm    Algorithm (raytrace, pathtrace, pathtrace2)." << std::endl;
+	std::wcout << L"    --verbose      Write progress information." << std::endl;
+}
+
+static bool GetParameters (
+	int argc, const wchar_t* argv[],
+	std::wstring& configFile,
+	std::wstring& resultFile,
+	std::wstring& algorithm,
+	bool& verbose)
+{
+	for (int i = 1; i < argc; i++) {
+		std::wstring currentParameter (argv[i]);
+		if (currentParameter == L"--config") {
+			if (i >= argc - 1) {
+				return false;
+			}
+			configFile = argv[i + 1];
+			i++;
+		} else if (currentParameter == L"--result") {
+			if (i >= argc - 1) {
+				return false;
+			}
+			resultFile = argv[i + 1];
+			i++;
+		} else if (currentParameter == L"--algorithm") {
+			if (i >= argc - 1) {
+				return false;
+			}
+			algorithm = argv[i + 1];
+			i++;
+		} else if (currentParameter == L"--verbose") {
+			verbose = true;
+		}
+	}
+
+	return !configFile.empty () && !resultFile.empty () && !algorithm.empty ();
+}
+
+int wmain (int argc, const wchar_t **argv)
 {
 	LibraryGuard rayTracerModule (L"RayTracer.dll");
 	if (rayTracerModule.module == NULL) {
@@ -40,26 +89,23 @@ int wmain (int argc, wchar_t **argv)
 	}
 
 	if (argc != 4) {
+	}
+
+	std::wstring configFile;
+	std::wstring resultFile;
+	std::wstring algorithm;
+	bool verbose = false;
+	if (!GetParameters (argc, argv, configFile, resultFile, algorithm, verbose)) {
+		WriteHelp ();
+
 		// development mode
 		RayTraceFunction rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "RayTrace");
 		if (rayTraceFunction == NULL) {
 			return 1;
 		}
-		rayTraceFunction (L"config01.txt", L"result.png", OnProgress, OnPixelReady);
+		rayTraceFunction (L"config01.txt", L"result.png", OnProgressVerbose, OnPixelReady);
 		return 1;
 	}
-
-	std::wstring configFile (argv[1]);
-	if (configFile.empty ()) {
-		return 1;
-	}
-
-	std::wstring resultFile (argv[2]);
-	if (resultFile.empty ()) {
-		return 1;
-	}
-
-	std::wstring algorithm (argv[3]);
 
 	RayTraceFunction rayTraceFunction = NULL;
 	if (algorithm == L"raytrace") {
@@ -73,7 +119,11 @@ int wmain (int argc, wchar_t **argv)
 		return 1;
 	}
 
-	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), OnProgress, OnPixelReady) != 0) {
+	ProgressCallback progressCallback = OnProgress;
+	if (verbose) {
+		progressCallback = OnProgressVerbose;
+	}
+	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), progressCallback, OnPixelReady) != 0) {
 		return 1;
 	}
 	return 0;
