@@ -49,7 +49,7 @@ enum RenderMode
 	PathTrace2Mode
 };
 
-static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
+static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
 {
 	if (DBGERROR (configFile == NULL)) {
 		return 1;
@@ -70,9 +70,9 @@ static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* re
 	if (mode == RayTraceMode) {
 		renderer.reset (new RayTracer (model, camera));
 	} else if (mode == PathTraceMode) {
-		renderer.reset (new PathTracer (model, camera));
+		renderer.reset (new PathTracer (model, camera, sampleNum));
 	} else if (mode == PathTrace2Mode) {
-		renderer.reset (new PathTracer2 (model, camera));
+		renderer.reset (new PathTracer2 (model, camera, sampleNum));
 	}
 	if (DBGERROR (renderer == NULL)) {
 		return 3;
@@ -92,17 +92,17 @@ static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* re
 	return 0;
 }
 
-int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
+int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
 {
-	return Render (RayTraceMode, configFile, resultFile, progressCallback, setPixelCallback);
+	return Render (RayTraceMode, configFile, resultFile, sampleNum, progressCallback, setPixelCallback);
 }
 
-int PathTrace (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
+int PathTrace (const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
 {
-	return Render (PathTraceMode, configFile, resultFile, progressCallback, setPixelCallback);
+	return Render (PathTraceMode, configFile, resultFile, sampleNum, progressCallback, setPixelCallback);
 }
 
-int PathTrace2 (const wchar_t* configFile, const wchar_t* resultFile, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
+int PathTrace2 (const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
 {
-	return Render (PathTrace2Mode, configFile, resultFile, progressCallback, setPixelCallback);
+	return Render (PathTrace2Mode, configFile, resultFile, sampleNum, progressCallback, setPixelCallback);
 }

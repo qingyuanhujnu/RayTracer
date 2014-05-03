@@ -5,16 +5,16 @@
 #include "intersection.hpp"
 #include "average.hpp"
 
-PathTracer2::PathTracer2 (const Model& model, const Camera& camera) :
-	Renderer (model, camera)
+PathTracer2::PathTracer2 (const Model& model, const Camera& camera, int sampleNum) :
+	Renderer (model, camera),
+	sampleNum (sampleNum)
 {
 }
 
 Color PathTracer2::GetFieldColor (const Image::Field& field)
 {
 	Average<Color> averageColor;
-	static const int sampleCount = 16;
-	for (int i = 0; i < sampleCount; i++) {
+	for (int i = 0; i < sampleNum; i++) {
 		InfiniteRay cameraRay (camera.GetEye (), field.GetRandomSample () - camera.GetEye ());
 		averageColor.Add (Trace (cameraRay, 0));
 	}

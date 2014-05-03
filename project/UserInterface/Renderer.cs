@@ -21,6 +21,7 @@ namespace UserInterface {
 		public static extern int RayTrace (
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
+            int sampleNum,
             ProgressCallback progressCallback,
             SetPixelCallback setPixelCallback);
 
@@ -28,6 +29,7 @@ namespace UserInterface {
         public static extern int PathTrace (
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
+            int sampleNum,
             ProgressCallback progressCallback,
             SetPixelCallback setPixelCallback);
 
@@ -35,6 +37,7 @@ namespace UserInterface {
         public static extern int PathTrace2 (
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
             [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
+            int sampleNum,
             ProgressCallback progressCallback,
             SetPixelCallback setPixelCallback);
     }
@@ -190,11 +193,11 @@ namespace UserInterface {
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
                 if (renderMode == RenderMode.RayTraceMode) {
-                    result = Win32Functions.RayTrace (tempFileName, tempResultFileName, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
+                    result = Win32Functions.RayTrace (tempFileName, tempResultFileName, 32, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
                 } else if (renderMode == RenderMode.PathTraceMode) {
-                    result = Win32Functions.PathTrace(tempFileName, tempResultFileName, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
+                    result = Win32Functions.PathTrace(tempFileName, tempResultFileName, 32, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
                 } else if (renderMode == RenderMode.PathTrace2Mode) {
-                    result = Win32Functions.PathTrace2(tempFileName, tempResultFileName, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
+                    result = Win32Functions.PathTrace2(tempFileName, tempResultFileName, 32, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
                 }
             }
 

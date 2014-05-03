@@ -6,15 +6,14 @@
 #include <omp.h>
 #include <algorithm>
 
-PathTracer::PathTracer (const Model& model, const Camera& camera) :
-	Renderer (model, camera)
+PathTracer::PathTracer (const Model& model, const Camera& camera, int sampleNum) :
+	Renderer (model, camera),
+	sampleNum (sampleNum)
 {
 }
 
 Color PathTracer::GetFieldColor (const Image::Field& field)
 {
-	const int sampleNum = 128; // per pixel
-
 	Color fieldColor;
 	for (int s = 0; s < sampleNum; ++s) {
 		InfiniteRay cameraRay (camera.GetEye (), field.GetRandomSample () - camera.GetEye ());
