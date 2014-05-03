@@ -152,12 +152,14 @@ static bool ReadLight (std::wifstream& inputStream, Model& model)
 {
 	Vec3 position;
 	Color color;
+	double radius;
 
 	if (!ReadNamedVec3 (inputStream, L"position", position)) { return false; }
 	if (!ReadNamedColor (inputStream, L"color", color)) { return false; }
+	if (!ReadNamedDouble (inputStream, L"radius", radius)) { return false; }
 
 	Light light;
-	light.Set (position, color);
+	light.Set (position, color, radius);
 	model.AddLight (light);
 	return true;
 }

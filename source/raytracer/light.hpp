@@ -8,10 +8,10 @@ class Light
 {
 public:
 	Light ();
-	Light (const Vec3& position, const Color& color);
+	Light (const Vec3& position, const Color& color, double radius);
 	~Light ();
 
-	void			Set (const Vec3& position, const Color& color);
+	void			Set (const Vec3& position, const Color& color, double radius);
 
 	const Vec3&		GetPosition () const;
 	const Color&	GetColor () const;
@@ -20,6 +20,7 @@ public:
 private:
 	Vec3			position;
 	Color			color;
+	double			radius;
 };
 
 #endif

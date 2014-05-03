@@ -12,6 +12,7 @@ camera
 light
 	position 2.0 -1.5 4.0
 	color 0.3 0.3 0.3
+	radius 2.0
 material
 	color 1.0 0.4 0.4
 	ambient 0.2
