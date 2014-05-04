@@ -4,25 +4,23 @@
 
 #include <math.h>
 
-Image::Field::Field (const Vec3& fieldBottomLeft, const Vec3& xDirection, const Vec3& yDirection, double fieldWidth, double fieldHeight, int sampleResolution) :
+Image::Field::Field (const Vec3& fieldBottomLeft, const Vec3& xDirection, const Vec3& yDirection, double fieldWidth, double fieldHeight) :
 	fieldBottomLeft (fieldBottomLeft),
 	xDirection (xDirection),
 	yDirection (yDirection),
-	sampleRes (sampleResolution)
+	fieldWidth (fieldWidth),
+	fieldHeight (fieldHeight)
 {
-	sampleWidth = fieldWidth / sampleRes;
-	sampleHeight = fieldHeight / sampleRes;
+
 }
 
-int Image::Field::SampleCount () const
+Vec3 Image::Field::GetFixSample (int sampleResolution, int index) const
 {
-	return sampleRes * sampleRes;
-}
+	int x = index % sampleResolution;
+	int y = index / sampleResolution;
 
-Vec3 Image::Field::GetSample (int index) const
-{
-	int x = index % sampleRes;
-	int y = index / sampleRes;
+	double sampleWidth = fieldWidth / sampleResolution;
+	double sampleHeight = fieldHeight / sampleResolution;
 
 	Vec3 result = fieldBottomLeft;
 	result = Offset (result, xDirection, x * sampleWidth + sampleWidth / 2.0);
@@ -33,15 +31,13 @@ Vec3 Image::Field::GetSample (int index) const
 Vec3 Image::Field::GetRandomSample () const
 {
 	Vec3 result = fieldBottomLeft;
-	result = Offset (result, xDirection, sampleRes * sampleWidth * random ());
-	result = Offset (result, yDirection, sampleRes * sampleHeight *random ());
+	result = Offset (result, xDirection, fieldWidth * random ());
+	result = Offset (result, yDirection, fieldHeight *random ());
 	return result;
 }
 
-Image::Image (const Camera& camera, int resolutionX, int resolutionY, double distance, int sampleResolution)
+Image::Image (const Camera& camera, int resolutionX, int resolutionY, double distance)
 {
-	sampleRes = sampleResolution;
-
 	double imageWidth = distance * tan (camera.GetXFov ()) * distance;
 	double imageHeight = distance * tan (camera.GetYFov ()) * distance;
 	fieldWidth = imageWidth / (double) resolutionX;
@@ -67,7 +63,7 @@ Image::Field Image::GetField (int x, int y) const
 	Vec3 fieldBottomLeft = bottomLeft;
 	fieldBottomLeft = Offset (fieldBottomLeft, xDirection, x * fieldWidth);
 	fieldBottomLeft = Offset (fieldBottomLeft, yDirection, y * fieldHeight);
-	return Field (fieldBottomLeft, xDirection, yDirection, fieldWidth, fieldHeight, sampleRes);
+	return Field (fieldBottomLeft, xDirection, yDirection, fieldWidth, fieldHeight);
 }
 
 Vec3 Image::GetFieldCenter (int x, int y) const

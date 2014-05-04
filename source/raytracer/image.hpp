@@ -10,10 +10,9 @@ public:
 	class Field
 	{
 	public:
-		Field (const Vec3& fieldBottomLeft, const Vec3& xDirection, const Vec3& yDirection, double fieldWidth, double fieldHeight, int sampleResolution);
+		Field (const Vec3& fieldBottomLeft, const Vec3& xDirection, const Vec3& yDirection, double fieldWidth, double fieldHeight);
 
-		int		SampleCount () const;
-		Vec3	GetSample (int index) const;
+		Vec3	GetFixSample (int sampleResolution, int index) const;
 		Vec3	GetRandomSample () const;
 
 	private:
@@ -21,12 +20,11 @@ public:
 		Vec3	xDirection;
 		Vec3	yDirection;
 
-		double	sampleWidth;
-		double	sampleHeight;
-		int		sampleRes;
+		double	fieldWidth;
+		double	fieldHeight;
 	};
 
-	Image (const Camera& camera, int resolutionX, int resolutionY, double distance, int sampleResolution);
+	Image (const Camera& camera, int resolutionX, int resolutionY, double distance);
 	~Image ();
 
 	Field		GetField (int x, int y) const;
@@ -39,7 +37,6 @@ private:
 
 	double		fieldWidth;
 	double		fieldHeight;
-	int			sampleRes;
 };
 
 #endif

@@ -13,8 +13,9 @@ RayTracer::RayTracer (const Model& model, const Camera& camera) :
 Color RayTracer::GetFieldColor (const Image::Field& field)
 {
 	Average<Color> averageColor;
-	for (int i = 0; i < field.SampleCount (); i++) {
-		InfiniteRay cameraRay (camera.GetEye (), field.GetSample (i) - camera.GetEye ());
+	int sampleRes = 3;
+	for (int i = 0; i < sampleRes * sampleRes; i++) {
+		InfiniteRay cameraRay (camera.GetEye (), field.GetFixSample (sampleRes, i) - camera.GetEye ());
 		averageColor.Add (RayCast (cameraRay, 0));
 	}
 	return averageColor.Get ();

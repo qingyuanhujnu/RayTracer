@@ -135,7 +135,7 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 		return false;
 	}
 
-	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance (), 3);
+	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance ());
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
 	const int reportInterval = 1000;
