@@ -79,11 +79,21 @@ Color PathTracer2::SampleLights (const Material& material, const Vec3& point, co
 		const Light& light = model.GetLight (i);
 		Vec3 randomLightPoint = RandomPointInSphereVolume (light.GetPosition (), light.GetRadius ());
 		SectorRay lightRay (point, randomLightPoint);
+
+		Color shadedColor;
 		if (!Intersection::RayGeometry (lightRay, model, NULL)) {
-			color += GetPhongShading (material, light, point, normal, viewDirection); // TODO: sulyozni
+			shadedColor = GetPhongShading (material, light, point, normal, viewDirection);
 		} else {
-			color += material.GetAmbientColor ();
+			shadedColor = material.GetAmbientColor ();
 		}
+
+		double distance = Distance (point, randomLightPoint);
+		double attenuation = 0.3; // TODO: parameter
+		if (!IsZero (distance * attenuation)) {
+			shadedColor = shadedColor * (1.0 / ((distance) * attenuation));
+		}
+
+		color += shadedColor;
 	}
 	return Clamp (color);
 }
