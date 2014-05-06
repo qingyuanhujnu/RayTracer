@@ -88,10 +88,8 @@ Color PathTracer2::SampleLights (const Material& material, const Vec3& point, co
 		}
 
 		double distance = Distance (point, randomLightPoint);
-		double attenuation = 0.3; // TODO: parameter
-		if (!IsZero (distance * attenuation)) {
-			shadedColor = shadedColor * (1.0 / ((distance) * attenuation));
-		}
+		double intensity = light.GetIntensity (distance);
+		shadedColor = shadedColor * intensity;
 
 		color += shadedColor;
 	}
