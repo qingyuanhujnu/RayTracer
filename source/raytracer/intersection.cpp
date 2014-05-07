@@ -33,11 +33,14 @@ Intersection::ModelIntersection::ModelIntersection () :
 bool Intersection::RaySphere (const Ray& ray, const Sphere& sphere, ShapeIntersection* intersection)
 {
 	const Vec3& rayOrigin = ray.GetOrigin ();
-	const Vec3& rayDirection = ray.GetDirection ();
+	if (IsLowerOrEqual (Distance (rayOrigin, sphere.origin), sphere.radius)) {
+		return true;
+	}
 
 	Vec3 sphereToRay;
 	FastVecSub (rayOrigin, sphere.origin, sphereToRay);
 
+	const Vec3& rayDirection = ray.GetDirection ();
 	double a = rayDirection * rayDirection;
 	double b = 2.0 * (sphereToRay * rayDirection);
 	double c = sphereToRay * sphereToRay - sphere.radius * sphere.radius;
