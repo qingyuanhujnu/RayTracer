@@ -125,5 +125,22 @@ namespace UserInterface {
         {
             history.Write ();
         }
+
+        private void MainForm_DragDrop (object sender, DragEventArgs e)
+        {
+            string[] fileNames = (string[]) e.Data.GetData (DataFormats.FileDrop);
+            if (fileNames.Length > 0) {
+                OpenFile (fileNames[0]);
+                history.AddMenuItem (fileMenu.DropDownItems, menuItemCount, fileNames[0], this.HistoryClick);
+                history.AddItem (fileNames[0]);
+            }
+        }
+
+        private void MainForm_DragEnter (object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent (DataFormats.FileDrop)) {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
     }
 }
