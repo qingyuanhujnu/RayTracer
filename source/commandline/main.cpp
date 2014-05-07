@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <ctime>
 
 typedef void (*ProgressCallback) (double progress);
 typedef void (*PixelReadyCallback) (int x, int y, double r, double g, double b, int picWidth, int picHeight);
@@ -128,6 +129,7 @@ int wmain (int argc, const wchar_t **argv)
 		return 1;
 	}
 
+	time_t begin = time (NULL);
 	ProgressCallback progressCallback = OnProgress;
 	if (verbose) {
 		progressCallback = OnProgressVerbose;
@@ -135,5 +137,11 @@ int wmain (int argc, const wchar_t **argv)
 	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), sampleNum, progressCallback, OnPixelReady) != 0) {
 		return 1;
 	}
+	time_t end = time (NULL);
+	
+	if (verbose) {
+		printf ("elapsed time: %d seconds\n", end - begin);
+	}
+
 	return 0;
 }
