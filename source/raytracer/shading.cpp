@@ -15,6 +15,6 @@ Color GetPhongShading (const Material& material, const Light& light, const Vec3&
 	double specularCoeff = pow (std::max (reflectionVector * viewDirection, 0.0), shininess);
 
 	Color diffuseColor = light.GetColor () * material.GetDiffuseColor ();
-	Color result = diffuseColor * diffuseCoeff + material.GetSpecularColor () * specularCoeff + material.GetAmbientColor ();
+	Color result = diffuseColor * diffuseCoeff + material.GetSpecularColor () * specularCoeff;
 	return Clamp (result);
 }

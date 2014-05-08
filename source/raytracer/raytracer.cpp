@@ -45,14 +45,12 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 		normal = normal * -1.0;
 	}
 
-	Color color;
+	Color color = material.GetAmbientColor ();
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		if (!IsInShadow (intersection.position, light)) {
 			color += GetPhongShading (material, light, intersection.position, normal, ray.GetDirection ());
-		} else {
-			color += material.GetAmbientColor ();
-		}
+		} 			
 	}
 
 	if (material.IsReflective ()) {

@@ -91,11 +91,9 @@ Color PathTracer2::SampleLights (const Material& material, const Vec3& point, co
 		Vec3 randomLightPoint = RandomPointInSphereVolume (light.GetPosition (), light.GetRadius ());
 		SectorRay lightRay (point, randomLightPoint);
 
-		Color shadedColor;
+		Color shadedColor = material.GetAmbientColor ();
 		if (!Intersection::RayGeometry (lightRay, model, NULL)) {
-			shadedColor = GetPhongShading (material, light, point, normal, viewDirection);
-		} else {
-			shadedColor = material.GetAmbientColor ();
+			shadedColor += GetPhongShading (material, light, point, normal, viewDirection);
 		}
 
 		double distance = Distance (point, randomLightPoint);
