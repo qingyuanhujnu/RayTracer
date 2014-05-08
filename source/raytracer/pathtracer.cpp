@@ -81,6 +81,16 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 		color += (reflectedColor * reflection);
 	}
 
+	if (material.IsTransparent ()) {
+		double transparency = material.GetTransparency ();
+		color = color * (1.0 - transparency);
+
+		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal);
+		InfiniteRay refractedRay (isect.position, refractedDirection);
+		Color refractedColor = Radiance (refractedRay, depth + 1);
+		color += refractedColor * transparency;
+	}
+
 	return Clamp (color);
 }
 

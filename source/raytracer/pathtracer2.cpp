@@ -51,6 +51,17 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 		Color reflectedColor = Trace (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
 	}
+
+	if (material.IsTransparent ()) {
+		double transparency = material.GetTransparency ();
+		color = color * (1.0 - transparency);
+
+		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal);
+		InfiniteRay refractedRay (intersection.position, refractedDirection);
+		Color refractedColor = Trace (refractedRay, depth + 1);
+		color += refractedColor * transparency;
+	}
+
 	return Clamp (color);
 }
 
