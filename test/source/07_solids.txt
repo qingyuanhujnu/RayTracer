@@ -22,6 +22,7 @@ material
 	shininess 1.0
 	reflection 0.2
 	transparency 0.0
+	refraction_index 1.0
 material
 	color 1.0 1.0 1.0
 	ambient 0.2
@@ -30,6 +31,7 @@ material
 	shininess 1.0
 	reflection 0.0
 	transparency 0.0
+	refraction_index 1.0
 solid
 	type tetrahedron
 	radius 1.0

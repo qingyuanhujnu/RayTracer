@@ -175,6 +175,7 @@ static bool ReadMaterial (std::wifstream& inputStream, Model& model)
 	double shininess;
 	double reflection;
 	double transparency;
+	double refractionIndex;
 
 	if (!ReadNamedColor (inputStream, L"color", color)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"ambient", ambient)) { return false; }
@@ -183,9 +184,10 @@ static bool ReadMaterial (std::wifstream& inputStream, Model& model)
 	if (!ReadNamedDouble (inputStream, L"shininess", shininess)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"reflection", reflection)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"transparency", transparency)) { return false; }
+	if (!ReadNamedDouble (inputStream, L"refraction_index", refractionIndex)) { return false; }
 
 	Material material;
-	material.Set (color, ambient, diffuse, specular, shininess, reflection, transparency);
+	material.Set (color, ambient, diffuse, specular, shininess, reflection, transparency, refractionIndex);
 	model.AddMaterial (material);
 	return true;
 }

@@ -7,20 +7,21 @@ Material::Material () :
 	specular (0.0),
 	shininess (0.0),
 	reflection (0.0),
-	transparency (0.0)
+	transparency (0.0),
+	refractionIndex (0.0)
 {
 }
 
-Material::Material (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency)
+Material::Material (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency, double refractionIndex)
 {
-	Set (color, ambient, diffuse, specular, shininess, reflection, transparency);
+	Set (color, ambient, diffuse, specular, shininess, reflection, transparency, refractionIndex);
 }
 
 Material::~Material ()
 {
 }
 
-void Material::Set (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency)
+void Material::Set (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency, double refractionIndex)
 {
 	this->color = color;
 	this->ambient = ambient;
@@ -29,6 +30,7 @@ void Material::Set (const Color& color, double ambient, double diffuse, double s
 	this->shininess = shininess;
 	this->reflection = reflection;
 	this->transparency = transparency;
+	this->refractionIndex = refractionIndex;
 }
 
 const Color& Material::GetColor () const
@@ -74,6 +76,11 @@ bool Material::IsTransparent () const
 double Material::GetTransparency () const
 {
 	return transparency;
+}
+
+double Material::GetRefractionIndex () const
+{
+	return refractionIndex;
 }
 
 Color Material::GetAmbientColor () const

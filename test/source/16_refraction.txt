@@ -22,6 +22,7 @@ material
 	shininess 20.0
 	reflection 0.5
 	transparency 0.0
+	refraction_index 1.0
 material
 	color 0.0 1.0 0.0
 	ambient 0.2
@@ -30,6 +31,7 @@ material
 	shininess 1.0
 	reflection 0.0
 	transparency 0.8
+	refraction_index 1.5
 material
 	color 1.0 1.0 1.0
 	ambient 0.2
@@ -38,6 +40,7 @@ material
 	shininess 1.0
 	reflection 0.0
 	transparency 0.0
+	refraction_index 1.0
 sphere
 	radius 1.5
 	segmentation 25
