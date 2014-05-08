@@ -66,7 +66,8 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 
 	if (shadowRayIsect.iSectType == Intersection::ModelIntersection::Light) {		// light hit!
 		const Light& light = model.GetLight (shadowRayIsect.lightIntersection.light);
-		color += GetPhongShading (material, light, isect.position, normal, ray.GetDirection ());
+		const Vec3 photonOrigin = shadowRayIsect.lightIntersection.position;
+		color += GetPhongShading (material, light, photonOrigin, isect.position, normal, ray.GetDirection ());
 	}
 	else if (shadowRayIsect.iSectType == Intersection::ModelIntersection::Geometry) {
 		color += Radiance (shadowRay, depth) * cDiffIntensity;
@@ -79,6 +80,16 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 		Color reflectedColor = Radiance (reflectedRay, depth + 1);
 		double reflection = material.GetReflection ();
 		color += (reflectedColor * reflection);
+	}
+
+	if (material.IsTransparent ()) {
+		double transparency = material.GetTransparency ();
+		color = color * (1.0 - transparency);
+
+		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal);
+		InfiniteRay refractedRay (isect.position, refractedDirection);
+		Color refractedColor = Radiance (refractedRay, depth + 1);
+		color += refractedColor * transparency;
 	}
 
 	return Clamp (color);
@@ -113,7 +124,8 @@ Color PathTracer::RayCastTowardsLights (const Vec3& position, const Vec3& normal
 			iSect.iSectType == Intersection::ModelIntersection::Light &&
 			iSect.lightIntersection.light == i) {		// If hit then also check if we hit the light we intended to hit.
 			double omega = 2 * PI * (1 - cos_a_max);
-			color += GetPhongShading (material, light, position, normal, ray.GetDirection ()) * omega /** INV_PI*/;	// TODO: I need to research BRDF to decide if the 1/PI is needed here or not.
+			const Vec3 photonOrigin = iSect.lightIntersection.position;
+			color += GetPhongShading (material, light, photonOrigin, position, normal, ray.GetDirection ()) * omega /** INV_PI*/;	// TODO: I need to research BRDF to decide if the 1/PI is needed here or not.
 		}
 	}
 

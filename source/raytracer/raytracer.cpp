@@ -45,14 +45,13 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 		normal = normal * -1.0;
 	}
 
-	Color color;
+	Color color = material.GetAmbientColor ();
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		if (!IsInShadow (intersection.position, light)) {
-			color += GetPhongShading (material, light, intersection.position, normal, ray.GetDirection ());
-		} else {
-			color += material.GetAmbientColor ();
-		}
+			const Vec3 photonOrigin = light.GetPosition ();
+			color += GetPhongShading (material, light, photonOrigin, intersection.position, normal, ray.GetDirection ());
+		} 			
 	}
 
 	if (material.IsReflective ()) {
@@ -60,6 +59,16 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 		Color reflectedColor = RayCast (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
+	}
+
+	if (material.IsTransparent ()) {
+		double transparency = material.GetTransparency ();
+		color = color * (1.0 - transparency);
+
+		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal);
+		InfiniteRay refractedRay (intersection.position, refractedDirection);
+		Color refractedColor = RayCast (refractedRay, depth + 1);
+		color += refractedColor * transparency;
 	}
 
 	return Clamp (color);

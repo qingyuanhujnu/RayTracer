@@ -51,6 +51,17 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 		Color reflectedColor = Trace (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
 	}
+
+	if (material.IsTransparent ()) {
+		double transparency = material.GetTransparency ();
+		color = color * (1.0 - transparency);
+
+		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal);
+		InfiniteRay refractedRay (intersection.position, refractedDirection);
+		Color refractedColor = Trace (refractedRay, depth + 1);
+		color += refractedColor * transparency;
+	}
+
 	return Clamp (color);
 }
 
@@ -74,24 +85,15 @@ static Vec3 RandomPointInSphereVolume (const Vec3& origin, double radius)
 
 Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection)
 {
-	Color color;
+	Color color = material.GetAmbientColor ();
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		Vec3 randomLightPoint = RandomPointInSphereVolume (light.GetPosition (), light.GetRadius ());
 		SectorRay lightRay (point, randomLightPoint);
 
-		Color shadedColor;
 		if (!Intersection::RayGeometry (lightRay, model, NULL)) {
-			shadedColor = GetPhongShading (material, light, point, normal, viewDirection);
-		} else {
-			shadedColor = material.GetAmbientColor ();
+			color += GetPhongShading (material, light, randomLightPoint, point, normal, viewDirection);
 		}
-
-		double distance = Distance (point, randomLightPoint);
-		double intensity = light.GetIntensity (distance);
-		shadedColor = shadedColor * intensity;
-
-		color += shadedColor;
 	}
 	return Clamp (color);
 }
