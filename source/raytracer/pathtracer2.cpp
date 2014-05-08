@@ -85,15 +85,15 @@ static Vec3 RandomPointInSphereVolume (const Vec3& origin, double radius)
 
 Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection)
 {
-	Color color;
+	Color color = material.GetAmbientColor ();
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		Vec3 randomLightPoint = RandomPointInSphereVolume (light.GetPosition (), light.GetRadius ());
 		SectorRay lightRay (point, randomLightPoint);
 
-		Color shadedColor = material.GetAmbientColor ();
+		Color shadedColor;
 		if (!Intersection::RayGeometry (lightRay, model, NULL)) {
-			shadedColor += GetPhongShading (material, light, point, normal, viewDirection);
+			shadedColor = GetPhongShading (material, light, point, normal, viewDirection);
 		}
 
 		double distance = Distance (point, randomLightPoint);
