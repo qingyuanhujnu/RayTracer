@@ -152,9 +152,3 @@ Vec3 GetReflectedDirection (const Vec3& direction, const Vec3& normal)
 	double dotProduct = normal * direction;
 	return direction - (2.0 * normal * dotProduct);
 }
-
-Vec3 GetRefractedDirection (const Vec3& direction, const Vec3& normal)
-{
-	// TODO: implement
-	return direction;
-}

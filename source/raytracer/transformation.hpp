@@ -26,6 +26,7 @@ public:
 	void	AppendRotationXYZ (const Vec3& rotation);
 
 	Vec3	Apply (const Vec3& vec) const;
+	Vec3	ApplyRotation (const Vec3& vec) const;
 	void	Clone (Transformation& mat) const;
 
 private:

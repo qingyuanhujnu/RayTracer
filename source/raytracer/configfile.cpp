@@ -363,6 +363,24 @@ static bool ReadMesh (std::wifstream& inputStream, Model& model)
 		vertices.push_back (vertex);
 	}
 
+	if (!ReadString (inputStream, command) || command != L"normals") {
+		return false;
+	}
+
+	UIndex normalCount = 0;
+	if (!ReadUIndex (inputStream, normalCount)) {
+		return false;
+	}
+
+	std::vector<Vec3> normals;
+	for (UIndex i = 0; i < normalCount; i++) {
+		Vec3 normal;
+		if (!ReadVec3 (inputStream, normal)) {
+			return false;
+		}
+		normals.push_back (normal);
+	}
+
 	if (!ReadString (inputStream, command) || command != L"triangles") {
 		return false;
 	}
@@ -377,14 +395,24 @@ static bool ReadMesh (std::wifstream& inputStream, Model& model)
 		UIndex v0;
 		UIndex v1;
 		UIndex v2;
-		UIndex material;
+		UIndex n0;
+		UIndex n1;
+		UIndex n2;
 		UIndex curveGroup;
+		UIndex material;
 		if (!ReadUIndex (inputStream, v0)) { return false; }
 		if (!ReadUIndex (inputStream, v1)) { return false; }
 		if (!ReadUIndex (inputStream, v2)) { return false; }
+		if (!ReadUIndex (inputStream, n0)) { return false; }
+		if (!ReadUIndex (inputStream, n1)) { return false; }
+		if (!ReadUIndex (inputStream, n2)) { return false; }
 		if (!ReadUIndex (inputStream, material)) { return false; }
 		if (!ReadUIndex (inputStream, curveGroup)) { return false; }
-		triangles.push_back (Mesh::Triangle (v0, v1, v2, material, curveGroup));
+		if (n0 == InvalidIndex || n1 == InvalidIndex || n2 == InvalidIndex) {
+			triangles.push_back (Mesh::Triangle (v0, v1, v2, material, curveGroup));
+		} else {
+			triangles.push_back (Mesh::Triangle (v0, v1, v2, n0, n1, n2, material));
+		}
 	}
 
 	Vec3 offset;
@@ -392,7 +420,7 @@ static bool ReadMesh (std::wifstream& inputStream, Model& model)
 	if (!ReadNamedVec3 (inputStream, L"offset", offset)) { return false; }
 	if (!ReadNamedVec3 (inputStream, L"rotation", rotation)) { return false; }
 
-	Generator::GenerateMesh (model, vertices, triangles, offset, rotation * DEGRAD);
+	Generator::GenerateMesh (model, vertices, normals, triangles, offset, rotation * DEGRAD);
 	return true;
 }
 

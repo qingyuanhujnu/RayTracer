@@ -12,7 +12,22 @@ Mesh::Triangle::Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex
 	normal1 (InvalidIndex),
 	normal2 (InvalidIndex),
 	material (material),
-	curveGroup (curveGroup)
+	curveGroup (curveGroup),
+	normalMode (Calculated)
+{
+
+}
+
+Mesh::Triangle::Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex normal1, UIndex normal2, UIndex normal3, UIndex material) :
+	vertex0 (vertex0),
+	vertex1 (vertex1),
+	vertex2 (vertex2),
+	normal0 (normal1),
+	normal1 (normal2),
+	normal2 (normal3),
+	material (material),
+	curveGroup (Mesh::NonCurved),
+	normalMode (UserDefined)
 {
 
 }
@@ -22,7 +37,7 @@ Mesh::Triangle::~Triangle ()
 
 }
 
-bool Mesh::Triangle::Check (UIndex materialCount, UIndex vertexCount, UIndex vertexNormalCount) const
+bool Mesh::Triangle::Check (UIndex materialCount, UIndex vertexCount, UIndex userDefinedVertexNormalCount, UIndex calculatedVertexNormalCount) const
 {
 	if (DBGERROR (material >= materialCount)) {
 		return false;
@@ -32,9 +47,15 @@ bool Mesh::Triangle::Check (UIndex materialCount, UIndex vertexCount, UIndex ver
 		return false;
 	}
 
-	if (curveGroup != NonCurved) {
-		if (DBGERROR (normal0 >= vertexNormalCount || normal1 >= vertexNormalCount || normal2 >= vertexNormalCount)) {
+	if (normalMode == UserDefined) {
+		if (DBGERROR (normal0 >= userDefinedVertexNormalCount || normal1 >= userDefinedVertexNormalCount || normal2 >= userDefinedVertexNormalCount)) {
 			return false;
+		}
+	} else if (normalMode == Calculated) {
+		if (curveGroup != NonCurved) {
+			if (DBGERROR (normal0 >= calculatedVertexNormalCount || normal1 >= calculatedVertexNormalCount || normal2 >= calculatedVertexNormalCount)) {
+				return false;
+			}
 		}
 	}
 
@@ -63,6 +84,12 @@ void Mesh::SetVertex (UIndex index, const Vec3& position)
 	vertices[index] = position;
 }
 
+UIndex Mesh::AddNormal (const Vec3& normal)
+{
+	userDefinedVertexNormals.push_back (Normalize (normal));
+	return vertices.size () - 1;
+}
+
 UIndex Mesh::AddTriangle (const Triangle& triangle)
 {
 	triangles.push_back (triangle);
@@ -74,6 +101,9 @@ void Mesh::Transform (const Transformation& transformation)
 	for (UIndex i = 0; i < vertices.size (); i++) {
 		vertices[i] = transformation.Apply (vertices[i]);
 	}
+	for (UIndex i = 0; i < userDefinedVertexNormals.size (); i++) {
+		userDefinedVertexNormals[i] = transformation.ApplyRotation (userDefinedVertexNormals[i]);
+	}
 }
 
 void Mesh::SetDoubleSided (bool isDoubleSided)
@@ -83,8 +113,8 @@ void Mesh::SetDoubleSided (bool isDoubleSided)
 
 void Mesh::Finalize ()
 {
-	triangleNormals.clear ();
-	vertexNormals.clear ();
+	calculatedTriangleNormals.clear ();
+	calculatedVertexNormals.clear ();
 
 	bool needVertexNormals = false;
 	for (UIndex i = 0; i < triangles.size (); i++) {
@@ -92,7 +122,7 @@ void Mesh::Finalize ()
 		if (triangle.curveGroup != Mesh::NonCurved) {
 			needVertexNormals = true;
 		}
-		triangleNormals.push_back (CalculateTriangleNormal (i));
+		calculatedTriangleNormals.push_back (CalculateTriangleNormal (i));
 	}
 
 	if (needVertexNormals) {
@@ -158,24 +188,28 @@ bool Mesh::IsDoubleSided () const
 Vec3 Mesh::GetNormal (UIndex index, const Vec3& coord) const
 {
 	const Triangle& triangle = triangles[index];
-	if (triangle.curveGroup == NonCurved) {
-		return triangleNormals[index];
-	}
-
-	if (DBGERROR (triangle.normal0 == InvalidIndex || triangle.normal1 == InvalidIndex || triangle.normal2 == InvalidIndex)) {
-		return triangleNormals[index];
-	}
-
 	const Vec3& vertex0 = vertices[triangle.vertex0];
 	const Vec3& vertex1 = vertices[triangle.vertex1];
 	const Vec3& vertex2 = vertices[triangle.vertex2];
 
-	const Vec3& normal0 = vertexNormals[triangle.normal0];
-	const Vec3& normal1 = vertexNormals[triangle.normal1];
-	const Vec3& normal2 = vertexNormals[triangle.normal2];
+	Vec3 interpolatedNormal;
+	if (triangle.normalMode == Triangle::UserDefined) {
+		const Vec3& normal0 = userDefinedVertexNormals[triangle.normal0];
+		const Vec3& normal1 = userDefinedVertexNormals[triangle.normal1];
+		const Vec3& normal2 = userDefinedVertexNormals[triangle.normal2];
+		interpolatedNormal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, coord);
+	} else if (triangle.normalMode == Triangle::Calculated){
+		if (triangle.curveGroup == NonCurved) {
+			return calculatedTriangleNormals[index];
+		}
 
-	Vec3 normal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, coord);
-	return Normalize (normal);
+		const Vec3& normal0 = calculatedVertexNormals[triangle.normal0];
+		const Vec3& normal1 = calculatedVertexNormals[triangle.normal1];
+		const Vec3& normal2 = calculatedVertexNormals[triangle.normal2];
+		interpolatedNormal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, coord);
+	}
+
+	return Normalize (interpolatedNormal);
 }
 
 const Box& Mesh::GetBoundingBox () const
@@ -195,15 +229,16 @@ const Octree& Mesh::GetOctree () const
 
 bool Mesh::Check (UIndex materialCount) const
 {
-	if (DBGERROR (triangles.size () != triangleNormals.size ())) {
+	if (DBGERROR (triangles.size () != calculatedTriangleNormals.size ())) {
 		return false;
 	}
 
 	UIndex vertexCount = vertices.size ();
-	UIndex vertexNormalCount = vertexNormals.size ();
+	UIndex userDefinedVertexNormalCount = userDefinedVertexNormals.size ();
+	UIndex calculatedVertexNormalCount = calculatedVertexNormals.size ();
 	for (UIndex i = 0; i < triangles.size (); i++) {
 		const Triangle& triangle = triangles[i];
-		if (DBGERROR (!triangle.Check (materialCount, vertexCount, vertexNormalCount))) {
+		if (DBGERROR (!triangle.Check (materialCount, vertexCount, userDefinedVertexNormalCount, calculatedVertexNormalCount))) {
 			return false;
 		}
 	}
@@ -258,13 +293,16 @@ void Mesh::CalculateVertexNormals ()
 
 	for (UIndex i = 0; i < triangles.size (); i++) {
 		Triangle& triangle = triangles[i];
+		if (triangle.normalMode != Triangle::Calculated) {
+			continue;
+		}
 		if (triangle.curveGroup != NonCurved) {
-			vertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex0], triangleNormals));
-			vertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex1], triangleNormals));
-			vertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex2], triangleNormals));
-			triangle.normal0 = vertexNormals.size () - 3;
-			triangle.normal1 = vertexNormals.size () - 2;
-			triangle.normal2 = vertexNormals.size () - 1;
+			calculatedVertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex0], calculatedTriangleNormals));
+			calculatedVertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex1], calculatedTriangleNormals));
+			calculatedVertexNormals.push_back (GetAverageNormal (*this, i, vertexToTriangle[triangle.vertex2], calculatedTriangleNormals));
+			triangle.normal0 = calculatedVertexNormals.size () - 3;
+			triangle.normal1 = calculatedVertexNormals.size () - 2;
+			triangle.normal2 = calculatedVertexNormals.size () - 1;
 		}
 	}
 }

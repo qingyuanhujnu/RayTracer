@@ -17,10 +17,17 @@ public:
 	class Triangle
 	{
 	public:
+		enum NormalMode
+		{
+			UserDefined,
+			Calculated
+		};
+
 		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex material, UIndex curveGroup = Mesh::NonCurved);
+		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex normal1, UIndex normal2, UIndex normal3, UIndex material);
 		~Triangle ();
 
-		bool		Check (UIndex materialCount, UIndex vertexCount, UIndex vertexNormalCount) const;
+		bool		Check (UIndex materialCount, UIndex vertexCount, UIndex userDefinedVertexNormalCount, UIndex calculatedVertexNormalCount) const;
 
 		UIndex		vertex0;
 		UIndex		vertex1;
@@ -32,6 +39,8 @@ public:
 
 		UIndex		material;
 		UIndex		curveGroup;
+		
+		NormalMode	normalMode;
 	};
 
 	Mesh ();
@@ -39,7 +48,9 @@ public:
 
 	UIndex					AddVertex (const Vec3& position);
 	void					SetVertex (UIndex index, const Vec3& position);
+	UIndex					AddNormal (const Vec3& normal);
 	UIndex					AddTriangle (const Triangle& triangle);
+
 	void					Transform (const Transformation& transformation);
 	void					SetDoubleSided (bool isDoubleSided);
 
@@ -67,8 +78,11 @@ private:
 
 	std::vector<Vec3>		vertices;
 	std::vector<Triangle>	triangles;
-	std::vector<Vec3>		triangleNormals;
-	std::vector<Vec3>		vertexNormals;
+
+	std::vector<Vec3>		userDefinedVertexNormals;
+	std::vector<Vec3>		calculatedTriangleNormals;
+	std::vector<Vec3>		calculatedVertexNormals;
+
 	bool					doubleSided;
 
 	Box						boundingBox;

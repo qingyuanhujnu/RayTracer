@@ -295,6 +295,28 @@ Vec3 Transformation::Apply (const Vec3& vec) const
 	return result;
 }
 
+Vec3 Transformation::ApplyRotation (const Vec3& vec) const
+{
+	double a00 = vec.x;
+	double a01 = vec.y;
+	double a02 = vec.z;
+	double b00 = matrix[0];
+	double b01 = matrix[1];
+	double b02 = matrix[2];
+	double b10 = matrix[4];
+	double b11 = matrix[5];
+	double b12 = matrix[6];
+	double b20 = matrix[8];
+	double b21 = matrix[9];
+	double b22 = matrix[10];
+
+	Vec3 result;
+	result.x = a00 * b00 + a01 * b10 + a02 * b20;
+	result.y = a00 * b01 + a01 * b11 + a02 * b21;
+	result.z = a00 * b02 + a01 * b12 + a02 * b22;
+	return result;
+}
+
 void Transformation::Clone (Transformation& mat) const
 {
 	mat.matrix[0] = matrix[0];

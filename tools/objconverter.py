@@ -16,12 +16,21 @@ def SetFileContent (filePath, content):
 	file.write (content)
 	file.close ()
 
-def GetVerticesAndTriangles (content, vertices, polygons):
+def GetGeometry (content, vertices, normals, polygons):
 	def GetVertexFromLine (line):
 		splitted = line.split (' ')
 		result = []
 		for part in splitted:
 			if part == 'v' or part == '':
+				continue
+			result.append (part)
+		return result
+
+	def GetNormalFromLine (line):
+		splitted = line.split (' ')
+		result = []
+		for part in splitted:
+			if part == 'vn' or part == '':
 				continue
 			result.append (part)
 		return result
@@ -32,7 +41,12 @@ def GetVerticesAndTriangles (content, vertices, polygons):
 		for part in splitted:
 			if part == 'f' or part == '':
 				continue
-			result.append (part.split ('/')[0])
+			splittedPart = part.split ('/')
+			vertex = splittedPart[0]
+			normal = 0
+			if len (splittedPart) >= 2:
+				normal = splittedPart[2]
+			result.append ([vertex, normal])
 		return result
 
 	splitted = content.split ('\n')
@@ -41,6 +55,9 @@ def GetVerticesAndTriangles (content, vertices, polygons):
 		if line.startswith ('v '):
 			vertex = GetVertexFromLine (line)
 			vertices.append (vertex)
+		elif line.startswith ('vn '):
+			normal = GetNormalFromLine (line)
+			normals.append (normal)
 		elif line.startswith ('f '):
 			polygon = GetPolygonFromLine (line)
 			polygons.append (polygon)
@@ -59,8 +76,9 @@ def Main ():
 	
 	content = GetFileContent (objFilePath)
 	vertices = []
+	normals = []
 	polygons = []
-	GetVerticesAndTriangles (content, vertices, polygons)
+	GetGeometry (content, vertices, normals, polygons)
 	
 	triangles = []
 	for polygon in polygons:
@@ -73,9 +91,14 @@ def Main ():
 	result += '\tvertices ' + str (len (vertices)) + '\n'
 	for vertex in vertices:
 		result += '\t\t ' + str (float (vertex[0]) * scale) + ' ' + str (float (vertex[1]) * scale) + ' ' + str (float (vertex[2]) * scale) + '\n'
+	result += '\tnormals ' + str (len (normals)) + '\n'
+	for normal in normals:
+		result += '\t\t ' + str (float (normal[0])) + ' ' + str (float (normal[1])) + ' ' + str (float (normal[2])) + '\n'
 	result += '\ttriangles ' + str (len (triangles)) + '\n'
 	for triangle in triangles:
-		result += '\t\t ' + str (int (triangle[0]) - 1) + ' ' + str (int (triangle[1]) - 1) + ' ' + str (int (triangle[2]) - 1) + ' <material> <curvegroup>\n'
+		result += '\t\t ' + str (int (triangle[0][0]) - 1) + ' ' + str (int (triangle[1][0]) - 1) + ' ' + str (int (triangle[2][0]) - 1)
+		result += ' ' + str (int (triangle[0][1]) - 1) + ' ' + str (int (triangle[1][1]) - 1) + ' ' + str (int (triangle[2][1]) - 1)
+		result += ' <material> <curvegroup>\n'
 	result += '\toffset 0 0 0\n'
 	result += '\trotation 0 0 0\n'
 	
