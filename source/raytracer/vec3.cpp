@@ -153,7 +153,25 @@ Vec3 GetReflectedDirection (const Vec3& direction, const Vec3& normal)
 	return direction - (2.0 * normal * dotProduct);
 }
 
-Vec3 GetRefractedDirection (const Vec3& vec, const Vec3& normal)
+Vec3 GetRefractedDirection (const Vec3& vec, const Vec3& normal, double refractionIndex)
 {
-	return vec;
+	double nr;
+	Vec3 nNormal;
+	if ((normal * vec) < 0.0) {		// Going into.
+		nr = 1.0 / refractionIndex;
+		nNormal = normal;
+	} else {						// Coming out from.
+		nr = refractionIndex;
+		nNormal = -1.0 * normal;
+	}
+
+	Vec3 invVec = -1.0 * vec;
+	double cosAlpha = -(nNormal*vec);
+
+	double a = 1.0 - nr*nr * (1.0 - (cosAlpha * cosAlpha));
+	if (IsGreaterOrEqual (a, 0.0)) {
+		return nr * vec + (nr * cosAlpha - sqrt (a)) * nNormal;
+	} else {
+		return GetReflectedDirection (vec, nNormal);
+	}
 }

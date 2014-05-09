@@ -33,6 +33,6 @@ double	Distance (const Vec3& aVec, const Vec3& bVec);
 Vec3	Offset (const Vec3& vec, const Vec3& direction, double distance);
 
 Vec3	GetReflectedDirection (const Vec3& vec, const Vec3& normal);
-Vec3	GetRefractedDirection (const Vec3& vec, const Vec3& normal);
+Vec3	GetRefractedDirection (const Vec3& vec, const Vec3& normal, double refractionIndex);
 
 #endif

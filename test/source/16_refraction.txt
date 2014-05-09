@@ -44,7 +44,7 @@ material
 sphere
 	radius 1.5
 	segmentation 25
-	offset 0.5 -1.0 1.5
+	offset -3.0 0.0 1.5
 	rotation 0.0 0.0 0.0
 	material 0
 sphere

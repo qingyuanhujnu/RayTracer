@@ -63,9 +63,10 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 
 	if (material.IsTransparent ()) {
 		double transparency = material.GetTransparency ();
+		double refractionIndex = material.GetRefractionIndex ();
 		color = color * (1.0 - transparency);
 
-		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal);
+		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
 		InfiniteRay refractedRay (intersection.position, refractedDirection);
 		Color refractedColor = RayCast (refractedRay, depth + 1);
 		color += refractedColor * transparency;
