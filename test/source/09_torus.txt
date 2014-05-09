@@ -33,15 +33,6 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 0.0 0.0 1.0
-	ambient 0.2
-	diffuse 0.8
-	specular 0.0
-	shininess 1.0
-	reflection 0.0
-	transparency 0.0
-	refraction_index 1.0
-material
 	color 1.0 1.0 1.0
 	ambient 0.2
 	diffuse 0.8
@@ -75,7 +66,7 @@ torus
 	innersegmentation 30
 	offset 1.0 -0.6 2.0
 	rotation 0.0 -20.0 0.0
-	material 4
+	material 3
 torus
 	outerradius 1.2
 	innerradius 0.5
@@ -83,9 +74,9 @@ torus
 	innersegmentation 30
 	offset 1.0 0.6 2.0
 	rotation 0.0 70.0 0.0
-	material 5
+	material 4
 roombox
 	size 6.0 6.0 6.0
 	offset 0.0 0.0 3.0
 	rotation 0.0 0.0 0.0
-	materials 0 3 1 3 3 3
+	materials 0 2 1 2 2 2
