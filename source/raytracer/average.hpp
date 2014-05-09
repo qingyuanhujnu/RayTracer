@@ -40,7 +40,7 @@ void Average<Type>::Add (const Type& newVal)
 template <class Type>
 Type Average<Type>::Get () const
 {
-	return val / count;
+	return count > 0 ? val / count : val;
 }
 
 #endif
