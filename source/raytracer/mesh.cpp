@@ -156,7 +156,11 @@ const Mesh::Triangle& Mesh::GetTriangle (UIndex index) const
 static double GetTriangleArea (double a, double b, double c)
 {
 	double s = (a + b + c) / 2.0;
-	return sqrt (s * (s - a) * (s - b) * (s - c));
+	double areaSquare = s * (s - a) * (s - b) * (s - c);
+	if (areaSquare < 0.0) {
+		return 0.0;
+	}
+	return sqrt (areaSquare);
 }
 
 static Vec3 BarycentricInterpolation (const Vec3& vertex0, const Vec3& vertex1, const Vec3& vertex2,
