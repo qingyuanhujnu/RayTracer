@@ -201,6 +201,10 @@ static Vec3 BarycentricInterpolation (const Vec3& vertex0, const Vec3& vertex1, 
 	double distance2 = Distance (vertex2, interpolationVertex);
 
 	double area = GetTriangleArea (edge0, edge1, edge2);
+	if (IsZero (area)) {
+		return value0;
+	}
+
 	double area0 = GetTriangleArea (edge0, distance0, distance1);
 	double area1 = GetTriangleArea (edge1, distance1, distance2);
 	double area2 = GetTriangleArea (edge2, distance0, distance2);
