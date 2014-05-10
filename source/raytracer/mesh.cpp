@@ -63,7 +63,8 @@ bool Mesh::Triangle::Check (UIndex materialCount, UIndex vertexCount, UIndex use
 }
 
 Mesh::Mesh () :
-	doubleSided (true)
+	doubleSided (true),
+	finalized (false)
 {
 
 }
@@ -75,29 +76,44 @@ Mesh::~Mesh ()
 
 UIndex Mesh::AddVertex (const Vec3& position)
 {
+	if (DBGERROR (finalized)) {
+		return InvalidIndex;
+	}
 	vertices.push_back (position);
 	return vertices.size () - 1;
 }
 
 void Mesh::SetVertex (UIndex index, const Vec3& position)
 {
+	if (DBGERROR (finalized)) {
+		return;
+	}
 	vertices[index] = position;
 }
 
 UIndex Mesh::AddNormal (const Vec3& normal)
 {
+	if (DBGERROR (finalized)) {
+		return InvalidIndex;
+	}
 	userDefinedVertexNormals.push_back (Normalize (normal));
 	return vertices.size () - 1;
 }
 
 UIndex Mesh::AddTriangle (const Triangle& triangle)
 {
+	if (DBGERROR (finalized)) {
+		return InvalidIndex;
+	}
 	triangles.push_back (triangle);
 	return triangles.size () - 1;
 }
 
 void Mesh::Transform (const Transformation& transformation)
 {
+	if (DBGERROR (finalized)) {
+		return;
+	}
 	for (UIndex i = 0; i < vertices.size (); i++) {
 		vertices[i] = transformation.Apply (vertices[i]);
 	}
@@ -108,11 +124,18 @@ void Mesh::Transform (const Transformation& transformation)
 
 void Mesh::SetDoubleSided (bool isDoubleSided)
 {
+	if (DBGERROR (finalized)) {
+		return;
+	}
 	doubleSided = isDoubleSided;
 }
 
 void Mesh::Finalize ()
 {
+	if (DBGERROR (finalized)) {
+		return;
+	}
+
 	calculatedTriangleNormals.clear ();
 	calculatedVertexNormals.clear ();
 
@@ -131,6 +154,8 @@ void Mesh::Finalize ()
 
 	CalculateBoundingShapes ();
 	CalculateOctree ();
+
+	finalized = true;
 }
 
 UIndex Mesh::VertexCount () const

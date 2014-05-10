@@ -84,6 +84,7 @@ private:
 	std::vector<Vec3>		calculatedVertexNormals;
 
 	bool					doubleSided;
+	bool					finalized;
 
 	Box						boundingBox;
 	Sphere					boundingSphere;
