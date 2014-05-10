@@ -1,7 +1,8 @@
 #include "light.hpp"
 #include "common.hpp"
 
-Light::Light ()
+Light::Light () :
+	radius (0.0)
 {
 }
 
