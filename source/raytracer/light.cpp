@@ -1,4 +1,5 @@
 #include "light.hpp"
+#include "common.hpp"
 
 Light::Light ()
 {
@@ -43,5 +44,9 @@ const Vec3& Light::GetAttenuation () const
 
 double Light::GetIntensity (double distance) const
 {
-	return 1.0 / (attenuation.x + distance * attenuation.y + distance * attenuation.z * attenuation.z);
+	double denom = (attenuation.x + distance * attenuation.y + distance * attenuation.z * attenuation.z);
+	if (IsZero (denom)) {
+		return 1.0;
+	}
+	return 1.0 / denom;
 }
