@@ -9,8 +9,9 @@
 class Progress : public RayTracer::IProgress
 {
 public:
-	Progress (ProgressCallback progressCallback) :
-		progressCallback (progressCallback)
+	Progress (ProgressCallback progressCallback, SetPixelCallback setPixelCallback) :
+		progressCallback (progressCallback),
+		setPixelCallback (setPixelCallback)
 	{
 
 	}
@@ -20,25 +21,13 @@ public:
 		progressCallback (progress);
 	}
 
-private:
-	ProgressCallback progressCallback;
-};
-
-class SendPixel : public RayTracer::PixelReady
-{
-public:
-	SendPixel (SetPixelCallback setPixelCallback) :
-		setPixelCallback (setPixelCallback)	
-	{
-
-	}
-
 	virtual void OnPixelReady (int x, int y, double r, double g, double b, int picWidth, int picHeight) const
 	{
 		setPixelCallback (x, y, r, g, b, picWidth, picHeight);
 	}
 
 private:
+	ProgressCallback progressCallback;
 	SetPixelCallback setPixelCallback;
 };
 
@@ -78,10 +67,9 @@ static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* re
 		return 3;
 	}
 
-	Progress progress (progressCallback);
-	SendPixel sendPixel (setPixelCallback);
+	Progress progress (progressCallback, setPixelCallback);
 	Renderer::ResultImage resultImage;
-	if (DBGERROR (!renderer->Render (parameters, resultImage, progress, sendPixel))) {
+	if (DBGERROR (!renderer->Render (parameters, resultImage, progress))) {
 		return 4;
 	}
 	

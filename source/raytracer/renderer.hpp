@@ -16,14 +16,7 @@ public:
 		virtual ~IProgress ();
 
 		virtual void OnProgress (double progress) const = 0;
-	};
-
-	class PixelReady
-	{
-	public:
-		virtual ~PixelReady ();
-
-		virtual void OnPixelReady (int /*x*/, int /*y*/, double /*r*/, double /*g*/, double /*b*/, int /*picWidth*/, int /*picHeight*/) const;
+		virtual void OnPixelReady (int x, int y, double r, double g, double b, int picWidth, int picHeight) const = 0;
 	};
 
 	class Parameters
@@ -68,7 +61,7 @@ public:
 	Renderer (const Model& model, const Camera& camera);
 	virtual ~Renderer ();
 
-	virtual bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress, const PixelReady& pixelReady);
+	virtual bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress);
 
 protected:
 	virtual Color	GetFieldColor (const Image::Field& field) = 0;

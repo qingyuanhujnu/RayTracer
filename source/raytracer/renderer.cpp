@@ -11,16 +11,6 @@ Renderer::IProgress::~IProgress ()
 
 }
 
-Renderer::PixelReady::~PixelReady ()
-{
-
-}
-
-void Renderer::PixelReady::OnPixelReady (int /*x*/, int /*y*/, double /*r*/, double /*g*/, double /*b*/, int /*picWidth*/, int /*picHeight*/) const
-{
-
-}
-
 Renderer::Parameters::Parameters ()
 {
 	Set (100, 100, 1.0);
@@ -121,7 +111,7 @@ Renderer::~Renderer ()
 {
 }
 
-bool Renderer::Render (const Parameters& parameters, ResultImage& result, const IProgress& progress, const PixelReady& pixelReady)
+bool Renderer::Render (const Parameters& parameters, ResultImage& result, const IProgress& progress)
 {
 	if (DBGERROR (!parameters.Check ())) {
 		return false;
@@ -158,7 +148,7 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 		Color fieldColor = GetFieldColor (field);
 		result.SetColor (x, y, fieldColor);
 
-		pixelReady.OnPixelReady (x, y, fieldColor.r, fieldColor.g, fieldColor.b, resX, resY);
+		progress.OnPixelReady (x, y, fieldColor.r, fieldColor.g, fieldColor.b, resX, resY);
 #ifndef DEBUG
 		#pragma omp critical
 #endif
