@@ -41,9 +41,11 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 		normal = normal * -1.0;
 	}
 
-	double materialEmission = 0.4;
-	color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - materialEmission);
-	color += SampleGeometry (intersection.position, normal, depth) * materialEmission;
+	double materialEmission = 0.6;
+	Color diffuseColor = material.GetDiffuseColor ();
+	double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * materialEmission;
+	color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - diffuseIntensity);
+	color += SampleGeometry (intersection.position, normal, depth) * diffuseIntensity;
 
 	if (material.IsReflective ()) {
 		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
@@ -104,9 +106,9 @@ Vec3 RandomDirectionOnHemisphere (const Vec3& normal)
     double theta = acos (sqrt (1.0 - random ()));
     double phi = 2.0 * PI * random ();
 
-    double xs = sin (theta) * cos(phi);
+    double xs = sin (theta) * cos (phi);
     double ys = cos (theta);
-    double zs = sin (theta) * sin(phi);
+    double zs = sin (theta) * sin (phi);
 
     Vec3 yVector (normal.x, normal.y, normal.z);
     Vec3 h = yVector;
