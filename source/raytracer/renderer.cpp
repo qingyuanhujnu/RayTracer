@@ -130,7 +130,7 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 
 	const int reportInterval = 1000;
 	int finishedPixels = 0;
-	int lastFinishedPixels = -reportInterval;
+	int lastFinishedPixels = 0;
 
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
@@ -155,7 +155,7 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 		{
 			finishedPixels++;
 
-			if (finishedPixels > lastFinishedPixels + reportInterval) {
+			if (finishedPixels == lastFinishedPixels + reportInterval) {
 				progress.OnProgress ((double) finishedPixels / (double) (resX * resY));
 				lastFinishedPixels = finishedPixels;
 			}
