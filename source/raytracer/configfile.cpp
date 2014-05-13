@@ -161,7 +161,8 @@ static bool ReadLight (std::wifstream& inputStream, Model& model)
 	if (!ReadNamedVec3 (inputStream, L"attenuation", attenuation)) { return false; }
 
 	Light light;
-	light.Set (position, color, radius, attenuation);
+	Sphere lightSphere (position, radius);
+	light.Set (lightSphere, color, attenuation);
 	model.AddLight (light);
 	return true;
 }

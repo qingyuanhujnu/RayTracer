@@ -14,8 +14,7 @@ public:
 private:
 
 	virtual Color	GetFieldColor (const Image::Field& field) override;
-	Color			RayCast (const Ray& ray, int depth) const;
-	Color			RayTrace (const Ray& ray, const Intersection::GeometryIntersection& intersection, int depth) const;
+	Color			RayTrace (const Ray& ray, int depth) const;
 	
 	bool			IsInShadow (const Vec3& position, const Light& light) const;
 };

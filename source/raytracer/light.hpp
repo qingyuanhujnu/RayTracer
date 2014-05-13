@@ -3,27 +3,28 @@
 
 #include "vec3.hpp"
 #include "color.hpp"
+#include "sphere.hpp"
 
 class Light
 {
 public:
 	Light ();
-	Light (const Vec3& position, const Color& color, double radius, const Vec3& attenuation);
+	Light (const Sphere& sphere, const Color& color, const Vec3& attenuation);
 	~Light ();
 
-	void			Set (const Vec3& position, const Color& color, double radius, const Vec3& attenuation);
+	void			Set (const Sphere& sphere, const Color& color, const Vec3& attenuation);
 
 	const Vec3&		GetPosition () const;
-	const Color&	GetColor () const;
 	double			GetRadius () const;
+	const Color&	GetColor () const;
 	const Vec3&		GetAttenuation () const;
 	
+	Vec3			GetRandomPoint () const;
 	double			GetIntensity (double distance) const;
 
 private:
-	Vec3			position;
+	Sphere			sphere;
 	Color			color;
-	double			radius;
 	Vec3			attenuation;
 };
 

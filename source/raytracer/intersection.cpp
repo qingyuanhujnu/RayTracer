@@ -33,7 +33,7 @@ Intersection::ModelIntersection::ModelIntersection () :
 bool Intersection::RaySphere (const Ray& ray, const Sphere& sphere, ShapeIntersection* intersection)
 {
 	const Vec3& rayOrigin = ray.GetOrigin ();
-	if (IsLowerOrEqual (Distance (rayOrigin, sphere.origin), sphere.radius)) {
+	if (sphere.ContainsPoint (rayOrigin)) {
 		return true;
 	}
 

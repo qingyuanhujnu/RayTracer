@@ -16,26 +16,23 @@ Color RayTracer::GetFieldColor (const Image::Field& field)
 	int sampleRes = 3;
 	for (int i = 0; i < sampleRes * sampleRes; i++) {
 		InfiniteRay cameraRay (camera.GetEye (), field.GetFixSample (sampleRes, i) - camera.GetEye ());
-		averageColor.Add (RayCast (cameraRay, 0));
+		averageColor.Add (RayTrace (cameraRay, 0));
 	}
 	return averageColor.Get ();
 }
 
-Color RayTracer::RayCast (const Ray& ray, int depth) const
+Color RayTracer::RayTrace (const Ray& ray, int depth) const
 {
-	if (depth <= 10) {
-		Intersection::GeometryIntersection intersection;
-		if (Intersection::RayGeometry (ray, model, &intersection)) {
-			return RayTrace (ray, intersection, depth);
-		}
+	Color color;
+	if (depth > 10) {
+		return color;
 	}
 
-	Color black (0.0, 0.0, 0.0);
-	return black;
-}
-
-Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersection& intersection, int depth) const
-{
+	Intersection::GeometryIntersection intersection;
+	if (!Intersection::RayGeometry (ray, model, &intersection)) {
+		return color;
+	}
+		
 	const Mesh& mesh = model.GetMesh (intersection.mesh);
 	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 	const Material& material = model.GetMaterial (triangle.material);
@@ -45,11 +42,11 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 		normal = normal * -1.0;
 	}
 
-	Color color = material.GetAmbientColor ();
+	color += material.GetAmbientColor ();
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		if (!IsInShadow (intersection.position, light)) {
-			const Vec3 photonOrigin = light.GetPosition ();
+			const Vec3& photonOrigin = light.GetPosition ();
 			color += GetPhongShading (material, light, photonOrigin, intersection.position, normal, ray.GetDirection ());
 		} 			
 	}
@@ -57,7 +54,7 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 	if (material.IsReflective ()) {
 		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-		Color reflectedColor = RayCast (reflectedRay, depth + 1);
+		Color reflectedColor = RayTrace (reflectedRay, depth + 1);
 		color += reflectedColor * material.GetReflection ();
 	}
 
@@ -68,7 +65,7 @@ Color RayTracer::RayTrace (const Ray& ray, const Intersection::GeometryIntersect
 
 		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
 		InfiniteRay refractedRay (intersection.position, refractedDirection);
-		Color refractedColor = RayCast (refractedRay, depth + 1);
+		Color refractedColor = RayTrace (refractedRay, depth + 1);
 		color += refractedColor * transparency;
 	}
 

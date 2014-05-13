@@ -68,30 +68,12 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 	return Clamp (color);
 }
 
-static double RandomInRange (double min, double max)
-{
-    return min + random () * (max - min);
-}
-
-static Vec3 RandomPointInSphereVolume (const Vec3& origin, double radius)
-{
-	double x = RandomInRange (-1.0, 1.0);
-	double y = RandomInRange (-1.0, 1.0);
-	double z = RandomInRange (-1.0, 1.0);
-
-	Vec3 randomDirection =  Vec3 (x, y, z) * (1.0 / sqrt (x * x + y * y + z * z));
-	double randomDistance = RandomInRange (0.0, radius);
-	
-	Vec3 randomPoint = Offset (origin, randomDirection, randomDistance);
-	return randomPoint;
-}
-
 Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection)
 {
 	Color color = material.GetAmbientColor ();
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
-		Vec3 randomLightPoint = RandomPointInSphereVolume (light.GetPosition (), light.GetRadius ());
+		Vec3 randomLightPoint = light.GetRandomPoint ();
 		SectorRay lightRay (point, randomLightPoint);
 
 		if (!Intersection::RayGeometry (lightRay, model, NULL)) {

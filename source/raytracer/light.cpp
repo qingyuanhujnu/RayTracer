@@ -1,31 +1,34 @@
 #include "light.hpp"
 #include "common.hpp"
 
-Light::Light () :
-	radius (0.0)
+Light::Light ()
 {
 }
 
-Light::Light (const Vec3& position, const Color& color, double radius, const Vec3& attenuation)
+Light::Light (const Sphere& sphere, const Color& color, const Vec3& attenuation)
 {
-	Set (position, color, radius, attenuation);
+	Set (sphere, color, attenuation);
 }
 
 Light::~Light ()
 {
 }
 
-void Light::Set (const Vec3& position, const Color& color, double radius, const Vec3& attenuation)
+void Light::Set (const Sphere& sphere, const Color& color, const Vec3& attenuation)
 {
-	this->position = position;
+	this->sphere = sphere;
 	this->color = color;
-	this->radius = radius;
 	this->attenuation = attenuation;
 }
 
 const Vec3& Light::GetPosition () const
 {
-	return position;
+	return sphere.origin;
+}
+
+double Light::GetRadius () const
+{
+	return sphere.radius;
 }
 
 const Color& Light::GetColor () const
@@ -33,14 +36,14 @@ const Color& Light::GetColor () const
 	return color;
 }
 
-double Light::GetRadius () const
-{
-	return radius;
-}
-
 const Vec3& Light::GetAttenuation () const
 {
 	return attenuation;
+}
+
+Vec3 Light::GetRandomPoint () const
+{
+	return sphere.GetRandomPointInVolume ();
 }
 
 double Light::GetIntensity (double distance) const
