@@ -118,8 +118,15 @@ namespace UserInterface {
             File.Delete (tempFileName);
             File.Delete (tempResultFileName);
 
-            renderImage.Dispose();
-            copyImage.Dispose();
+            if (renderImage != null)
+            {
+                renderImage.Dispose();
+            }
+
+            if (copyImage != null)
+            {
+                copyImage.Dispose();
+            }
 
             mainForm.UpdateControlsForEdit ();
         }
