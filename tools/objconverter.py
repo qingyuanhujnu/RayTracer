@@ -66,13 +66,15 @@ def Main ():
 	currentPath = os.path.dirname (os.path.abspath (__file__))
 	os.chdir (currentPath)
 
-	if len (sys.argv) != 4:
-		print 'usage: objconverter <objFile> <resultFile> <scale>'
+	if len (sys.argv) != 6:
+		print 'usage: objconverter <objFile> <resultFile> <scale> <material> <curvegroup>'
 		return
 		
 	objFilePath = sys.argv[1]
 	resultFilePath = sys.argv[2]
 	scale = float (sys.argv[3])
+	material = sys.argv[4]
+	curvegroup = sys.argv[5]
 	
 	content = GetFileContent (objFilePath)
 	vertices = []
@@ -98,7 +100,7 @@ def Main ():
 	for triangle in triangles:
 		result += '\t\t ' + str (int (triangle[0][0]) - 1) + ' ' + str (int (triangle[1][0]) - 1) + ' ' + str (int (triangle[2][0]) - 1)
 		result += ' ' + str (int (triangle[0][1]) - 1) + ' ' + str (int (triangle[1][1]) - 1) + ' ' + str (int (triangle[2][1]) - 1)
-		result += ' <material> <curvegroup>\n'
+		result += ' ' + material + ' ' + curvegroup + '\n'
 	result += '\toffset 0 0 0\n'
 	result += '\trotation 0 0 0\n'
 	
