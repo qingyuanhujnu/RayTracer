@@ -31,8 +31,8 @@ Vec3 Image::Field::GetFixSample (int sampleResolution, int index) const
 Vec3 Image::Field::GetRandomSample () const
 {
 	Vec3 result = fieldBottomLeft;
-	result = Offset (result, xDirection, fieldWidth * random ());
-	result = Offset (result, yDirection, fieldHeight *random ());
+	result = Offset (result, xDirection, fieldWidth * Random ());
+	result = Offset (result, yDirection, fieldHeight * Random ());
 	return result;
 }
 

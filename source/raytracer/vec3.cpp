@@ -23,6 +23,13 @@ Vec3::~Vec3 ()
 
 }
 
+void Vec3::Set (double x, double y, double z)
+{
+	this->x = x;
+	this->y = y;
+	this->z = z;
+}
+
 bool Vec3::operator== (const Vec3& vec) const
 {
 	return IsEqual (x, vec.x) && IsEqual (y, vec.y) && IsEqual (z, vec.z);

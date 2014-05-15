@@ -8,6 +8,8 @@ public:
 	Vec3 (double x, double y, double z);
 	~Vec3 ();
 
+	void	Set (double x, double y, double z);
+
 	bool	operator== (const Vec3& vec) const;
 
 	Vec3	operator+ (const Vec3& vec) const;

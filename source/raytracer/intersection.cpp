@@ -361,6 +361,18 @@ bool Intersection::RayGeometry (const Ray& ray, const Model& model, GeometryInte
 	return found;
 }
 
+static bool RayLightShape (const Ray& ray, const Light& light, Intersection::LightIntersection* intersection)
+{
+	if (light.GetShape () == Light::SphereShape) {
+		const Sphere& sphere = light.GetSphere ();
+		return Intersection::RaySphere (ray, sphere, intersection);
+	} else if (light.GetShape () == Light::BoxShape) {
+		const Box& box = light.GetBox ();
+		return Intersection::RayBox (ray, box, intersection);
+	}
+	return false;
+}
+
 bool Intersection::RayLight (const Ray& ray, const Model& model, LightIntersection* intersection)
 {
 	bool found = false;
@@ -368,16 +380,15 @@ bool Intersection::RayLight (const Ray& ray, const Model& model, LightIntersecti
 
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
-		Sphere sphere (light.GetPosition (), light.GetRadius ());
 		if (intersection == NULL) {
-			if (RaySphere (ray, sphere, NULL)) {
+			if (RayLightShape (ray, light, NULL)) {
 				found = true;
 				break;
 			}
 		}
 		else {
 			LightIntersection currentIntersection;
-			if (RaySphere (ray, sphere, &currentIntersection)) {
+			if (RayLightShape (ray, light, &currentIntersection)) {
 				if (IsLower (currentIntersection.distance, minIntersection.distance)) {
 					minIntersection = currentIntersection;
 					minIntersection.light = i;

@@ -28,45 +28,53 @@ Color RayTracer::RayTrace (const Ray& ray, int depth) const
 		return color;
 	}
 
-	Intersection::GeometryIntersection intersection;
-	if (!Intersection::RayGeometry (ray, model, &intersection)) {
+	Intersection::ModelIntersection modelIntersection;
+	if (!Intersection::RayModel (ray, model, &modelIntersection)) {
 		return color;
 	}
-		
-	const Mesh& mesh = model.GetMesh (intersection.mesh);
-	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
-	const Material& material = model.GetMaterial (triangle.material);
+	
+	if (modelIntersection.iSectType == Intersection::ModelIntersection::Geometry) {
+		const Intersection::GeometryIntersection& intersection = modelIntersection.geometryIntersection;
 
-	Vec3 normal = mesh.GetNormal (intersection.triangle, intersection.position);
-	if (intersection.facing == Intersection::ShapeIntersection::Back) {
-		normal = normal * -1.0;
-	}
+		const Mesh& mesh = model.GetMesh (intersection.mesh);
+		const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
+		const Material& material = model.GetMaterial (triangle.material);
 
-	color += material.GetAmbientColor ();
-	for (UIndex i = 0; i < model.LightCount (); i++) {
-		const Light& light = model.GetLight (i);
-		if (!IsInShadow (intersection.position, light)) {
-			const Vec3& photonOrigin = light.GetPosition ();
-			color += GetPhongShading (material, light, photonOrigin, intersection.position, normal, ray.GetDirection ());
-		} 			
-	}
+		Vec3 normal = mesh.GetNormal (intersection.triangle, intersection.position);
+		if (intersection.facing == Intersection::ShapeIntersection::Back) {
+			normal = normal * -1.0;
+		}
 
-	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
-		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-		Color reflectedColor = RayTrace (reflectedRay, depth + 1);
-		color += reflectedColor * material.GetReflection ();
-	}
+		color += material.GetAmbientColor ();
+		for (UIndex i = 0; i < model.LightCount (); i++) {
+			const Light& light = model.GetLight (i);
+			if (!IsInShadow (intersection.position, light)) {
+				const Vec3& photonOrigin = light.GetPosition ();
+				color += GetPhongShading (material, light, photonOrigin, intersection.position, normal, ray.GetDirection ());
+			} 			
+		}
 
-	if (material.IsTransparent ()) {
-		double transparency = material.GetTransparency ();
-		double refractionIndex = material.GetRefractionIndex ();
-		color = color * (1.0 - transparency);
+		if (material.IsReflective ()) {
+			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+			InfiniteRay reflectedRay (intersection.position, reflectedDirection);
+			Color reflectedColor = RayTrace (reflectedRay, depth + 1);
+			color += reflectedColor * material.GetReflection ();
+		}
 
-		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
-		InfiniteRay refractedRay (intersection.position, refractedDirection);
-		Color refractedColor = RayTrace (refractedRay, depth + 1);
-		color += refractedColor * transparency;
+		if (material.IsTransparent ()) {
+			double transparency = material.GetTransparency ();
+			double refractionIndex = material.GetRefractionIndex ();
+			color = color * (1.0 - transparency);
+
+			Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
+			InfiniteRay refractedRay (intersection.position, refractedDirection);
+			Color refractedColor = RayTrace (refractedRay, depth + 1);
+			color += refractedColor * transparency;
+		}
+	} else if (modelIntersection.iSectType == Intersection::ModelIntersection::Light) {
+		const Intersection::LightIntersection& intersection = modelIntersection.lightIntersection;
+		const Light& light = model.GetLight (intersection.light);
+		color += light.GetColor ();
 	}
 
 	return Clamp (color);

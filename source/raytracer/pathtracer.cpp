@@ -41,7 +41,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	Color colDiffuse = material.GetDiffuseColor ();
 	double cDiffIntensity = (colDiffuse.r + colDiffuse.g + colDiffuse.b) / 3.0;
 
-	if (++depth > 5 && cDiffIntensity < random ()) {
+	if (++depth > 5 && cDiffIntensity < Random ()) {
 		return color;				// russian roulette: what a suicidal path we took!
 	}
 
@@ -49,8 +49,8 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 
 	// Diffuse reflection
 	// Get random direction in the hemisphere given by hit surface's normal
-	double r1 = random () * 2 * PI;		// random angle around
-	double r2 = cos (random () * PI * 0.5);		// distance that is weighted towards normals direction
+	double r1 = Random () * 2 * PI;		// random angle around
+	double r2 = cos (Random () * PI * 0.5);		// distance that is weighted towards normals direction
 	double r2s = sqrt (r2);
 
 	Vec3 w = normal;
@@ -109,9 +109,9 @@ Color PathTracer::RayCastTowardsLights (const Vec3& position, const Vec3& normal
 		Vec3 sw = light.GetPosition () - position;
 		Vec3 su = Normalize ((fabs (sw.x) > .1 ? Vec3 (0, 1, 0) : Vec3 (1, 0, 0)) ^ sw);
 		Vec3 sv = sw ^ su;
-		double lr = light.GetRadius ();
+		double lr = 2.0; // TODO: handle sphere and box light shapes
 		double cos_a_max = sqrt (1 - lr*lr / ((position - light.GetPosition ()) * (position - light.GetPosition ())));		// angle of the cone in which we see the light
-		double eps1 = random (), eps2 = random ();
+		double eps1 = Random (), eps2 = Random ();
 		double cos_a = 1 - eps1 + eps1*cos_a_max;
 		double sin_a = sqrt (1 - cos_a*cos_a);
 		double phi = 2 * PI * eps2;

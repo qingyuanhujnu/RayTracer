@@ -18,11 +18,6 @@ Sphere::~Sphere ()
 {
 }
 
-static double RandomInRange (double min, double max)
-{
-    return min + random () * (max - min);
-}
-
 bool Sphere::ContainsPoint (const Vec3& point) const
 {
 	if (IsLowerOrEqual (Distance (point, origin), radius)) {

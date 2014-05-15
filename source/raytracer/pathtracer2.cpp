@@ -28,41 +28,49 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 		return color;
 	}
 
-	Intersection::GeometryIntersection intersection;
-	if (!Intersection::RayGeometry (ray, model, &intersection)) {
+	Intersection::ModelIntersection modelIntersection;
+	if (!Intersection::RayModel (ray, model, &modelIntersection)) {
 		return color;
 	}
 
-	const Mesh& mesh = model.GetMesh (intersection.mesh);
-	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
-	const Material& material = model.GetMaterial (triangle.material);
-	Vec3 normal = mesh.GetNormal (intersection.triangle, intersection.position);
-	if (intersection.facing == Intersection::ShapeIntersection::Back) {
-		normal = normal * -1.0;
-	}
+	if (modelIntersection.iSectType == Intersection::ModelIntersection::Geometry) {
+		const Intersection::GeometryIntersection& intersection = modelIntersection.geometryIntersection;
 
-	double materialEmission = 0.6;
-	Color diffuseColor = material.GetDiffuseColor ();
-	double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * materialEmission;
-	color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - diffuseIntensity);
-	color += SampleGeometry (intersection.position, normal, depth) * diffuseIntensity;
+		const Mesh& mesh = model.GetMesh (intersection.mesh);
+		const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
+		const Material& material = model.GetMaterial (triangle.material);
+		Vec3 normal = mesh.GetNormal (intersection.triangle, intersection.position);
+		if (intersection.facing == Intersection::ShapeIntersection::Back) {
+			normal = normal * -1.0;
+		}
 
-	if (material.IsReflective ()) {
-		Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
-		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-		Color reflectedColor = Trace (reflectedRay, depth + 1);
-		color += reflectedColor * material.GetReflection ();
-	}
+		double diffuseCompensation = 0.6; // TODO: this is magic
+		Color diffuseColor = material.GetDiffuseColor ();
+		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * diffuseCompensation;
+		color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - diffuseIntensity);
+		color += SampleGeometry (intersection.position, normal, depth) * diffuseIntensity;
 
-	if (material.IsTransparent ()) {
-		double transparency = material.GetTransparency ();
-		double refractionIndex = material.GetRefractionIndex ();
-		color = color * (1.0 - transparency);
+		if (material.IsReflective ()) {
+			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+			InfiniteRay reflectedRay (intersection.position, reflectedDirection);
+			Color reflectedColor = Trace (reflectedRay, depth + 1);
+			color += reflectedColor * material.GetReflection ();
+		}
 
-		Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
-		InfiniteRay refractedRay (intersection.position, refractedDirection);
-		Color refractedColor = Trace (refractedRay, depth + 1);
-		color += refractedColor * transparency;
+		if (material.IsTransparent ()) {
+			double transparency = material.GetTransparency ();
+			double refractionIndex = material.GetRefractionIndex ();
+			color = color * (1.0 - transparency);
+
+			Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
+			InfiniteRay refractedRay (intersection.position, refractedDirection);
+			Color refractedColor = Trace (refractedRay, depth + 1);
+			color += refractedColor * transparency;
+		}
+	} else if (modelIntersection.iSectType == Intersection::ModelIntersection::Light) {
+		const Intersection::LightIntersection& intersection = modelIntersection.lightIntersection;
+		const Light& light = model.GetLight (intersection.light);
+		color += light.GetColor ();
 	}
 
 	return Clamp (color);
@@ -85,8 +93,8 @@ Color PathTracer2::SampleLights (const Material& material, const Vec3& point, co
 
 Vec3 RandomDirectionOnHemisphere (const Vec3& normal)
 {
-    double theta = acos (sqrt (1.0 - random ()));
-    double phi = 2.0 * PI * random ();
+    double theta = acos (sqrt (1.0 - Random ()));
+    double phi = 2.0 * PI * Random ();
 
     double xs = sin (theta) * cos (phi);
     double ys = cos (theta);

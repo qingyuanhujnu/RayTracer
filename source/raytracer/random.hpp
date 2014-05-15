@@ -3,6 +3,7 @@
 
 #include <random>
 
-double random ();
+double Random ();
+double RandomInRange (double min, double max);
 
 #endif

@@ -150,19 +150,43 @@ static bool ReadCamera (std::wifstream& inputStream, Camera& camera)
 
 static bool ReadLight (std::wifstream& inputStream, Model& model)
 {
+	Light::Shape shape = Light::SphereShape;
 	Vec3 position;
 	Color color;
-	double radius;
+	double radius = 0.0;
+	double xSize = 0.0;
+	double ySize = 0.0;
+	double zSize = 0.0;
 	Vec3 attenuation;
+
+	std::wstring shapeString;
+	if (!ReadNamedString (inputStream, L"shape", shapeString)) { return false; }
+	if (shapeString == L"sphere") {
+		shape = Light::SphereShape;
+		if (!ReadDouble (inputStream, radius)) { return false; }
+	} else if (shapeString == L"box") {
+		shape = Light::BoxShape;
+		if (!ReadDouble (inputStream, xSize)) { return false; }
+		if (!ReadDouble (inputStream, ySize)) { return false; }
+		if (!ReadDouble (inputStream, zSize)) { return false; }
+	} else {
+		return false;
+	}
 
 	if (!ReadNamedVec3 (inputStream, L"position", position)) { return false; }
 	if (!ReadNamedColor (inputStream, L"color", color)) { return false; }
-	if (!ReadNamedDouble (inputStream, L"radius", radius)) { return false; }
 	if (!ReadNamedVec3 (inputStream, L"attenuation", attenuation)) { return false; }
 
 	Light light;
-	Sphere lightSphere (position, radius);
-	light.Set (lightSphere, color, attenuation);
+	if (shape == Light::SphereShape) {
+		Sphere sphere (position, radius);
+		light.Set (sphere, color, attenuation);
+	} else if (shape == Light::BoxShape) {
+		Box box (position, xSize, ySize, zSize);
+		light.Set (box, color, attenuation);
+	} else {
+		return false;
+	}
 	model.AddLight (light);
 	return true;
 }
