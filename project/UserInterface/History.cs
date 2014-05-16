@@ -64,7 +64,7 @@ namespace UserInterface
                 RegistryKey appKey = softwareKey.CreateSubKey ("RayTracer");
                 String historyString = "";
                 for (int i = 0; i < history.Count; i++) {
-                    if (history.Count - i <= 5) {
+                    if (history.Count - i <= 10) {
                         historyString += history[i] + separator;
                     }
                 }

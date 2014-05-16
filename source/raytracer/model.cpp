@@ -33,6 +33,24 @@ UIndex Model::MeshCount () const
 	return geometry.size ();
 }
 
+UIndex Model::VertexCount () const
+{
+	UIndex result = 0;
+	for (UIndex i = 0; i < geometry.size (); i++) {
+		result += geometry[i].VertexCount ();
+	}
+	return result;
+}
+
+UIndex Model::TriangleCount () const
+{
+	UIndex result = 0;
+	for (UIndex i = 0; i < geometry.size (); i++) {
+		result += geometry[i].TriangleCount ();
+	}
+	return result;
+}
+
 UIndex Model::MaterialCount () const
 {
 	return materials.size ();

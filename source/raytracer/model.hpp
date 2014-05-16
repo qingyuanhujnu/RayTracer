@@ -18,6 +18,8 @@ public:
 	UIndex					AddLight (const Light& light);
 
 	UIndex					MeshCount () const;
+	UIndex					VertexCount () const;
+	UIndex					TriangleCount () const;
 	UIndex					MaterialCount () const;
 	UIndex					LightCount () const;
 

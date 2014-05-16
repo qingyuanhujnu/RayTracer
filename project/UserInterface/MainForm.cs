@@ -36,8 +36,9 @@ namespace UserInterface {
             menuStrip.Enabled = false;
             configTextBox.Enabled = false;
             pictureBox.Visible = true;
-            progressBar.Visible = true;
-            progressBar.Value = 0;
+            toolStripProgressBar.Visible = true;
+            toolStripProgressBar.Value = 0;
+            toolStripStatusLabel.Text = "";
         }
 
         public void UpdateControlsForEdit ()
@@ -45,12 +46,14 @@ namespace UserInterface {
             menuStrip.Enabled = true;
             configTextBox.Enabled = true;
             pictureBox.Visible = true;
-            progressBar.Visible = false;
+            toolStripProgressBar.Visible = false;
+            toolStripStatusLabel.Text = "";
         }
 
         public void SetProgressBarValue (Int32 val)
         {
-            progressBar.Value = val;
+            toolStripProgressBar.Value = val;
+            toolStripStatusLabel.Text = val.ToString () + "%";
         }
 
         public void SetPictureBoxImage (Image image)

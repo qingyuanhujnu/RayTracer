@@ -93,10 +93,8 @@ namespace UserInterface {
 
             lock (this)
             {
-                if (renderImage != null)
-                {
-                    if (copyImage != null)
-                    {
+                if (renderImage != null) {
+                    if (copyImage != null) {
                         copyImage.Dispose();
                     }
                     copyImage = new Bitmap(renderImage);
@@ -118,13 +116,11 @@ namespace UserInterface {
             File.Delete (tempFileName);
             File.Delete (tempResultFileName);
 
-            if (renderImage != null)
-            {
+            if (renderImage != null) {
                 renderImage.Dispose();
             }
 
-            if (copyImage != null)
-            {
+            if (copyImage != null) {
                 copyImage.Dispose();
             }
 
@@ -133,18 +129,13 @@ namespace UserInterface {
 
         private void SetPixel (int x, int y, double r, double g, double b, int picWidth, int picHeight)        
         {
-            Color color = Color.FromArgb(255,
-                                    Convert.ToByte(r * 255),
-                                    Convert.ToByte(g * 255),
-                                    Convert.ToByte(b * 255));
+            Color color = Color.FromArgb (255, Convert.ToByte (r * 255), Convert.ToByte (g * 255), Convert.ToByte (b * 255));
 
-            lock (this)
-            {
-                if (renderImage == null || picWidth > renderImage.Width || picHeight > renderImage.Height)
-                {
-                    renderImage = new Bitmap(picWidth, picHeight);
+            lock (this) {
+                if (renderImage == null || picWidth != renderImage.Width || picHeight != renderImage.Height) {
+                    renderImage = new Bitmap (picWidth, picHeight);
                 }
-                renderImage.SetPixel(x, picHeight - 1 - y, color);      // Bitmap.SetPixel is NOT thread safe :(
+                renderImage.SetPixel (x, picHeight - 1 - y, color);      // Bitmap.SetPixel is NOT thread safe :(
             }
         }
         
@@ -193,7 +184,7 @@ namespace UserInterface {
 
             private void NativeRayTracerSetPixelCallback (int x, int y, double r, double g, double b, int picWidth, int picHeight)
             {
-                setPixelCallback(x, y, r, g, b, picWidth, picHeight);
+                setPixelCallback (x, y, r, g, b, picWidth, picHeight);
             }
 
             private void DoRayTrace (object sender, DoWorkEventArgs e)

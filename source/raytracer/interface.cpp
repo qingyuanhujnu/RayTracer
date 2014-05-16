@@ -18,12 +18,16 @@ public:
 
 	virtual void OnProgress (double progress) const
 	{
-		progressCallback (progress);
+		if (progressCallback != nullptr) {
+			progressCallback (progress);
+		}
 	}
 
 	virtual void OnPixelReady (int x, int y, double r, double g, double b, int picWidth, int picHeight) const
 	{
-		setPixelCallback (x, y, r, g, b, picWidth, picHeight);
+		if (setPixelCallback != nullptr) {
+			setPixelCallback (x, y, r, g, b, picWidth, picHeight);
+		}
 	}
 
 private:

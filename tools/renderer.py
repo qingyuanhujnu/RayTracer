@@ -10,7 +10,8 @@ def DeleteFile (filePath):
 		os.remove (filePath)
 
 def RayTrace (binaryPath, configFile, resultFile, algorithm, samples):
-	command = binaryPath + ' --config "' + configFile + '" --result "' + resultFile + '" --algorithm ' + algorithm + ' --samples' + str (samples) + ' --verbose'
+	command = binaryPath + ' --config "' + configFile + '" --result "' + resultFile + '" --algorithm ' + algorithm + ' --samples ' + str (samples) + ' --verbose'
+	print command
 	return os.system (command)
 
 def Render (binaryPath, configFile, resolution, algorithm, samples):
@@ -44,12 +45,13 @@ def Main ():
 	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
 	
 	resolution = 400
+	samples = 256
 	for algorithm in ['raytrace', 'pathtrace2']:
-		#Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, 256)
-		#Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, 256)
-		#Render (binaryPath, '../test/source/14_two_lights.txt', resolution, algorithm, 256)
-		#Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, 256)
-		Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, 256)
+		#Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)
+		#Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
+		#Render (binaryPath, '../test/source/14_two_lights.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples)
+		#Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
 	return
 	
 Main ()
