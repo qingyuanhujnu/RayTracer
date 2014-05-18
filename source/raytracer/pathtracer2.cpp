@@ -44,7 +44,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 			normal = normal * -1.0;
 		}
 
-		double diffuseCompensation = 0.6; // https://www.youtube.com/watch?v=YWf5BLUOhNM
+		double diffuseCompensation = 0.4; // https://www.youtube.com/watch?v=YWf5BLUOhNM
 		Color diffuseColor = material.GetDiffuseColor ();
 		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * diffuseCompensation;
 		color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - diffuseIntensity);

@@ -47,11 +47,10 @@ def Main ():
 	resolution = 400
 	samples = 256
 	for algorithm in ['raytrace', 'pathtrace2']:
-		#Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/14_two_lights.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)
 		Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
 	return
 	
 Main ()
