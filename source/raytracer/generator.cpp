@@ -119,15 +119,6 @@ void Generator::GenerateRoomBox (Model& model, double xSize, double ySize, doubl
 	model.AddMesh (mesh);
 }
 
-static Vec3 CylindricalToCartesian (double radius, double height, double theta)
-{
-	Vec3 result;
-	result.x = radius * cos (theta);
-	result.y = radius * sin (theta);
-	result.z = height;
-	return result;
-};
-
 void Generator::GenerateCylinder (Model& model, double radius, double height, int segmentation, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
 	Mesh mesh;
@@ -168,15 +159,6 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 	mesh.Finalize ();
 	model.AddMesh (mesh);
 }
-
-static Vec3 SphericalToCartesian (double radius, double theta, double phi)
-{
-	Vec3 result;
-	result.x = radius * sin (theta) * cos (phi);
-	result.y = radius * sin (theta) * sin (phi);
-	result.z = radius * cos (theta);
-	return result;
-};
 
 void Generator::GenerateSphere (Model& model, double radius, int segmentation, const Vec3& offset, const Vec3& rotation, UIndex material)
 {
@@ -242,15 +224,6 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 	mesh.Finalize ();
 	model.AddMesh (mesh);
 }
-
-static Vec3 PolarToCartesian (double radius, double theta)
-{
-	Vec3 result;
-	result.x = radius * cos (theta);
-	result.y = radius * sin (theta);
-	result.z = 0.0;
-	return result;
-};
 
 static Vec3 CoordRotateZ (const Vec3& coord, double angle)
 {

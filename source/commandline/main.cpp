@@ -3,9 +3,19 @@
 #include <string>
 #include <ctime>
 
+typedef void (*StartRenderCallback) (int picWidth, int picHeight, int vertexCount, int triangleCount);
+typedef void (*EndRenderCallback) ();
 typedef void (*ProgressCallback) (double progress);
-typedef void (*PixelReadyCallback) (int x, int y, double r, double g, double b, int picWidth, int picHeight);
-typedef bool (*RayTraceFunction) (const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, PixelReadyCallback pixelReadyCallback);
+typedef void (*SetPixelCallback) (int x, int y, double r, double g, double b);
+typedef int (*RenderFunction) (
+	int algorithm,
+	const wchar_t* configFile,
+	const wchar_t* resultFile,
+	int sampleNum,
+	StartRenderCallback startRenderCallback,
+	EndRenderCallback endRenderCallback,
+	ProgressCallback progressCallback,
+	SetPixelCallback setPixelCallback);
 
 class LibraryGuard
 {
@@ -23,6 +33,24 @@ public:
 	HMODULE module;
 };
 
+static void StartRender (int picWidth, int picHeight, int vertexCount, int triangleCount)
+{
+
+}
+
+static void StartRenderVerbose (int picWidth, int picHeight, int vertexCount, int triangleCount)
+{
+	printf ("image width: %d\n", picWidth);
+	printf ("image height: %d\n", picHeight);
+	printf ("vertex count: %d\n", vertexCount);
+	printf ("triangle count: %d\n", triangleCount);
+}
+
+static void EndRender ()
+{
+
+}
+
 static void OnProgress (double progress)
 {
 
@@ -33,7 +61,7 @@ static void OnProgressVerbose (double progress)
 	printf ("%f%%\n", progress * 100.0);
 }
 
-static void OnPixelReady (int x, int y, double r, double g, double b, int picWidth, int picHeight)
+static void OnPixelReady (int x, int y, double r, double g, double b)
 {
 
 }
@@ -100,6 +128,11 @@ int wmain (int argc, const wchar_t **argv)
 	if (argc != 4) {
 	}
 
+	RenderFunction renderFunction = (RenderFunction) GetProcAddress (rayTracerModule.module, "Render");
+	if (renderFunction == NULL) {
+		return 1;
+	}
+
 	std::wstring configFile;
 	std::wstring resultFile;
 	std::wstring algorithm;
@@ -109,32 +142,30 @@ int wmain (int argc, const wchar_t **argv)
 		WriteHelp ();
 
 		// development mode
-		RayTraceFunction rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "RayTrace");
-		if (rayTraceFunction == NULL) {
-			return 1;
-		}
-		rayTraceFunction (L"config01.txt", L"result.png", 32, OnProgressVerbose, OnPixelReady);
+		renderFunction (0, L"config01.txt", L"result.png", 32, StartRenderVerbose, EndRender, OnProgressVerbose, OnPixelReady);
 		return 1;
 	}
 
-	RayTraceFunction rayTraceFunction = NULL;
+	int algorithmVal = 0;
 	if (algorithm == L"raytrace") {
-		rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "RayTrace");
+		algorithmVal = 0;
 	} else if (algorithm == L"pathtrace") {
-		rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "PathTrace");
+		algorithmVal = 1;
 	} else if (algorithm == L"pathtrace2") {
-		rayTraceFunction = (RayTraceFunction) GetProcAddress (rayTracerModule.module, "PathTrace2");
+		algorithmVal = 2;
 	}
-	if (rayTraceFunction == NULL) {
+	if (renderFunction == NULL) {
 		return 1;
 	}
 
 	time_t begin = time (NULL);
+	StartRenderCallback startRenderCallback = StartRender;
 	ProgressCallback progressCallback = OnProgress;
 	if (verbose) {
+		startRenderCallback = StartRenderVerbose;
 		progressCallback = OnProgressVerbose;
 	}
-	if (rayTraceFunction (configFile.c_str (), resultFile.c_str (), sampleNum, progressCallback, OnPixelReady) != 0) {
+	if (renderFunction (algorithmVal, configFile.c_str (), resultFile.c_str (), sampleNum, startRenderCallback, EndRender, progressCallback, OnPixelReady) != 0) {
 		return 1;
 	}
 	time_t end = time (NULL);

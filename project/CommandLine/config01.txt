@@ -9,10 +9,12 @@ camera
 	up 0.0 0.0 1.0
 	xfov 45.0
 	yfov 45.0
+	focal_length 0.0
+	aperture_radius 0.0
 light
+	shape sphere 0.5
 	position 3.0 3.5 5.5
 	color 1.0 1.0 1.0
-	radius 0.5
 	attenuation 1.0 0.1 0.01
 material
 	color 1.0 0.0 0.0

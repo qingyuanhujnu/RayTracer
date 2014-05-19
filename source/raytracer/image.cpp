@@ -36,6 +36,16 @@ Vec3 Image::Field::GetRandomSample () const
 	return result;
 }
 
+const Vec3& Image::Field::GetXDirection () const
+{
+	return xDirection;
+}
+
+const Vec3& Image::Field::GetYDirection () const
+{
+	return yDirection;
+}
+
 Image::Image (const Camera& camera, int resolutionX, int resolutionY, double distance)
 {
 	double imageWidth = distance * tan (camera.GetXFov ()) * distance;

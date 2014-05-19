@@ -20,6 +20,7 @@ public:
 
 	void	Append (const Transformation& mat);
 	void	AppendTranslation (const Vec3& translation);
+	void	AppendRotation (const Vec3& axis, double angle, const Vec3* origo);
 	void	AppendRotationX (double angle);
 	void	AppendRotationY (double angle);
 	void	AppendRotationZ (double angle);

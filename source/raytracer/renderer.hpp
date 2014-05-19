@@ -58,7 +58,7 @@ public:
 		std::vector<Color>	image;
 	};
 
-	Renderer (const Model& model, const Camera& camera);
+	Renderer (const Model& model, const Camera& camera, int sampleNum);
 	virtual ~Renderer ();
 
 	virtual bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress);
@@ -68,6 +68,7 @@ protected:
 
 	Model			model;
 	Camera			camera;
+	int				sampleNum;
 };
 
 #endif

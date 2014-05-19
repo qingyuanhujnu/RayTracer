@@ -12,8 +12,11 @@ public:
 	public:
 		Field (const Vec3& fieldBottomLeft, const Vec3& xDirection, const Vec3& yDirection, double fieldWidth, double fieldHeight);
 
-		Vec3	GetFixSample (int sampleResolution, int index) const;
-		Vec3	GetRandomSample () const;
+		Vec3			GetFixSample (int sampleResolution, int index) const;
+		Vec3			GetRandomSample () const;
+
+		const Vec3&		GetXDirection () const;
+		const Vec3&		GetYDirection () const;
 
 	private:
 		Vec3	fieldBottomLeft;

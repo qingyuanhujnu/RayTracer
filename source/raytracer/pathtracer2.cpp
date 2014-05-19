@@ -6,8 +6,7 @@
 #include "average.hpp"
 
 PathTracer2::PathTracer2 (const Model& model, const Camera& camera, int sampleNum) :
-	Renderer (model, camera),
-	sampleNum (sampleNum)
+	Renderer (model, camera, sampleNum)
 {
 }
 
@@ -15,8 +14,16 @@ Color PathTracer2::GetFieldColor (const Image::Field& field)
 {
 	Average<Color> averageColor;
 	for (int i = 0; i < sampleNum; i++) {
-		InfiniteRay cameraRay (camera.GetEye (), field.GetRandomSample () - camera.GetEye ());
-		averageColor.Add (Trace (cameraRay, 0));
+		if (!IsZero (camera.GetApertureRadius ()) && !IsZero (camera.GetFocalLength ())) {
+			Vec3 aperturePosition = camera.GetRandomAperturePoint (field.GetXDirection (), field.GetYDirection ());
+			Vec3 samplePosition = field.GetRandomSample ();
+			Vec3 focalPoint = camera.GetFocalPoint (samplePosition);
+			InfiniteRay cameraRay (aperturePosition, focalPoint - aperturePosition);
+			averageColor.Add (Trace (cameraRay, 0));
+		} else {
+			InfiniteRay cameraRay (camera.GetEye (), field.GetRandomSample () - camera.GetEye ());
+			averageColor.Add (Trace (cameraRay, 0));
+		}
 	}
 	return averageColor.Get ();
 }

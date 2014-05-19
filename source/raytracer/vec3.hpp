@@ -37,4 +37,8 @@ Vec3	Offset (const Vec3& vec, const Vec3& direction, double distance);
 Vec3	GetReflectedDirection (const Vec3& vec, const Vec3& normal);
 Vec3	GetRefractedDirection (const Vec3& vec, const Vec3& normal, double refractionIndex);
 
+Vec3	PolarToCartesian (double radius, double theta);
+Vec3	SphericalToCartesian (double radius, double theta, double phi);
+Vec3	CylindricalToCartesian (double radius, double height, double theta);
+
 #endif

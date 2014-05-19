@@ -182,3 +182,30 @@ Vec3 GetRefractedDirection (const Vec3& vec, const Vec3& normal, double refracti
 		return GetReflectedDirection (vec, nNormal);
 	}
 }
+
+Vec3 PolarToCartesian (double radius, double theta)
+{
+	Vec3 result;
+	result.x = radius * cos (theta);
+	result.y = radius * sin (theta);
+	result.z = 0.0;
+	return result;
+};
+
+Vec3 SphericalToCartesian (double radius, double theta, double phi)
+{
+	Vec3 result;
+	result.x = radius * sin (theta) * cos (phi);
+	result.y = radius * sin (theta) * sin (phi);
+	result.z = radius * cos (theta);
+	return result;
+};
+
+Vec3 CylindricalToCartesian (double radius, double height, double theta)
+{
+	Vec3 result;
+	result.x = radius * cos (theta);
+	result.y = radius * sin (theta);
+	result.z = height;
+	return result;
+};

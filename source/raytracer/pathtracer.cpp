@@ -7,8 +7,7 @@
 #include <algorithm>
 
 PathTracer::PathTracer (const Model& model, const Camera& camera, int sampleNum) :
-	Renderer (model, camera),
-	sampleNum (sampleNum)
+	Renderer (model, camera, sampleNum)
 {
 }
 

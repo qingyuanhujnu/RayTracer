@@ -73,7 +73,7 @@ void Transformation::SetRotation  (const Vec3& axis, double angle, const Vec3* o
 	double si = sin (angle);
 	double co = cos (angle);
 	
-	if (origo == NULL) {
+	if (origo == nullptr) {
 		matrix[0] = u2 + (v2 + w2) * co;
 		matrix[1] = u * v * (1.0 - co) - w * si;
 		matrix[2] = u * w * (1.0 - co) + v * si;
@@ -238,6 +238,13 @@ void Transformation::AppendTranslation (const Vec3& translation)
 {
 	Transformation transformation;
 	transformation.SetTranslation (translation);
+	Append (transformation);
+}
+
+void Transformation::AppendRotation (const Vec3& axis, double angle, const Vec3* origo)
+{
+	Transformation transformation;
+	transformation.SetRotation (axis, angle, origo);
 	Append (transformation);
 }
 

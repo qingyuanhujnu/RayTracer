@@ -101,9 +101,10 @@ const Color& Renderer::ResultImage::GetColor (int x, int y) const
 	return image[y * resolutionX + x];
 }
 
-Renderer::Renderer (const Model& model, const Camera& camera) :
+Renderer::Renderer (const Model& model, const Camera& camera, int sampleNum) :
 	model (model),
-	camera (camera)
+	camera (camera),
+	sampleNum (sampleNum)
 {
 }
 

@@ -12,32 +12,25 @@ namespace UserInterface {
 	static class Win32Functions
 	{
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        public delegate void StartRenderCallback (int picWidth, int picHeight, int vertexCount, int triangleCount);
+
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        public delegate void EndRenderCallback ();
+
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public delegate void ProgressCallback (double progress);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void SetPixelCallback(int x, int y, double r, double g, double b, int picWidth, int picHeight);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        public delegate void SetPixelCallback(int x, int y, double r, double g, double b);
 
 		[DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int RayTrace (
+		public static extern int Render (
+            int algorithm,
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
 			[MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
             int sampleNum,
-            ProgressCallback progressCallback,
-            SetPixelCallback setPixelCallback);
-
-        [DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int PathTrace (
-            [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
-            [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
-            int sampleNum,
-            ProgressCallback progressCallback,
-            SetPixelCallback setPixelCallback);
-
-        [DllImport ("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int PathTrace2 (
-            [MarshalAsAttribute (UnmanagedType.LPWStr)] string configFile,
-            [MarshalAsAttribute (UnmanagedType.LPWStr)] string resultFile,
-            int sampleNum,
+            StartRenderCallback startRenderCallback,
+            EndRenderCallback endRenderCallback,
             ProgressCallback progressCallback,
             SetPixelCallback setPixelCallback);
     }
@@ -81,10 +74,22 @@ namespace UserInterface {
                 writer.Close ();
 
                 RenderWorker worker = new RenderWorker ();
-                worker.Start (renderMode, tempFileName, tempResultFileName, Progress, Finish, SetPixel);
+                worker.Start (renderMode, tempFileName, tempResultFileName, StartRender, EndRender, Progress, Finish, SetPixel);
             } catch {
 
             }
+        }
+
+        private void StartRender (int picWidth, int picHeight, int vertexCount, int triangleCount)
+        {
+            if (renderImage != null) {
+                renderImage.Dispose ();
+            }
+            renderImage = new Bitmap (picWidth, picHeight);
+        }
+
+        private void EndRender ()
+        {
         }
 
         private void Progress (int progress)
@@ -127,15 +132,12 @@ namespace UserInterface {
             mainForm.UpdateControlsForEdit ();
         }
 
-        private void SetPixel (int x, int y, double r, double g, double b, int picWidth, int picHeight)        
+        private void SetPixel (int x, int y, double r, double g, double b)
         {
             Color color = Color.FromArgb (255, Convert.ToByte (r * 255), Convert.ToByte (g * 255), Convert.ToByte (b * 255));
 
             lock (this) {
-                if (renderImage == null || picWidth != renderImage.Width || picHeight != renderImage.Height) {
-                    renderImage = new Bitmap (picWidth, picHeight);
-                }
-                renderImage.SetPixel (x, picHeight - 1 - y, color);      // Bitmap.SetPixel is NOT thread safe :(
+                renderImage.SetPixel (x, renderImage.Height - 1 - y, color);      // Bitmap.SetPixel is NOT thread safe :(
             }
         }
         
@@ -149,7 +151,9 @@ namespace UserInterface {
 
             private Action<int> progressCallback;
             private Action<int> finishedCallback;
-            private Action<int, int, double, double, double, int, int> setPixelCallback;
+            private Action<int, int, int, int> startRenderCallback;
+            private Action endRenderCallback;
+            private Action<int, int, double, double, double> setPixelCallback;
 
             int result = -1;
 
@@ -164,39 +168,61 @@ namespace UserInterface {
             public void Start (RenderMode renderMode, 
                                 String tempFileName,
                                 String tempResultFileName,
+                                Action<int, int, int, int> startRenderCallback,
+                                Action endRenderCallback,
                                 Action<int> progressCallback,
                                 Action<int> finishedCallback,
-                                Action<int, int, double, double, double, int, int> setPixelCallback)
+                                Action<int, int, double, double, double> setPixelCallback)
             {
                 this.renderMode = renderMode;
                 this.tempFileName = tempFileName;
                 this.tempResultFileName = tempResultFileName;
+                this.startRenderCallback = startRenderCallback;
+                this.endRenderCallback = endRenderCallback;
                 this.progressCallback = progressCallback;
                 this.finishedCallback = finishedCallback;
                 this.setPixelCallback = setPixelCallback;
                 backgroundWorker.RunWorkerAsync ();
             }
 
-            private void NativeRayTracerProgressCallback (double progress)
+            private void NativeRayTracerStartRenderCallback (int picWidth, int picHeight, int vertexCount, int triangleCount)
             {
-                backgroundWorker.ReportProgress ((Int32)(progress * 100.0));
+                startRenderCallback (picWidth, picHeight, vertexCount, triangleCount);
             }
 
-            private void NativeRayTracerSetPixelCallback (int x, int y, double r, double g, double b, int picWidth, int picHeight)
+            private void NativeRayTracerEndRenderCallback ()
             {
-                setPixelCallback (x, y, r, g, b, picWidth, picHeight);
+                
+            }
+            
+            private void NativeRayTracerProgressCallback (double progress)
+            {
+                backgroundWorker.ReportProgress ((Int32) (progress * 100.0));
+            }
+
+            private void NativeRayTracerSetPixelCallback (int x, int y, double r, double g, double b)
+            {
+                setPixelCallback (x, y, r, g, b);
             }
 
             private void DoRayTrace (object sender, DoWorkEventArgs e)
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
-                if (renderMode == RenderMode.RayTraceMode) {
-                    result = Win32Functions.RayTrace (tempFileName, tempResultFileName, 32, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
-                } else if (renderMode == RenderMode.PathTraceMode) {
-                    result = Win32Functions.PathTrace(tempFileName, tempResultFileName, 32, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
-                } else if (renderMode == RenderMode.PathTrace2Mode) {
-                    result = Win32Functions.PathTrace2(tempFileName, tempResultFileName, 32, NativeRayTracerProgressCallback, NativeRayTracerSetPixelCallback);
+                Int32 algorithm = 0;
+                switch (renderMode) {
+                    case RenderMode.RayTraceMode: algorithm = 0; break;
+                    case RenderMode.PathTraceMode: algorithm = 1; break;
+                    case RenderMode.PathTrace2Mode: algorithm = 2; break;
                 }
+                result = Win32Functions.Render (
+                    algorithm,
+                    tempFileName,
+                    tempResultFileName,
+                    32,
+                    NativeRayTracerStartRenderCallback,
+                    NativeRayTracerEndRenderCallback,
+                    NativeRayTracerProgressCallback,
+                    NativeRayTracerSetPixelCallback);
             }
 
             private void RayTraceProgressChanged (object sender, ProgressChangedEventArgs e)

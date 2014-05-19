@@ -2,26 +2,27 @@
 #include "ray.hpp"
 #include "image.hpp"
 #include "common.hpp"
+#include "random.hpp"
 #include "average.hpp"
 #include "shading.hpp"
 
-RayTracer::RayTracer (const Model& model, const Camera& camera) :
-	Renderer (model, camera)
+RayTracer::RayTracer (const Model& model, const Camera& camera, int sampleNum) :
+	Renderer (model, camera, sampleNum)
 {
 }
 
 Color RayTracer::GetFieldColor (const Image::Field& field)
 {
 	Average<Color> averageColor;
-	int sampleRes = 3;
+	int sampleRes = (int) sqrt ((double) sampleNum);
 	for (int i = 0; i < sampleRes * sampleRes; i++) {
 		InfiniteRay cameraRay (camera.GetEye (), field.GetFixSample (sampleRes, i) - camera.GetEye ());
-		averageColor.Add (RayTrace (cameraRay, 0));
+		averageColor.Add (Trace (cameraRay, 0));
 	}
 	return averageColor.Get ();
 }
 
-Color RayTracer::RayTrace (const Ray& ray, int depth) const
+Color RayTracer::Trace (const Ray& ray, int depth) const
 {
 	Color color;
 	if (depth > 10) {
@@ -57,7 +58,7 @@ Color RayTracer::RayTrace (const Ray& ray, int depth) const
 		if (material.IsReflective ()) {
 			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
 			InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-			Color reflectedColor = RayTrace (reflectedRay, depth + 1);
+			Color reflectedColor = Trace (reflectedRay, depth + 1);
 			color += reflectedColor * material.GetReflection ();
 		}
 
@@ -68,7 +69,7 @@ Color RayTracer::RayTrace (const Ray& ray, int depth) const
 
 			Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
 			InfiniteRay refractedRay (intersection.position, refractedDirection);
-			Color refractedColor = RayTrace (refractedRay, depth + 1);
+			Color refractedColor = Trace (refractedRay, depth + 1);
 			color += refractedColor * transparency;
 		}
 	} else if (modelIntersection.iSectType == Intersection::ModelIntersection::Light) {

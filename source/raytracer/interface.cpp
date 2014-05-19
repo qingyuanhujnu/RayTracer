@@ -1,4 +1,5 @@
 #include "interface.hpp"
+#include "random.hpp"
 #include "configfile.hpp"
 #include "raytracer.hpp"
 #include "pathtracer.hpp"
@@ -42,8 +43,23 @@ enum RenderMode
 	PathTrace2Mode
 };
 
-static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
+int Render (
+	int algorithm,
+	const wchar_t* configFile,
+	const wchar_t* resultFile,
+	int sampleNum,
+	StartRenderCallback startRenderCallback,
+	EndRenderCallback endRenderCallback,
+	ProgressCallback progressCallback,
+	SetPixelCallback setPixelCallback)
 {
+	RenderMode renderMode = RayTraceMode;
+	switch (algorithm) {
+		case 0: renderMode = RayTraceMode; break;
+		case 1: renderMode = PathTraceMode; break;
+		case 2: renderMode = PathTrace2Mode; break;
+	}
+
 	if (DBGERROR (configFile == NULL)) {
 		return 1;
 	}
@@ -59,12 +75,16 @@ static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* re
 		return 2;
 	}
 	
+	if (startRenderCallback != nullptr) {
+		startRenderCallback (parameters.GetResolutionX (), parameters.GetResolutionY (), model.VertexCount (), model.TriangleCount ());
+	}
+
 	std::unique_ptr<Renderer> renderer = NULL;
-	if (mode == RayTraceMode) {
-		renderer.reset (new RayTracer (model, camera));
-	} else if (mode == PathTraceMode) {
+	if (renderMode == RayTraceMode) {
+		renderer.reset (new RayTracer (model, camera, sampleNum));
+	} else if (renderMode == PathTraceMode) {
 		renderer.reset (new PathTracer (model, camera, sampleNum));
-	} else if (mode == PathTrace2Mode) {
+	} else if (renderMode == PathTrace2Mode) {
 		renderer.reset (new PathTracer2 (model, camera, sampleNum));
 	}
 	if (DBGERROR (renderer == NULL)) {
@@ -79,22 +99,11 @@ static int Render (RenderMode mode, const wchar_t* configFile, const wchar_t* re
 	
 	if (DBGERROR (!Export::ExportImage (resultImage, resultFile, L"image/png"))) {
 		return 5;
-	}	
+	}
+
+	if (endRenderCallback != nullptr) {
+		endRenderCallback ();
+	}
 
 	return 0;
-}
-
-int RayTrace (const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
-{
-	return Render (RayTraceMode, configFile, resultFile, sampleNum, progressCallback, setPixelCallback);
-}
-
-int PathTrace (const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
-{
-	return Render (PathTraceMode, configFile, resultFile, sampleNum, progressCallback, setPixelCallback);
-}
-
-int PathTrace2 (const wchar_t* configFile, const wchar_t* resultFile, int sampleNum, ProgressCallback progressCallback, SetPixelCallback setPixelCallback)
-{
-	return Render (PathTrace2Mode, configFile, resultFile, sampleNum, progressCallback, setPixelCallback);
 }

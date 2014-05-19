@@ -9,6 +9,8 @@ camera
 	up 0.0 0.0 1.0
 	xfov 45.0
 	yfov 45.0
+	focal_length 0.0
+	aperture_radius 0.0
 light
 	shape box 2.0 2.0 0.1
 	position 0.0 0.0 5.9

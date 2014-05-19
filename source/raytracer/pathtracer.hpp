@@ -14,8 +14,6 @@ private:
 
 	Color			Radiance (const Ray& ray, int depth) const;
 	Color			RayCastTowardsLights (const Vec3& position, const Vec3& normal, const Material& material) const;
-
-	int				sampleNum;
 };
 
 #endif

@@ -138,13 +138,18 @@ static bool ReadCamera (std::wifstream& inputStream, Camera& camera)
 	double	xFov;
 	double	yFov;
 
+	double	focalLength;
+	double	apertureRadius;
+
 	if (!ReadNamedVec3 (inputStream, L"eye", eye)) { return false; }
 	if (!ReadNamedVec3 (inputStream, L"center", center)) { return false; }
 	if (!ReadNamedVec3 (inputStream, L"up", up)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"xfov", xFov)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"yfov", yFov)) { return false; }
+	if (!ReadNamedDouble (inputStream, L"focal_length", focalLength)) { return false; }
+	if (!ReadNamedDouble (inputStream, L"aperture_radius", apertureRadius)) { return false; }
 
-	camera.Set (eye, center, up, xFov * DEGRAD, yFov * DEGRAD);
+	camera.Set (eye, center, up, xFov * DEGRAD, yFov * DEGRAD, focalLength, apertureRadius);
 	return true;
 }
 
