@@ -101,7 +101,8 @@ def Main ():
 		['14_two_lights.txt', 'raytrace', 9],
 		['15_refraction.txt', 'raytrace', 9],
 		['16_dragon.txt', 'raytrace', 9],
-		['17_depth_of_field.txt', 'raytrace', 9]
+		['17_depth_of_field.txt', 'raytrace', 9],
+		['18_various_shapes.txt', 'raytrace', 9]
 	]
 	
 	maxFileNameLength = 0
