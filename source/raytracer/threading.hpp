@@ -1,5 +1,7 @@
 #ifndef THREADING_HPP
 #define THREADING_HPP
+
+#include <vector>
 #include <memory>
 
 class LockImp;
@@ -32,5 +34,7 @@ public:
 private:
 	std::shared_ptr<ThreadImp>	imp;
 };
+
+int GetProcessorNum ();
 
 #endif

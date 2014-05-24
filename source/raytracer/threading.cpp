@@ -1,4 +1,5 @@
 #include "threading.hpp"
+#include "common.hpp"
 #include <windows.h>
 
 class LockImp
@@ -141,4 +142,11 @@ bool Thread::Start ()
 void Thread::Wait ()
 {
 	imp->Wait ();
+}
+
+int GetProcessorNum ()
+{
+	SYSTEM_INFO systemInfo;
+	GetSystemInfo (&systemInfo);
+	return systemInfo.dwNumberOfProcessors;
 }
