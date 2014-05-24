@@ -62,10 +62,9 @@ public:
 	virtual ~Renderer ();
 
 	virtual bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress);
+	virtual Color	GetFieldColor (const Image::Field& field) const = 0;
 
 protected:
-	virtual Color	GetFieldColor (const Image::Field& field) = 0;
-
 	Model			model;
 	Camera			camera;
 	int				sampleNum;

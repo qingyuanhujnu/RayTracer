@@ -97,6 +97,9 @@
     <ClCompile Include="..\..\source\raytracer\pathtracer2.cpp">
       <Filter>RayTracer</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\raytracer\threading.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer\raytracer.hpp">
@@ -179,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\raytracer\pathtracer2.hpp">
       <Filter>RayTracer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\raytracer\threading.hpp">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

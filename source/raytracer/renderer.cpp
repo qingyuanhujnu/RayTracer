@@ -1,4 +1,5 @@
 #include "renderer.hpp"
+#include "threading.hpp"
 #include <omp.h>
 
 Renderer::IProgress::IProgress ()
@@ -60,8 +61,8 @@ double Renderer::Parameters::GetImageDistance () const
 }
 
 Renderer::ResultImage::ResultImage () :
-resolutionX (0),
-resolutionY (0)
+	resolutionX (0),
+	resolutionY (0)
 {
 
 }
@@ -112,6 +113,88 @@ Renderer::~Renderer ()
 {
 }
 
+class ProgressReport
+{
+public:
+	ProgressReport (const Renderer::IProgress* progress) :
+		progress (progress),
+		reportInterval (1000),
+		finishedPixels (0),
+		lastFinishedPixels (0)
+	{
+	
+	}
+
+	void Report (int x, int y, double r, double g, double b, int picWidth, int picHeight)
+	{
+		progress->OnPixelReady (x, y, r, g, b, picWidth, picHeight);
+
+		lock.Enter ();
+		finishedPixels++;
+		if (finishedPixels == lastFinishedPixels + reportInterval) {
+			progress->OnProgress ((double) finishedPixels / (double) (picWidth * picHeight));
+			lastFinishedPixels = finishedPixels;
+		}
+		lock.Leave ();
+	}
+
+private:
+	const Renderer::IProgress*	progress;
+	int							reportInterval;
+	int							finishedPixels;
+	int							lastFinishedPixels;
+	Lock						lock;
+};
+
+class RenderThread : public Thread
+{
+public:
+	RenderThread (int threadIndex,
+				  int threadNum,
+				  const Image* image,
+				  const Renderer* renderer,
+				  const Renderer::Parameters* parameters,
+				  ProgressReport* progressReport,
+				  Renderer::ResultImage* resultImage) :
+		Thread (),
+		threadIndex (threadIndex),
+		threadNum (threadNum),
+		image (image),
+		renderer (renderer),
+		parameters (parameters),
+		progressReport (progressReport),
+		resultImage (resultImage)
+	{
+	
+	}
+
+	virtual int Do ()
+	{
+		const int resX = parameters->GetResolutionX ();
+		const int resY = parameters->GetResolutionY ();
+		for (int pix = threadIndex; pix < (resX * resY); pix += threadNum) {
+			int x = pix % resX;
+			int y = resY - (pix / resX) - 1;
+
+			Image::Field field = image->GetField (x, y);
+			Color fieldColor = renderer->GetFieldColor (field);
+			resultImage->SetColor (x, y, fieldColor);
+
+			progressReport->Report (x, y, fieldColor.r, fieldColor.g, fieldColor.b, resX, resY);
+		}
+		return 0;
+	}
+
+private:
+	int threadIndex;
+	int threadNum;
+	const Image* image;
+	const Renderer* renderer;
+	const Renderer::Parameters* parameters;
+	ProgressReport* progressReport;
+	Renderer::ResultImage* resultImage;
+};
+
 bool Renderer::Render (const Parameters& parameters, ResultImage& result, const IProgress& progress)
 {
 	if (DBGERROR (!parameters.Check ())) {
@@ -129,18 +212,14 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance ());
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
-	const int reportInterval = 1000;
-	int finishedPixels = 0;
-	int lastFinishedPixels = 0;
-
+	ProgressReport progressReport (&progress);
+	progress.OnProgress (0.0);
+//#define USEOMP
+#ifdef USEOMP
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
-
-	progress.OnProgress (0.0);
-#ifndef DEBUG
 	const int procs = omp_get_num_procs ();		// logical cores
-	#pragma omp parallel for schedule(dynamic, 4) num_threads (procs - 1)
-#endif
+	#pragma omp parallel for schedule(dynamic, 4) num_threads (procs)
 	for (int pix = 0; pix < (resX * resY); ++pix) {
 		int x = pix % resX;
 		int y = resY - (pix / resX) - 1;
@@ -149,19 +228,30 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 		Color fieldColor = GetFieldColor (field);
 		result.SetColor (x, y, fieldColor);
 
-		progress.OnPixelReady (x, y, fieldColor.r, fieldColor.g, fieldColor.b, resX, resY);
-#ifndef DEBUG
 		#pragma omp critical
-#endif
-		{
-			finishedPixels++;
-
-			if (finishedPixels == lastFinishedPixels + reportInterval) {
-				progress.OnProgress ((double) finishedPixels / (double) (resX * resY));
-				lastFinishedPixels = finishedPixels;
-			}
-		}
+		progressReport.Report (x, y, fieldColor.r, fieldColor.g, fieldColor.b, resX, resY);
 	}
+#else
+	const UIndex threadNum = 4;
+	std::vector<RenderThread> threads;
+	for (UIndex i = 0; i < threadNum; i++) {
+		threads.push_back (RenderThread (
+			i,
+			threadNum,
+			&image,
+			this,
+			&parameters,
+			&progressReport,
+			&result
+		));
+	}
+	for (UIndex i = 0; i < threadNum; i++) {
+		threads[i].Start ();
+	}
+	for (UIndex i = 0; i < threadNum; i++) {
+		threads[i].Wait ();
+	}
+#endif
 	progress.OnProgress (1.0);
 
 	return true;

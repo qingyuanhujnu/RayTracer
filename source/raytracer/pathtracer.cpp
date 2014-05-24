@@ -11,7 +11,7 @@ PathTracer::PathTracer (const Model& model, const Camera& camera, int sampleNum)
 {
 }
 
-Color PathTracer::GetFieldColor (const Image::Field& field)
+Color PathTracer::GetFieldColor (const Image::Field& field) const
 {
 	Color fieldColor;
 	for (int s = 0; s < sampleNum; ++s) {

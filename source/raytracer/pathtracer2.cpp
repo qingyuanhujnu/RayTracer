@@ -10,7 +10,7 @@ PathTracer2::PathTracer2 (const Model& model, const Camera& camera, int sampleNu
 {
 }
 
-Color PathTracer2::GetFieldColor (const Image::Field& field)
+Color PathTracer2::GetFieldColor (const Image::Field& field) const
 {
 	Average<Color> averageColor;
 	for (int i = 0; i < sampleNum; i++) {
@@ -28,7 +28,7 @@ Color PathTracer2::GetFieldColor (const Image::Field& field)
 	return averageColor.Get ();
 }
 
-Color PathTracer2::Trace (const Ray& ray, int depth)
+Color PathTracer2::Trace (const Ray& ray, int depth) const
 {
 	Color color;
 	if (depth > 5) {
@@ -83,7 +83,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth)
 	return Clamp (color);
 }
 
-Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection)
+Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection) const
 {
 	Color color = material.GetAmbientColor ();
 	for (UIndex i = 0; i < model.LightCount (); i++) {
@@ -124,7 +124,7 @@ Vec3 RandomDirectionOnHemisphere (const Vec3& normal)
     return Normalize (direction);
 }
 
-Color PathTracer2::SampleGeometry (const Vec3& point, const Vec3& normal, int depth)
+Color PathTracer2::SampleGeometry (const Vec3& point, const Vec3& normal, int depth) const
 {
 	Color color;
 	Vec3 randomDir = RandomDirectionOnHemisphere (normal);

@@ -12,7 +12,7 @@ public:
 	RayTracer (const Model& model, const Camera& camera, int sampleNum);
 	
 private:
-	virtual Color	GetFieldColor (const Image::Field& field) override;
+	virtual Color	GetFieldColor (const Image::Field& field) const override;
 	Color			Trace (const Ray& ray, int depth) const;
 	
 	bool			IsInShadow (const Vec3& position, const Light& light) const;

@@ -10,7 +10,7 @@ public:
 	PathTracer (const Model& model, const Camera& camera, int sampleNum);
 
 private:
-	virtual Color	GetFieldColor (const Image::Field& field) override;
+	virtual Color	GetFieldColor (const Image::Field& field) const override;
 
 	Color			Radiance (const Ray& ray, int depth) const;
 	Color			RayCastTowardsLights (const Vec3& position, const Vec3& normal, const Material& material) const;

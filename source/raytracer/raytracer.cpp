@@ -11,7 +11,7 @@ RayTracer::RayTracer (const Model& model, const Camera& camera, int sampleNum) :
 {
 }
 
-Color RayTracer::GetFieldColor (const Image::Field& field)
+Color RayTracer::GetFieldColor (const Image::Field& field) const
 {
 	Average<Color> averageColor;
 	int sampleRes = (int) sqrt ((double) sampleNum);

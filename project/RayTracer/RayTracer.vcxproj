@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\source\raytracer\pathtracer2.cpp" />
     <ClCompile Include="..\..\source\raytracer\random.cpp" />
     <ClCompile Include="..\..\source\raytracer\renderer.cpp" />
+    <ClCompile Include="..\..\source\raytracer\threading.cpp" />
     <ClCompile Include="..\..\source\raytracer\transformation.cpp" />
     <ClCompile Include="..\..\source\raytracer\sphere.cpp" />
     <ClCompile Include="..\..\source\raytracer\triangle.cpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="..\..\source\raytracer\pathtracer2.hpp" />
     <ClInclude Include="..\..\source\raytracer\random.hpp" />
     <ClInclude Include="..\..\source\raytracer\renderer.hpp" />
+    <ClInclude Include="..\..\source\raytracer\threading.hpp" />
     <ClInclude Include="..\..\source\raytracer\transformation.hpp" />
     <ClInclude Include="..\..\source\raytracer\sphere.hpp" />
     <ClInclude Include="..\..\source\raytracer\triangle.hpp" />
