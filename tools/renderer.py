@@ -51,8 +51,9 @@ def Main ():
 		#Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples)
 		#Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
 		#Render (binaryPath, '../test/source/17_depth_of_field.txt', resolution, algorithm, samples)
-		Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples)
+		#Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples)
 		#Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/12_bunny.txt', resolution, algorithm, samples)
 	return
 	
 Main ()
