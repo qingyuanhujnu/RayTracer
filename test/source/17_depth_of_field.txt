@@ -13,7 +13,7 @@ camera
 	aperture_radius 0.15
 light
 	shape box 2.0 2.0 0.1
-	position 0.0 0.0 5.9
+	position 0.0 0.0 5.95
 	color 1.0 1.0 1.0
 	attenuation 1.0 0.1 0.01
 material
