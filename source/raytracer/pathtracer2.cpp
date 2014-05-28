@@ -51,17 +51,12 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 			normal = normal * -1.0;
 		}
 
-		double diffuseCompensation = 0.5; // https://www.youtube.com/watch?v=YWf5BLUOhNM
+		double diffuseCompensation = 0.6; // https://www.youtube.com/watch?v=YWf5BLUOhNM
 		Color diffuseColor = material.GetDiffuseColor ();
 		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * diffuseCompensation;
 		
-		color += material.GetAmbientColor ();
-		bool sampleLights = diffuseIntensity < Random ();
-		if (sampleLights) {
-			color += SampleLights (material, intersection.position, normal, ray.GetDirection ());
-		} else {
-			color += SampleGeometry (intersection.position, normal, depth);
-		}
+		color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - diffuseIntensity);
+		color += SampleGeometry (intersection.position, normal, depth) * diffuseIntensity;
 
 		if (material.IsReflective ()) {
 			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
@@ -91,7 +86,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 
 Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection) const
 {
-	Color color;
+	Color color = material.GetAmbientColor ();
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		Vec3 randomLightPoint = light.GetRandomPoint ();
