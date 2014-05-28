@@ -51,11 +51,17 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 			normal = normal * -1.0;
 		}
 
-		double diffuseCompensation = 0.6; // https://www.youtube.com/watch?v=YWf5BLUOhNM
+		double diffuseCompensation = 0.5; // https://www.youtube.com/watch?v=YWf5BLUOhNM
 		Color diffuseColor = material.GetDiffuseColor ();
 		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * diffuseCompensation;
-		color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - diffuseIntensity);
-		color += SampleGeometry (intersection.position, normal, depth) * diffuseIntensity;
+		
+		color += material.GetAmbientColor ();
+		bool sampleLights = diffuseIntensity < Random ();
+		if (sampleLights) {
+			color += SampleLights (material, intersection.position, normal, ray.GetDirection ());
+		} else {
+			color += SampleGeometry (intersection.position, normal, depth);
+		}
 
 		if (material.IsReflective ()) {
 			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
@@ -85,7 +91,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 
 Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection) const
 {
-	Color color = material.GetAmbientColor ();
+	Color color;
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		Vec3 randomLightPoint = light.GetRandomPoint ();
@@ -126,13 +132,8 @@ Vec3 RandomDirectionOnHemisphere (const Vec3& normal)
 
 Color PathTracer2::SampleGeometry (const Vec3& point, const Vec3& normal, int depth) const
 {
-	Color color;
 	Vec3 randomDir = RandomDirectionOnHemisphere (normal);
-	InfiniteRay lightRay (point, randomDir);
-	Intersection::ModelIntersection modelIntersection;
-	if (Intersection::RayModel (lightRay, model, &modelIntersection) &&
-		modelIntersection.iSectType == Intersection::ModelIntersection::Geometry)	{
-		color = Trace (lightRay, depth + 1);
-	}
+	InfiniteRay randomRay (point, randomDir);
+	Color color = Trace (randomRay, depth + 1);
 	return Clamp (color);
 }
