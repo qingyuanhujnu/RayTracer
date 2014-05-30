@@ -7,8 +7,8 @@ camera
 	eye 5.0 3.0 4.0
 	center 0.0 0.0 0.5
 	up 0.0 0.0 1.0
-	xfov 45.0
-	yfov 45.0
+	xfov 60.0
+	yfov 60.0
 	focal_length 0.0
 	aperture_radius 0.0
 light

@@ -48,8 +48,8 @@ const Vec3& Image::Field::GetYDirection () const
 
 Image::Image (const Camera& camera, int resolutionX, int resolutionY, double distance)
 {
-	double imageWidth = distance * tan (camera.GetXFov ()) * distance;
-	double imageHeight = distance * tan (camera.GetYFov ()) * distance;
+	double imageWidth = 2.0 * distance * tan (camera.GetXFov () / 2.0);
+	double imageHeight = 2.0 * distance * tan (camera.GetYFov () / 2.0);
 	fieldWidth = imageWidth / (double) resolutionX;
 	fieldHeight = imageHeight / (double) resolutionY;
 
