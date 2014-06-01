@@ -24,6 +24,5 @@ def Main ():
 	renderlib.ModifyCameraParameters (configPath, tempPath, camera)
 	renderlib.Render (binaryPath, tempPath, 'stereo_2.png', algorithm, samples, True)
 	renderlib.DeleteFile (tempPath)
-	print camera
 	
 Main ()
