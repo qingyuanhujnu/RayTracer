@@ -12,7 +12,7 @@ def Main ():
 	os.chdir (currentPath)
 
 	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
-	configPath = 'aaa.txt'
+	configPath = 'teapot.txt'
 	
 	algorithm = 'raytrace'
 	samples = 1
