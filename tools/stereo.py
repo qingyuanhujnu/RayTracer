@@ -12,16 +12,19 @@ def Main ():
 	os.chdir (currentPath)
 
 	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
-	configPath = 'teapot.txt'
+	configPath = '..\\test\\source\\08_sphere_and_cylinder.txt'
 	
 	algorithm = 'raytrace'
-	samples = 1
+	samples = 9
+	resolution = 1000
 	tempPath = 'temp.txt'
 	
-	renderlib.Render (binaryPath, configPath, 'stereo_1.png', algorithm, samples, True)
-	camera = renderlib.GetCameraParameters (configPath)
+	renderlib.ModifyResolution (configPath, tempPath, resolution)
+	renderlib.Render (binaryPath, tempPath, 'stereo_1.png', algorithm, samples, True)
+	
+	camera = renderlib.GetCameraParameters (tempPath)
 	renderlib.OffsetEyePosition (camera, 0.1)
-	renderlib.ModifyCameraParameters (configPath, tempPath, camera)
+	renderlib.ModifyCameraParameters (tempPath, tempPath, camera)
 	renderlib.Render (binaryPath, tempPath, 'stereo_2.png', algorithm, samples, True)
 	renderlib.DeleteFile (tempPath)
 	
