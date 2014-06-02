@@ -11,13 +11,14 @@ def Render (binaryPath, configFile, resolution, algorithm, samples):
 	configFileName = os.path.split (configFile)[1]
 	print 'rendering: ' + configFileName + ' (' + algorithm + ')'
 	tempConfigFile = 'temp.txt'
-	renderlib.ModifyResolution (configFile, tempConfigFile, resolution)
+	renderlib.CopyFile (configFile, tempConfigFile)
+	renderlib.ModifyResolution (tempConfigFile, resolution)
 	
 	tempResultFile = 'temp.png'
 	renderlib.Render (binaryPath, tempConfigFile, tempResultFile, algorithm, samples, True)
 	renderlib.DeleteFile (tempConfigFile)
 
-	resultFileName = configFileName + '_algorithm-' + algorithm + '_samples-' + str (samples) + '.png'
+	resultFileName = renderlib.GetFileNameFromParameters (configFileName, algorithm, samples, '')
 	renderlib.DeleteFile (resultFileName)
 	os.rename (tempResultFile, resultFileName)
 	
@@ -27,7 +28,7 @@ def Main ():
 
 	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
 	
-	resolution = 200
+	resolution = 400
 	samples = 1
 	for algorithm in ['pathtrace2']:
 		Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)

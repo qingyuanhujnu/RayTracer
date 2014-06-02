@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import math
+import shutil
 
 def DeleteFile (filePath):
 	if os.path.exists (filePath):
@@ -17,25 +18,42 @@ def Render (binaryPath, configFile, resultFile, algorithm, samples, verbose):
 		command += ' --verbose'
 	return os.system (command)
 
-def ModifyResolution (originalConfigFile, tempConfigFile, resolution):
-	file = open (originalConfigFile, 'rb')
+def GetFileNameFromParameters (configFileName, algorithm, samples, postFix):
+	fileName = configFileName
+	fileName += '_algorithm-' + algorithm
+	fileName += '_samples-' + str (samples)
+	if postFix != '':
+		fileName += '_' + postFix
+	fileName += '.png'
+	return fileName
+	
+def GetFileContent (path):	
+	file = open (path, 'rb')
 	content = file.read ()
 	file.close ()
-	content = re.sub ('xresolution \d+', 'xresolution ' + str (resolution), content)
-	content = re.sub ('yresolution \d+', 'yresolution ' + str (resolution), content)
-	file = open (tempConfigFile, 'wb')
+	return content
+
+def SetFileContent (path, content):	
+	file = open (path, 'wb')
 	file.write (content)
 	file.close ()
 
+def CopyFile (originalConfigFile, newConfigFile):
+	shutil.copyfile (originalConfigFile, newConfigFile)
+	
+def ModifyResolution (configFile, resolution):
+	content = GetFileContent (configFile)
+	content = re.sub ('xresolution \d+', 'xresolution ' + str (resolution), content)
+	content = re.sub ('yresolution \d+', 'yresolution ' + str (resolution), content)
+	SetFileContent (configFile, content)
+
 def GetCameraParameters (configFile):
-	file = open (configFile, 'rb')
-	content = file.read ()
-	file.close ()
-	found = re.search ('eye ([\d\.]+) ([\d\.]+) ([\d\.]+)', content)
+	content = GetFileContent (configFile)
+	found = re.search ('eye ([\-\d\.]+) ([\-\d\.]+) ([\-\d\.]+)', content)
 	eye = [float (found.group (1)), float (found.group (2)), float (found.group (3))]
-	found = re.search ('center ([\d\.]+) ([\d\.]+) ([\d\.]+)', content)
+	found = re.search ('center ([\-\d\.]+) ([\-\d\.]+) ([\-\d\.]+)', content)
 	center = [float (found.group (1)), float (found.group (2)), float (found.group (3))]
-	found = re.search ('up ([\d\.]+) ([\d\.]+) ([\d\.]+)', content)
+	found = re.search ('up ([\-\d\.]+) ([\-\d\.]+) ([\-\d\.]+)', content)
 	up = [float (found.group (1)), float (found.group (2)), float (found.group (3))]
 	camera = {
 		'eye' : eye,
@@ -44,16 +62,12 @@ def GetCameraParameters (configFile):
 	}
 	return camera
 
-def ModifyCameraParameters (originalConfigFile, tempConfigFile, camera):
-	file = open (originalConfigFile, 'rb')
-	content = file.read ()
-	file.close ()
-	content = re.sub ('eye ([\d\.]+) ([\d\.]+) ([\d\.]+)', 'eye ' + str (camera['eye'][0]) + ' ' + str (camera['eye'][1]) + ' ' + str (camera['eye'][2]), content)
-	content = re.sub ('center ([\d\.]+) ([\d\.]+) ([\d\.]+)', 'center ' + str (camera['center'][0]) + ' ' + str (camera['center'][1]) + ' ' + str (camera['center'][2]), content)
-	content = re.sub ('up ([\d\.]+) ([\d\.]+) ([\d\.]+)', 'up ' + str (camera['up'][0]) + ' ' + str (camera['up'][1]) + ' ' + str (camera['up'][2]), content)
-	file = open (tempConfigFile, 'wb')
-	file.write (content)
-	file.close ()
+def ModifyCameraParameters (configFile, camera):
+	content = GetFileContent (configFile)
+	content = re.sub ('eye ([\-\d\.]+) ([\-\d\.]+) ([\-\d\.]+)', 'eye ' + str (camera['eye'][0]) + ' ' + str (camera['eye'][1]) + ' ' + str (camera['eye'][2]), content)
+	content = re.sub ('center ([\-\d\.]+) ([\-\d\.]+) ([\-\d\.]+)', 'center ' + str (camera['center'][0]) + ' ' + str (camera['center'][1]) + ' ' + str (camera['center'][2]), content)
+	content = re.sub ('up ([\-\d\.]+) ([\-\d\.]+) ([\-\d\.]+)', 'up ' + str (camera['up'][0]) + ' ' + str (camera['up'][1]) + ' ' + str (camera['up'][2]), content)
+	SetFileContent (configFile, content)
 	
 def VecSub (a, b):
 	return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
