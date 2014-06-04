@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Drawing;
 using System.ComponentModel;
+using System.Collections;
 
 namespace UserInterface {
 	static class Win32Functions
@@ -42,7 +43,8 @@ namespace UserInterface {
         private String tempFileName;
 
         private volatile Bitmap renderImage;
-        private Bitmap copyImage;
+		private volatile ArrayList pixelTable;
+		private volatile Int32 finishedPixels;
 
         public enum RenderMode
         {
@@ -56,7 +58,6 @@ namespace UserInterface {
             this.mainForm = mainForm;
             this.renderMode = renderMode;
             this.renderImage = null;
-            this.copyImage = null;
 		}
 
         public void Start (String configString, Settings settings)
@@ -84,7 +85,10 @@ namespace UserInterface {
                 renderImage.Dispose ();
             }
             renderImage = new Bitmap (picWidth, picHeight);
-        }
+
+			pixelTable = ArrayList.Synchronized (new ArrayList ());
+			finishedPixels = 0;
+		}
 
         private void EndRender ()
         {
@@ -96,13 +100,13 @@ namespace UserInterface {
 
             lock (this)
             {
-                if (renderImage != null) {
-                    if (copyImage != null) {
-                        copyImage.Dispose();
-                    }
-                    copyImage = new Bitmap (renderImage);
-                    mainForm.SetPictureBoxImage (copyImage);
-                }
+				Int32 pixelTableCount = pixelTable.Count;
+				for (Int32 i = finishedPixels; i < pixelTableCount; i++) {
+					DictionaryEntry entry = (DictionaryEntry)pixelTable[i];
+					renderImage.SetPixel (((Point) entry.Key).X, renderImage.Height - ((Point) entry.Key).Y - 1, (Color) entry.Value);
+				}
+				finishedPixels = pixelTableCount;
+				mainForm.SetPictureBoxImage (renderImage);
             }
         }
 
@@ -113,21 +117,15 @@ namespace UserInterface {
             }
 
             File.Delete (tempFileName);
-
-            if (renderImage != null) {
-                renderImage.Dispose();
-            }
-
+			pixelTable.Clear ();
+			finishedPixels = 0;
             mainForm.UpdateControlsForEdit ();
         }
 
         private void SetPixel (int x, int y, double r, double g, double b)
         {
             Color color = Color.FromArgb (255, Convert.ToByte (r * 255), Convert.ToByte (g * 255), Convert.ToByte (b * 255));
-
-            lock (this) {
-                renderImage.SetPixel (x, renderImage.Height - 1 - y, color);      // Bitmap.SetPixel is NOT thread safe :(
-            }
+			pixelTable.Add (new DictionaryEntry (new Point (x, y), color));
         }
         
         private class RenderWorker
