@@ -103,7 +103,8 @@ def Main ():
 		['16_dragon.txt', 'raytrace', 9],
 		['17_depth_of_field.txt', 'raytrace', 9],
 		['18_various_shapes.txt', 'raytrace', 9],
-		['19_not_square.txt', 'raytrace', 9]
+		['19_not_square.txt', 'raytrace', 9],
+		['20_teapot_and_sphere.txt', 'raytrace', 9]
 	]
 	
 	maxFileNameLength = 0
