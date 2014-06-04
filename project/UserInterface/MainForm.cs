@@ -16,6 +16,7 @@ namespace UserInterface {
 	public partial class MainForm : Form
     {
         private History history = new History ();
+        private Settings settings = new Settings ();
         private String openedFile = null;
         private int menuItemCount = 0;
 
@@ -28,6 +29,8 @@ namespace UserInterface {
 
             history.Read ();
             history.AddAllMenuItems (fileMenu.DropDownItems, menuItemCount, this.HistoryClick);
+
+            settings.Read ();
             UpdateControlsForEdit ();
 		}
 
@@ -89,22 +92,28 @@ namespace UserInterface {
             Close ();
         }
 
+        private void settingsMenu_Click (object sender, EventArgs e)
+        {
+            SettingsForm settingsForm = new SettingsForm (settings);
+            settingsForm.ShowDialog ();
+        }
+
         private void rayTraceMenu_Click (object sender, EventArgs e)
         {
             Renderer rayTracer = new Renderer (this, Renderer.RenderMode.RayTraceMode);
-            rayTracer.Start (configTextBox.Text);
+            rayTracer.Start (configTextBox.Text, settings);
         }
 
         private void pathTraceMenu_Click (object sender, EventArgs e)
         {
             Renderer rayTracer = new Renderer (this, Renderer.RenderMode.PathTraceMode);
-            rayTracer.Start (configTextBox.Text);
+            rayTracer.Start (configTextBox.Text, settings);
         }
 
         private void pathTrace2Menu_Click (object sender, EventArgs e)
         {
             Renderer rayTracer = new Renderer (this, Renderer.RenderMode.PathTrace2Mode);
-            rayTracer.Start (configTextBox.Text);
+            rayTracer.Start (configTextBox.Text, settings);
         }
         
         private void OpenFile (String fileName)
@@ -126,6 +135,7 @@ namespace UserInterface {
 
         private void MainForm_FormClosed (object sender, FormClosedEventArgs e)
         {
+            settings.Write ();
             history.Write ();
         }
 

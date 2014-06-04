@@ -40,7 +40,6 @@ namespace UserInterface {
         private MainForm mainForm;
         private RenderMode renderMode;
         private String tempFileName;
-        private String tempResultFileName;
 
         private volatile Bitmap renderImage;
         private Bitmap copyImage;
@@ -60,21 +59,20 @@ namespace UserInterface {
             this.copyImage = null;
 		}
 
-        public void Start (String configString)
+        public void Start (String configString, Settings settings)
         {
             try {
                 mainForm.UpdateControlsForRender ();
                 mainForm.SetPictureBoxImage (null);
 
                 tempFileName = "temp.txt";
-                tempResultFileName = "temp.png";
 
                 StreamWriter writer = new StreamWriter (tempFileName);
                 writer.Write (configString);
                 writer.Close ();
 
                 RenderWorker worker = new RenderWorker ();
-                worker.Start (renderMode, tempFileName, tempResultFileName, StartRender, EndRender, Progress, Finish, SetPixel);
+                worker.Start (renderMode, settings, tempFileName, StartRender, EndRender, Progress, Finish, SetPixel);
             } catch {
 
             }
@@ -102,31 +100,22 @@ namespace UserInterface {
                     if (copyImage != null) {
                         copyImage.Dispose();
                     }
-                    copyImage = new Bitmap(renderImage);
-                    mainForm.SetPictureBoxImage(copyImage);
+                    copyImage = new Bitmap (renderImage);
+                    mainForm.SetPictureBoxImage (copyImage);
                 }
             }
         }
 
         private void Finish (int result)
         {
-            if (result == 0) {
-                MemoryStream memoryStream = new MemoryStream (File.ReadAllBytes (tempResultFileName));
-                Image image = Image.FromStream (memoryStream);
-                mainForm.SetPictureBoxImage(image);
-            } else {
+            if (result != 0) {
                 mainForm.SetPictureBoxImage (null);
             }
 
             File.Delete (tempFileName);
-            File.Delete (tempResultFileName);
 
             if (renderImage != null) {
                 renderImage.Dispose();
-            }
-
-            if (copyImage != null) {
-                copyImage.Dispose();
             }
 
             mainForm.UpdateControlsForEdit ();
@@ -146,8 +135,8 @@ namespace UserInterface {
             private BackgroundWorker backgroundWorker = new BackgroundWorker ();
 
             private String tempFileName;
-            private String tempResultFileName;
             private RenderMode renderMode;
+            private Settings settings;
 
             private Action<int> progressCallback;
             private Action<int> finishedCallback;
@@ -166,8 +155,8 @@ namespace UserInterface {
             }
 
             public void Start (RenderMode renderMode, 
+                                Settings settings,
                                 String tempFileName,
-                                String tempResultFileName,
                                 Action<int, int, int, int> startRenderCallback,
                                 Action endRenderCallback,
                                 Action<int> progressCallback,
@@ -175,8 +164,8 @@ namespace UserInterface {
                                 Action<int, int, double, double, double> setPixelCallback)
             {
                 this.renderMode = renderMode;
+                this.settings = settings;
                 this.tempFileName = tempFileName;
-                this.tempResultFileName = tempResultFileName;
                 this.startRenderCallback = startRenderCallback;
                 this.endRenderCallback = endRenderCallback;
                 this.progressCallback = progressCallback;
@@ -217,8 +206,8 @@ namespace UserInterface {
                 result = Win32Functions.Render (
                     algorithm,
                     tempFileName,
-                    tempResultFileName,
-                    32,
+                    "",
+                    settings.Resolution,
                     NativeRayTracerStartRenderCallback,
                     NativeRayTracerEndRenderCallback,
                     NativeRayTracerProgressCallback,

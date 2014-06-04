@@ -41,6 +41,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.settingsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -54,6 +55,7 @@
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenu,
+            this.settingsMenu,
             this.renderMenu});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
@@ -75,28 +77,28 @@
             // fileMenuOpen
             // 
             this.fileMenuOpen.Name = "fileMenuOpen";
-            this.fileMenuOpen.Size = new System.Drawing.Size(103, 22);
+            this.fileMenuOpen.Size = new System.Drawing.Size(152, 22);
             this.fileMenuOpen.Text = "Open";
             this.fileMenuOpen.Click += new System.EventHandler(this.FileMenuOpen_Click);
             // 
             // fileMenuSave
             // 
             this.fileMenuSave.Name = "fileMenuSave";
-            this.fileMenuSave.Size = new System.Drawing.Size(103, 22);
+            this.fileMenuSave.Size = new System.Drawing.Size(152, 22);
             this.fileMenuSave.Text = "Save";
             this.fileMenuSave.Click += new System.EventHandler(this.FileMenuSave_Click);
             // 
             // fileMenuExit
             // 
             this.fileMenuExit.Name = "fileMenuExit";
-            this.fileMenuExit.Size = new System.Drawing.Size(103, 22);
+            this.fileMenuExit.Size = new System.Drawing.Size(152, 22);
             this.fileMenuExit.Text = "Exit";
             this.fileMenuExit.Click += new System.EventHandler(this.FileMenuExit_Click);
             // 
             // toolStripSeparator
             // 
             this.toolStripSeparator.Name = "toolStripSeparator";
-            this.toolStripSeparator.Size = new System.Drawing.Size(100, 6);
+            this.toolStripSeparator.Size = new System.Drawing.Size(149, 6);
             // 
             // renderMenu
             // 
@@ -111,21 +113,21 @@
             // rayTraceMenu
             // 
             this.rayTraceMenu.Name = "rayTraceMenu";
-            this.rayTraceMenu.Size = new System.Drawing.Size(139, 22);
+            this.rayTraceMenu.Size = new System.Drawing.Size(152, 22);
             this.rayTraceMenu.Text = "Ray Trace";
             this.rayTraceMenu.Click += new System.EventHandler(this.rayTraceMenu_Click);
             // 
             // pathTraceMenu
             // 
             this.pathTraceMenu.Name = "pathTraceMenu";
-            this.pathTraceMenu.Size = new System.Drawing.Size(139, 22);
+            this.pathTraceMenu.Size = new System.Drawing.Size(152, 22);
             this.pathTraceMenu.Text = "Path Trace";
             this.pathTraceMenu.Click += new System.EventHandler(this.pathTraceMenu_Click);
             // 
             // pathTrace2Menu
             // 
             this.pathTrace2Menu.Name = "pathTrace2Menu";
-            this.pathTrace2Menu.Size = new System.Drawing.Size(139, 22);
+            this.pathTrace2Menu.Size = new System.Drawing.Size(152, 22);
             this.pathTrace2Menu.Text = "Path Trace 2";
             this.pathTrace2Menu.Click += new System.EventHandler(this.pathTrace2Menu_Click);
             // 
@@ -191,6 +193,13 @@
             this.toolStripStatusLabel.Size = new System.Drawing.Size(118, 17);
             this.toolStripStatusLabel.Text = "toolStripStatusLabel1";
             // 
+            // settingsMenu
+            // 
+            this.settingsMenu.Name = "settingsMenu";
+            this.settingsMenu.Size = new System.Drawing.Size(61, 20);
+            this.settingsMenu.Text = "Settings";
+            this.settingsMenu.Click += new System.EventHandler(this.settingsMenu_Click);
+            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -238,6 +247,7 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
+        private System.Windows.Forms.ToolStripMenuItem settingsMenu;
 	}
 }
 
