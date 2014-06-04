@@ -60,11 +60,7 @@ int Render (
 		case 2: renderMode = PathTrace2Mode; break;
 	}
 
-	if (DBGERROR (configFile == NULL)) {
-		return 1;
-	}
-
-	if (DBGERROR (resultFile == NULL)) {
+	if (DBGERROR (configFile == nullptr)) {
 		return 1;
 	}
 
@@ -79,7 +75,7 @@ int Render (
 		startRenderCallback (parameters.GetResolutionX (), parameters.GetResolutionY (), model.VertexCount (), model.TriangleCount ());
 	}
 
-	std::unique_ptr<Renderer> renderer = NULL;
+	std::unique_ptr<Renderer> renderer = nullptr;
 	if (renderMode == RayTraceMode) {
 		renderer.reset (new RayTracer (model, camera, sampleNum));
 	} else if (renderMode == PathTraceMode) {
@@ -87,7 +83,7 @@ int Render (
 	} else if (renderMode == PathTrace2Mode) {
 		renderer.reset (new PathTracer2 (model, camera, sampleNum));
 	}
-	if (DBGERROR (renderer == NULL)) {
+	if (DBGERROR (renderer == nullptr)) {
 		return 3;
 	}
 
@@ -97,8 +93,10 @@ int Render (
 		return 4;
 	}
 	
-	if (DBGERROR (!Export::ExportImage (resultImage, resultFile, L"image/png"))) {
-		return 5;
+	if (resultFile != nullptr && resultFile[0] != '\0') {
+		if (DBGERROR (!Export::ExportImage (resultImage, resultFile, L"image/png"))) {
+			return 5;
+		}
 	}
 
 	if (endRenderCallback != nullptr) {
