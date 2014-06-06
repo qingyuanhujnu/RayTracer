@@ -15,7 +15,8 @@ def Render (binaryPath, configFile, resolution, algorithm, samples, cameraOffset
 
 	tempPath = 'temp.txt'
 	renderlib.CopyFile (configFile, tempPath)
-	renderlib.ModifyResolution (tempPath, resolution)
+	if resolution != 0:
+		renderlib.ModifyResolution (tempPath, resolution)
 
 	camera = renderlib.GetCameraParameters (configFile)
 	renderlib.OffsetEyePosition (camera, -cameraOffset / 2.0)
@@ -32,6 +33,7 @@ def Render (binaryPath, configFile, resolution, algorithm, samples, cameraOffset
 	renderlib.DeleteFile (tempPath)
 	
 	resultFileName = renderlib.GetFileNameFromParameters (configFileName, algorithm, samples, 'stereo')
+	resultFileName.replace ('.png', '.jpg')
 	image1 = Image.open (fileName1)
 	image2 = Image.open (fileName2)
 	width, height = image1.size
@@ -52,15 +54,17 @@ def Main ():
 	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
 	
 	algorithm = 'pathtrace2'
-	samples = 128
-	resolution = 800
+	samples = 1
+	resolution = 0
 	cameraOffset = 0.1
 	
-	Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples, cameraOffset)
-	Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples, cameraOffset)
-	Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples, cameraOffset)
-	Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples, cameraOffset)
-	Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples, cameraOffset)
-	Render (binaryPath, '../test/source/12_bunny.txt', resolution, algorithm, samples, cameraOffset)	
+	Render (binaryPath, 'testfiles/teapot.txt', resolution, algorithm, samples, cameraOffset)
+	Render (binaryPath, 'testfiles/dragon.txt', resolution, algorithm, samples, cameraOffset)
+	#Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples, cameraOffset)
+	#Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples, cameraOffset)
+	#Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples, cameraOffset)
+	#Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples, cameraOffset)
+	#Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples, cameraOffset)
+	#Render (binaryPath, '../test/source/12_bunny.txt', resolution, algorithm, samples, cameraOffset)	
 
 Main ()

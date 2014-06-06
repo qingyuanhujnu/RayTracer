@@ -29,15 +29,15 @@ def Main ():
 	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
 	
 	resolution = 400
-	samples = 1
+	samples = 512
 	for algorithm in ['pathtrace2']:
 		Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/17_depth_of_field.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
-		#Render (binaryPath, '../test/source/12_bunny.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/17_depth_of_field.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
+		Render (binaryPath, '../test/source/12_bunny.txt', resolution, algorithm, samples)
 	return
 	
 Main ()

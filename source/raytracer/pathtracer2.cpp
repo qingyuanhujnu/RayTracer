@@ -31,7 +31,7 @@ Color PathTracer2::GetFieldColor (const Image::Field& field) const
 Color PathTracer2::Trace (const Ray& ray, int depth) const
 {
 	Color color;
-	if (depth > 5) {
+	if (depth > 10) {
 		return color;
 	}
 
@@ -51,12 +51,14 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 			normal = normal * -1.0;
 		}
 
-		double diffuseCompensation = 0.6; // https://www.youtube.com/watch?v=YWf5BLUOhNM
-		Color diffuseColor = material.GetDiffuseColor ();
-		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * diffuseCompensation;
-		
-		color += SampleLights (material, intersection.position, normal, ray.GetDirection ()) * (1.0 - diffuseIntensity);
-		color += SampleGeometry (intersection.position, normal, depth) * diffuseIntensity;
+		const double lightSampleProbability = 0.5;
+		if (Random () < lightSampleProbability) {
+			color += SampleLights (material, intersection.position, normal, ray.GetDirection ());
+		} else {
+			Color diffuseColor = material.GetDiffuseColor ();
+			double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0);
+			color += SampleGeometry (intersection.position, normal, depth) * diffuseIntensity;
+		}
 
 		if (material.IsReflective ()) {
 			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
