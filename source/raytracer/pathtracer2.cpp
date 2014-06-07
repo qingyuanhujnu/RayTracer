@@ -51,6 +51,8 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 			normal = normal * -1.0;
 		}
 
+		color += material.GetAmbientColor ();
+
 		const double lightSampleProbability = 0.5;
 		if (Random () < lightSampleProbability) {
 			color += SampleLights (material, intersection.position, normal, ray.GetDirection ());
@@ -88,7 +90,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 
 Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection) const
 {
-	Color color = material.GetAmbientColor ();
+	Color color;
 	for (UIndex i = 0; i < model.LightCount (); i++) {
 		const Light& light = model.GetLight (i);
 		Vec3 randomLightPoint = light.GetRandomPoint ();
