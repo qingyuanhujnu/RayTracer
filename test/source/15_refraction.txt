@@ -44,15 +44,15 @@ material
 	transparency 0.0
 	refraction_index 1.0
 sphere
-	radius 1.5
+	radius 1.0
 	segmentation 25
-	offset -3.0 0.0 1.5
+	offset -1.0 -1.0 1.0
 	rotation 0.0 0.0 0.0
 	material 0
 sphere
 	radius 1.0
 	segmentation 25
-	offset 0.5 2.0 2.0
+	offset 1.5 1.5 1.7
 	rotation 0.0 0.0 0.0
 	material 1
 roombox

@@ -46,24 +46,25 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 		const Mesh& mesh = model.GetMesh (intersection.mesh);
 		const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 		const Material& material = model.GetMaterial (triangle.material);
-		Vec3 normal = mesh.GetNormal (intersection.triangle, intersection.position);
+		Vec3 originalNormal = mesh.GetNormal (intersection.triangle, intersection.position);
+		Vec3 rayDirectedNormal = originalNormal;
 		if (intersection.facing == Intersection::ShapeIntersection::Back) {
-			normal = normal * -1.0;
+			rayDirectedNormal = rayDirectedNormal * -1.0;
 		}
 
 		color += material.GetAmbientColor ();
 
 		const double lightSampleProbability = 0.5;
 		if (Random () < lightSampleProbability) {
-			color += SampleLights (material, intersection.position, normal, ray.GetDirection ());
+			color += SampleLights (material, intersection.position, rayDirectedNormal, ray.GetDirection ());
 		} else {
 			Color diffuseColor = material.GetDiffuseColor ();
 			double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0);
-			color += SampleGeometry (intersection.position, normal, depth) * diffuseIntensity;
+			color += SampleGeometry (intersection.position, rayDirectedNormal, depth) * diffuseIntensity;
 		}
 
 		if (material.IsReflective ()) {
-			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), rayDirectedNormal);
 			InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 			Color reflectedColor = Trace (reflectedRay, depth + 1);
 			color += reflectedColor * material.GetReflection ();
@@ -74,7 +75,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 			double refractionIndex = material.GetRefractionIndex ();
 			color = color * (1.0 - transparency);
 
-			Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
+			Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), originalNormal, refractionIndex);
 			InfiniteRay refractedRay (intersection.position, refractedDirection);
 			Color refractedColor = Trace (refractedRay, depth + 1);
 			color += refractedColor * transparency;

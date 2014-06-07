@@ -41,9 +41,10 @@ Color RayTracer::Trace (const Ray& ray, int depth) const
 		const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 		const Material& material = model.GetMaterial (triangle.material);
 
-		Vec3 normal = mesh.GetNormal (intersection.triangle, intersection.position);
+		Vec3 originalNormal = mesh.GetNormal (intersection.triangle, intersection.position);
+		Vec3 rayDirectedNormal = originalNormal;
 		if (intersection.facing == Intersection::ShapeIntersection::Back) {
-			normal = normal * -1.0;
+			rayDirectedNormal = rayDirectedNormal * -1.0;
 		}
 
 		color += material.GetAmbientColor ();
@@ -51,12 +52,12 @@ Color RayTracer::Trace (const Ray& ray, int depth) const
 			const Light& light = model.GetLight (i);
 			if (!IsInShadow (intersection.position, light)) {
 				const Vec3& photonOrigin = light.GetPosition ();
-				color += GetPhongShading (material, light, photonOrigin, intersection.position, normal, ray.GetDirection ());
+				color += GetPhongShading (material, light, photonOrigin, intersection.position, rayDirectedNormal, ray.GetDirection ());
 			} 			
 		}
 
 		if (material.IsReflective ()) {
-			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), normal);
+			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), rayDirectedNormal);
 			InfiniteRay reflectedRay (intersection.position, reflectedDirection);
 			Color reflectedColor = Trace (reflectedRay, depth + 1);
 			color += reflectedColor * material.GetReflection ();
@@ -67,7 +68,7 @@ Color RayTracer::Trace (const Ray& ray, int depth) const
 			double refractionIndex = material.GetRefractionIndex ();
 			color = color * (1.0 - transparency);
 
-			Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), normal, refractionIndex);
+			Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), originalNormal, refractionIndex);
 			InfiniteRay refractedRay (intersection.position, refractedDirection);
 			Color refractedColor = Trace (refractedRay, depth + 1);
 			color += refractedColor * transparency;
