@@ -117,8 +117,11 @@ namespace UserInterface {
             }
 
             File.Delete (tempFileName);
-			pixelTable.Clear ();
+			if (pixelTable != null) {
+				pixelTable.Clear ();
+			}
 			finishedPixels = 0;
+
             mainForm.UpdateControlsForEdit ();
         }
 
