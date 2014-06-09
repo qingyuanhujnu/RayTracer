@@ -232,7 +232,10 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 		progressReport.Report (x, y, fieldColor.r, fieldColor.g, fieldColor.b, resX, resY);
 	}
 #else
-	const UIndex threadNum = GetProcessorNum () - 1;
+	UIndex threadNum = GetProcessorNum () - 1;
+	if (threadNum < 1) {
+		threadNum = 1;
+	}
 	std::vector<RenderThread> threads;
 	for (UIndex i = 0; i < threadNum; i++) {
 		threads.push_back (RenderThread (
