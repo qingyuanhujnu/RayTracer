@@ -50,51 +50,64 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 
 	if (modelIntersection.iSectType == Intersection::ModelIntersection::Geometry) {
 		const Intersection::GeometryIntersection& intersection = modelIntersection.geometryIntersection;
-
-		const Mesh& mesh = model.GetMesh (intersection.mesh);
-		const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
-		const Material& material = model.GetMaterial (triangle.material);
-		Vec3 originalNormal = mesh.GetNormal (intersection.triangle, intersection.position);
-		Vec3 rayDirectedNormal = originalNormal;
-		if (intersection.facing == Intersection::ShapeIntersection::Back) {
-			rayDirectedNormal = rayDirectedNormal * -1.0;
-		}
-
-		color += material.GetAmbientColor ();
-
-		const double lightSampleProbability = 0.5;
-		if (Random () < lightSampleProbability) {
-			color += SampleLights (material, intersection.position, rayDirectedNormal, ray.GetDirection (), depth);
-		} else {
-			Color diffuseColor = material.GetDiffuseColor ();
-			double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0);
-			color += SampleGeometry (intersection.position, rayDirectedNormal, depth) * diffuseIntensity;
-		}
-
-		if (material.IsReflective ()) {
-			Vec3 reflectedDirection = GetReflectedDirection (ray.GetDirection (), rayDirectedNormal);
-			InfiniteRay reflectedRay (intersection.position, reflectedDirection);
-			Color reflectedColor = Trace (reflectedRay, depth + 1);
-			color += reflectedColor * material.GetReflection ();
-		}
-
-		if (material.IsTransparent ()) {
-			double transparency = material.GetTransparency ();
-			double refractionIndex = material.GetRefractionIndex ();
-			color = color * (1.0 - transparency);
-
-			Vec3 refractedDirection = GetRefractedDirection (ray.GetDirection (), originalNormal, refractionIndex);
-			InfiniteRay refractedRay (intersection.position, refractedDirection);
-			Color refractedColor = Trace (refractedRay, depth + 1);
-			color += refractedColor * transparency;
-		}
+		color += TraceGeometry (intersection, ray.GetDirection (), depth);
 	} else if (modelIntersection.iSectType == Intersection::ModelIntersection::Light) {
 		const Intersection::LightIntersection& intersection = modelIntersection.lightIntersection;
-		const Light& light = model.GetLight (intersection.light);
-		color += light.GetColor ();
+		color += TraceLight (intersection);
 	}
 
 	return Clamp (color);
+}
+
+Color PathTracer2::TraceGeometry (const Intersection::GeometryIntersection& intersection, const Vec3& rayDirection, int depth) const
+{
+	Color color;
+
+	const Mesh& mesh = model.GetMesh (intersection.mesh);
+	const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
+	const Material& material = model.GetMaterial (triangle.material);
+	Vec3 originalNormal = mesh.GetNormal (intersection.triangle, intersection.position);
+	Vec3 rayDirectedNormal = originalNormal;
+	if (intersection.facing == Intersection::ShapeIntersection::Back) {
+		rayDirectedNormal = rayDirectedNormal * -1.0;
+	}
+
+	color += material.GetAmbientColor ();
+
+	const double lightSampleProbability = 0.5;
+	if (Random () < lightSampleProbability) {
+		color += SampleLights (material, intersection.position, rayDirectedNormal, rayDirection, depth);
+	} else {
+		Color diffuseColor = material.GetDiffuseColor ();
+		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0);
+		color += SampleGeometry (intersection.position, rayDirectedNormal, depth) * diffuseIntensity;
+	}
+
+	if (material.IsReflective ()) {
+		Vec3 reflectedDirection = GetReflectedDirection (rayDirection, rayDirectedNormal);
+		InfiniteRay reflectedRay (intersection.position, reflectedDirection);
+		Color reflectedColor = Trace (reflectedRay, depth + 1);
+		color += reflectedColor * material.GetReflection ();
+	}
+
+	if (material.IsTransparent ()) {
+		double transparency = material.GetTransparency ();
+		double refractionIndex = material.GetRefractionIndex ();
+		color = color * (1.0 - transparency);
+
+		Vec3 refractedDirection = GetRefractedDirection (rayDirection, originalNormal, refractionIndex);
+		InfiniteRay refractedRay (intersection.position, refractedDirection);
+		Color refractedColor = Trace (refractedRay, depth + 1);
+		color += refractedColor * transparency;
+	}
+
+	return color;
+}
+
+Color PathTracer2::TraceLight (const Intersection::LightIntersection& intersection) const
+{
+	const Light& light = model.GetLight (intersection.light);
+	return light.GetColor ();
 }
 
 Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection, int depth) const
@@ -114,7 +127,7 @@ Color PathTracer2::SampleLights (const Material& material, const Vec3& point, co
 				const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
 				const Material& material = model.GetMaterial (triangle.material);
 				if (material.IsTransparent () && intersection.facing == Intersection::ShapeIntersection::Front) {
-					color += Trace (lightRay, depth + 1);
+					color += TraceGeometry (intersection, lightRay.GetDirection (), depth + 1);
 				}
 			}
 		} else {
