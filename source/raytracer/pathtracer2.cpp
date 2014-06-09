@@ -6,8 +6,16 @@
 #include "average.hpp"
 
 PathTracer2::PathTracer2 (const Model& model, const Camera& camera, int sampleNum) :
-	Renderer (model, camera, sampleNum)
+	Renderer (model, camera, sampleNum),
+	hasTransparency (false)
 {
+	for (UIndex i = 0; i < model.MaterialCount (); i++) {
+		const Material& material = model.GetMaterial (i);
+		if (material.IsTransparent ()) {
+			hasTransparency = true;
+			break;
+		}
+	}
 }
 
 Color PathTracer2::GetFieldColor (const Image::Field& field) const
@@ -31,7 +39,7 @@ Color PathTracer2::GetFieldColor (const Image::Field& field) const
 Color PathTracer2::Trace (const Ray& ray, int depth) const
 {
 	Color color;
-	if (depth > 10) {
+	if (depth > 5) {
 		return color;
 	}
 
@@ -56,7 +64,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 
 		const double lightSampleProbability = 0.5;
 		if (Random () < lightSampleProbability) {
-			color += SampleLights (material, intersection.position, rayDirectedNormal, ray.GetDirection ());
+			color += SampleLights (material, intersection.position, rayDirectedNormal, ray.GetDirection (), depth);
 		} else {
 			Color diffuseColor = material.GetDiffuseColor ();
 			double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0);
@@ -89,7 +97,7 @@ Color PathTracer2::Trace (const Ray& ray, int depth) const
 	return Clamp (color);
 }
 
-Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection) const
+Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection, int depth) const
 {
 	Color color;
 	for (UIndex i = 0; i < model.LightCount (); i++) {
@@ -97,8 +105,22 @@ Color PathTracer2::SampleLights (const Material& material, const Vec3& point, co
 		Vec3 randomLightPoint = light.GetRandomPoint ();
 		SectorRay lightRay (point, randomLightPoint);
 
-		if (!Intersection::RayGeometry (lightRay, model, NULL)) {
-			color += GetPhongShading (material, light, randomLightPoint, point, normal, viewDirection);
+		if (hasTransparency) {
+			Intersection::GeometryIntersection intersection;
+			if (!Intersection::RayGeometry (lightRay, model, &intersection)) {
+				color += GetPhongShading (material, light, randomLightPoint, point, normal, viewDirection);
+			} else {
+				const Mesh& mesh = model.GetMesh (intersection.mesh);
+				const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
+				const Material& material = model.GetMaterial (triangle.material);
+				if (material.IsTransparent () && intersection.facing == Intersection::ShapeIntersection::Front) {
+					color += Trace (lightRay, depth + 1);
+				}
+			}
+		} else {
+			if (!Intersection::RayGeometry (lightRay, model, NULL)) {
+				color += GetPhongShading (material, light, randomLightPoint, point, normal, viewDirection);
+			}
 		}
 	}
 	return Clamp (color);
