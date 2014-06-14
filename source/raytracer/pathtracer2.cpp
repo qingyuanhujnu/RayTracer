@@ -79,7 +79,8 @@ Color PathTracer2::TraceGeometry (const Intersection::GeometryIntersection& inte
 		color += SampleLights (material, intersection.position, rayDirectedNormal, rayDirection, depth);
 	} else {
 		Color diffuseColor = material.GetDiffuseColor ();
-		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0);
+		double diffuseCompensation = 0.6;
+		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * diffuseCompensation;
 		color += SampleGeometry (intersection.position, rayDirectedNormal, depth) * diffuseIntensity;
 	}
 
