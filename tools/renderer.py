@@ -12,7 +12,8 @@ def Render (binaryPath, configFile, resolution, algorithm, samples):
 	print 'rendering: ' + configFileName + ' (' + algorithm + ')'
 	tempConfigFile = 'temp.txt'
 	renderlib.CopyFile (configFile, tempConfigFile)
-	renderlib.ModifyResolution (tempConfigFile, resolution)
+	if resolution != 0:
+		renderlib.ModifyResolution (tempConfigFile, resolution)
 	
 	tempResultFile = 'temp.png'
 	renderlib.Render (binaryPath, tempConfigFile, tempResultFile, algorithm, samples, True)
@@ -39,6 +40,10 @@ def Main ():
 		Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples)
 		Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
 		Render (binaryPath, '../test/source/12_bunny.txt', resolution, algorithm, samples)
+		
+		#Render (binaryPath, 'testfiles/teapot.txt', resolution, algorithm, samples)
+		#Render (binaryPath, 'testfiles/dragon.txt', resolution, algorithm, samples)
+		#Render (binaryPath, 'testfiles/shapes.txt', resolution, algorithm, samples)
 	return
 	
 Main ()
