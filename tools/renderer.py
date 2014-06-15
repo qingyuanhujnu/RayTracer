@@ -28,22 +28,24 @@ def Main ():
 	os.chdir (currentPath)
 
 	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
-	
+
+	algorithm = 'pathtrace2'
 	resolution = 400
 	samples = 512
-	for algorithm in ['pathtrace2']:
-		Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)
-		Render (binaryPath, '../test/source/02_cylinder.txt', resolution, algorithm, samples)
-		Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples)
-		Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
-		Render (binaryPath, '../test/source/17_depth_of_field.txt', resolution, algorithm, samples)
-		Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples)
-		Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
-		Render (binaryPath, '../test/source/12_bunny.txt', resolution, algorithm, samples)
-		
-		#Render (binaryPath, 'testfiles/teapot.txt', resolution, algorithm, samples)
-		#Render (binaryPath, 'testfiles/dragon.txt', resolution, algorithm, samples)
-		#Render (binaryPath, 'testfiles/shapes.txt', resolution, algorithm, samples)
+	Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)
+	Render (binaryPath, '../test/source/02_cylinder.txt', resolution, algorithm, samples)
+	Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples)
+	Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
+	Render (binaryPath, '../test/source/17_depth_of_field.txt', resolution, algorithm, samples)
+	Render (binaryPath, '../test/source/18_various_shapes.txt', resolution, algorithm, samples)
+	Render (binaryPath, '../test/source/12_bunny.txt', resolution, algorithm, samples)
+	Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
+	Render (binaryPath, 'testfiles/cornell.txt', resolution, algorithm, samples)
+	
+	resolution = 0
+	Render (binaryPath, 'testfiles/shapes.txt', resolution, algorithm, samples)
+	Render (binaryPath, 'testfiles/teapot.txt', resolution, algorithm, samples)
+	Render (binaryPath, 'testfiles/dragon.txt', resolution, algorithm, samples)
 	return
 	
 Main ()

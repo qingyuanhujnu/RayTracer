@@ -1,7 +1,7 @@
 version 1
 parameters
-	xresolution 168
-	yresolution 105
+	xresolution 504
+	yresolution 315
 	imagedistance 1.0
 camera
 	eye 6.0 5.0 7.0
