@@ -12,10 +12,10 @@ camera
 	focal_length 0.0
 	aperture_radius 0.0
 light
-	shape box 2.0 2.0 0.1
-	position 0.0 0.0 11.95
+	shape sphere 1.5
+	position 0.0 0.0 8.0
 	color 1.0 1.0 1.0
-	attenuation 0.0 0.1 0.01
+	attenuation 0.5 0.1 0.01
 material
 	color 1.0 0.4 0.4
 	ambient 0.2
@@ -62,15 +62,6 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 1.0 0.4 0.4
-	ambient 0.2
-	diffuse 0.8
-	specular 0.0
-	shininess 1.0
-	reflection 0.3
-	transparency 0.0
-	refraction_index 1.0
-material
 	color 0.35 0.8 0.68
 	ambient 0.2
 	diffuse 0.8
@@ -79,21 +70,30 @@ material
 	reflection 0.3
 	transparency 0.0
 	refraction_index 1.0
+material
+	color 1.0 0.4 0.4
+	ambient 0.2
+	diffuse 0.8
+	specular 0.0
+	shininess 1.0
+	reflection 0.3
+	transparency 0.0
+	refraction_index 1.0
 cuboid
-	size 1.5 1.5 1.5
-	offset 0.0 1.4 0.75
+	size 1.8 1.8 1.8
+	offset -1.0 -1.4 0.9
 	rotation 0.0 0.0 -20.0
 	material 4
 sphere
 	radius 1.2
-	segmentation 20
-	offset -1.0 -1.4 1.2
+	segmentation 40
+	offset 0.0 1.4 1.2
 	rotation 0.0 0.0 0.0
 	material 5
 cylinder
 	radius 0.7
 	height 1.2
-	segmentation 30
+	segmentation 40
 	offset 1.5 -0.1 0.6
 	rotation 0.0 0.0 0.0
 	material 6
