@@ -22,7 +22,7 @@ material
 	diffuse 0.8
 	specular 0.0
 	shininess 1.0
-	reflection 0.5
+	reflection 0.0
 	transparency 0.0
 	refraction_index 1.0
 material
@@ -44,12 +44,12 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 0.0 0.54 0.72
+	color 1.0 0.4 0.4
 	ambient 0.2
 	diffuse 0.8
 	specular 0.0
 	shininess 1.0
-	reflection 0.5
+	reflection 0.0
 	transparency 0.0
 	refraction_index 1.0
 mesh
