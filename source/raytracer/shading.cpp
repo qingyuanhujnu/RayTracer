@@ -8,7 +8,8 @@ Color GetPhongShading (const Material& material,
 					   const Vec3& photonOrigin,
 					   const Vec3& shadedPoint,
 					   const Vec3& shadedPointNormal,
-					   const Vec3& viewDirection)
+					   const Vec3& viewDirection,
+					   const Vec2& texCoord)
 {
 	Vec3 lightDirection = Normalize (light.GetPosition () - shadedPoint);
 	Vec3 reflectionVector = GetReflectedDirection (lightDirection, shadedPointNormal);
@@ -19,8 +20,8 @@ Color GetPhongShading (const Material& material,
 	double shininess = material.GetShininess ();
 	double specularCoeff = pow (std::max (reflectionVector * viewDirection, 0.0), shininess);
 
-	Color diffuseColor = light.GetColor () * material.GetDiffuseColor ();
-	Color color = diffuseColor * diffuseCoeff + material.GetSpecularColor () * specularCoeff;
+	Color diffuseColor = light.GetColor () * material.GetDiffuseColor (texCoord);
+	Color color = diffuseColor * diffuseCoeff + material.GetSpecularColor (texCoord) * specularCoeff;
 
 	// attenuation
 	double distance = Distance (shadedPoint, photonOrigin);

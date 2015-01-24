@@ -144,6 +144,11 @@ double Distance (const Vec3& aVec, const Vec3& bVec)
 	return sqrt ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
 }
 
+double Length (const Vec3& vec)
+{
+	return sqrt (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+}
+
 Vec3 Offset (const Vec3& vec, const Vec3& direction, double distance)
 {
 	Vec3 normal = Normalize (direction);

@@ -4,6 +4,13 @@
 
 #include <algorithm>
 
+Mesh::Vertex::Vertex (const Vec3& pos, const Vec2& texCoord) :
+	pos (pos),
+	texCoord (texCoord)
+{
+
+}
+
 Mesh::Triangle::Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex material, UIndex curveGroup) :
 	vertex0 (vertex0),
 	vertex1 (vertex1),
@@ -74,21 +81,21 @@ Mesh::~Mesh ()
 
 }
 
-UIndex Mesh::AddVertex (const Vec3& position)
+UIndex Mesh::AddVertex (const Vertex& vertex)
 {
 	if (DBGERROR (finalized)) {
 		return InvalidIndex;
 	}
-	vertices.push_back (position);
+	vertices.push_back (vertex);
 	return vertices.size () - 1;
 }
 
-void Mesh::SetVertex (UIndex index, const Vec3& position)
+void Mesh::SetVertex (UIndex index, const Mesh::Vertex& vertex)
 {
 	if (DBGERROR (finalized)) {
 		return;
 	}
-	vertices[index] = position;
+	vertices[index] = vertex;
 }
 
 UIndex Mesh::AddNormal (const Vec3& normal)
@@ -115,7 +122,7 @@ void Mesh::Transform (const Transformation& transformation)
 		return;
 	}
 	for (UIndex i = 0; i < vertices.size (); i++) {
-		vertices[i] = transformation.Apply (vertices[i]);
+		vertices[i].pos = transformation.Apply (vertices[i].pos);
 	}
 	for (UIndex i = 0; i < userDefinedVertexNormals.size (); i++) {
 		userDefinedVertexNormals[i] = transformation.ApplyRotation (userDefinedVertexNormals[i]);
@@ -168,7 +175,7 @@ UIndex Mesh::TriangleCount () const
 	return triangles.size ();
 }
 
-const Vec3& Mesh::GetVertex (UIndex index) const
+const Mesh::Vertex& Mesh::GetVertex (UIndex index) const
 {
 	return vertices[index];
 }
@@ -221,16 +228,16 @@ bool Mesh::IsDoubleSided () const
 Vec3 Mesh::GetNormal (UIndex index, const Vec3& coord) const
 {
 	const Triangle& triangle = triangles[index];
-	const Vec3& vertex0 = vertices[triangle.vertex0];
-	const Vec3& vertex1 = vertices[triangle.vertex1];
-	const Vec3& vertex2 = vertices[triangle.vertex2];
+	const Mesh::Vertex& vertex0 = vertices[triangle.vertex0];
+	const Mesh::Vertex& vertex1 = vertices[triangle.vertex1];
+	const Mesh::Vertex& vertex2 = vertices[triangle.vertex2];
 
 	Vec3 interpolatedNormal;
 	if (triangle.normalMode == Triangle::UserDefined) {
 		const Vec3& normal0 = userDefinedVertexNormals[triangle.normal0];
 		const Vec3& normal1 = userDefinedVertexNormals[triangle.normal1];
 		const Vec3& normal2 = userDefinedVertexNormals[triangle.normal2];
-		interpolatedNormal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, coord);
+		interpolatedNormal = BarycentricInterpolation (vertex0.pos, vertex1.pos, vertex2.pos, normal0, normal1, normal2, coord);
 	} else if (triangle.normalMode == Triangle::Calculated){
 		if (triangle.curveGroup == NonCurved) {
 			return calculatedTriangleNormals[index];
@@ -239,7 +246,7 @@ Vec3 Mesh::GetNormal (UIndex index, const Vec3& coord) const
 		const Vec3& normal0 = calculatedVertexNormals[triangle.normal0];
 		const Vec3& normal1 = calculatedVertexNormals[triangle.normal1];
 		const Vec3& normal2 = calculatedVertexNormals[triangle.normal2];
-		interpolatedNormal = BarycentricInterpolation (vertex0, vertex1, vertex2, normal0, normal1, normal2, coord);
+		interpolatedNormal = BarycentricInterpolation (vertex0.pos, vertex1.pos, vertex2.pos, normal0, normal1, normal2, coord);
 	}
 
 	return Normalize (interpolatedNormal);
@@ -303,12 +310,12 @@ Vec3 Mesh::CalculateTriangleNormal (UIndex index)
 {
 	const Triangle& triangle = triangles[index];
 
-	const Vec3& vertex0 = GetVertex (triangle.vertex0);
-	const Vec3& vertex1 = GetVertex (triangle.vertex1);
-	const Vec3& vertex2 = GetVertex (triangle.vertex2);
+	const Mesh::Vertex& vertex0 = GetVertex (triangle.vertex0);
+	const Mesh::Vertex& vertex1 = GetVertex (triangle.vertex1);
+	const Mesh::Vertex& vertex2 = GetVertex (triangle.vertex2);
 
-	Vec3 edgeDir1 = vertex1 - vertex0;
-	Vec3 edgeDir2 = vertex2 - vertex0;
+	Vec3 edgeDir1 = vertex1.pos - vertex0.pos;
+	Vec3 edgeDir2 = vertex2.pos - vertex0.pos;
 	return Normalize (edgeDir1 ^ edgeDir2);
 }
 
@@ -345,7 +352,7 @@ void Mesh::CalculateBoundingShapes ()
 	Vec3 min (INF, INF, INF);
 	Vec3 max (-INF, -INF, -INF);
 	for (UIndex i = 0; i < vertices.size (); i++) {
-		const Vec3& position = vertices[i];
+		const Vec3& position = vertices[i].pos;
 		if (position.x < min.x) { min.x = position.x; };
 		if (position.y < min.y) { min.y = position.y; };
 		if (position.z < min.z) { min.z = position.z; };
@@ -359,7 +366,7 @@ void Mesh::CalculateBoundingShapes ()
 
 	double maxDistance = -INF;
 	for (UIndex i = 0; i < vertices.size (); i++) {
-		const Vec3& position = vertices[i];
+		const Vec3& position = vertices[i].pos;
 		double currentDistance = Distance (position, boundingSphere.origin);
 		if (currentDistance > maxDistance) {
 			maxDistance = currentDistance;
@@ -373,9 +380,9 @@ void Mesh::CalculateOctree ()
 	octree.SetBox (boundingBox);
 	for (UIndex i = 0; i < triangles.size (); i++) {
 		const Triangle& triangle = triangles[i];
-		const Vec3& vertex0 = vertices[triangle.vertex0];
-		const Vec3& vertex1 = vertices[triangle.vertex1];
-		const Vec3& vertex2 = vertices[triangle.vertex2];
+		const Vec3& vertex0 = vertices[triangle.vertex0].pos;
+		const Vec3& vertex1 = vertices[triangle.vertex1].pos;
+		const Vec3& vertex2 = vertices[triangle.vertex2].pos;
 		octree.AddTriangle (i, vertex0, vertex1, vertex2);
 	}
 }

@@ -23,6 +23,7 @@ public:
 		ShapeIntersection ();
 
 		Vec3 position;
+		Vec2 texCoord;
 		double distance;
 		Facing facing;
 	};

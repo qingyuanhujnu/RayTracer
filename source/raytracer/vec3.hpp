@@ -32,6 +32,7 @@ void	FastVecMult (const Vec3& op1, const Vec3& op2, Vec3& result);		// Use this 
 
 Vec3	Normalize (const Vec3& vec);
 double	Distance (const Vec3& aVec, const Vec3& bVec);
+double	Length (const Vec3& vec);
 Vec3	Offset (const Vec3& vec, const Vec3& direction, double distance);
 
 Vec3	GetReflectedDirection (const Vec3& vec, const Vec3& normal);

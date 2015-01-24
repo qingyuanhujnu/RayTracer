@@ -37,7 +37,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	const Material& material = model.GetMaterial (triangle.material);
 	Vec3 normal = mesh.GetNormal (isect.triangle, isect.position);
 
-	Color colDiffuse = material.GetDiffuseColor ();
+	Color colDiffuse = material.GetDiffuseColor (isect.texCoord);
 	double cDiffIntensity = (colDiffuse.r + colDiffuse.g + colDiffuse.b) / 3.0;
 
 	if (++depth > 5 && cDiffIntensity < Random ()) {
@@ -66,7 +66,7 @@ Color PathTracer::Radiance (const Ray& ray, int depth) const
 	if (shadowRayIsect.iSectType == Intersection::ModelIntersection::Light) {		// light hit!
 		const Light& light = model.GetLight (shadowRayIsect.lightIntersection.light);
 		const Vec3 photonOrigin = shadowRayIsect.lightIntersection.position;
-		color += GetPhongShading (material, light, photonOrigin, isect.position, normal, ray.GetDirection ());
+		color += GetPhongShading (material, light, photonOrigin, isect.position, normal, ray.GetDirection (), isect.texCoord);
 	}
 	else if (shadowRayIsect.iSectType == Intersection::ModelIntersection::Geometry) {
 		color += Radiance (shadowRay, depth) * cDiffIntensity;
@@ -125,7 +125,8 @@ Color PathTracer::RayCastTowardsLights (const Vec3& position, const Vec3& normal
 			iSect.lightIntersection.light == i) {		// If hit then also check if we hit the light we intended to hit.
 			double omega = 2 * PI * (1 - cos_a_max);
 			const Vec3 photonOrigin = iSect.lightIntersection.position;
-			color += GetPhongShading (material, light, photonOrigin, position, normal, ray.GetDirection ()) * omega /** INV_PI*/;	// TODO: I need to research BRDF to decide if the 1/PI is needed here or not.
+			// TODO what to do with texcoord here?
+			color += GetPhongShading (material, light, photonOrigin, position, normal, ray.GetDirection (), Vec2 ()) * omega /** INV_PI*/;	// TODO: I need to research BRDF to decide if the 1/PI is needed here or not.
 		}
 	}
 

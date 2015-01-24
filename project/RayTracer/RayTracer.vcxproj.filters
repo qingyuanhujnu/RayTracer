@@ -100,6 +100,12 @@
     <ClCompile Include="..\..\source\raytracer\threading.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\raytracer\vec2.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\raytracer\texture.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer\raytracer.hpp">
@@ -185,6 +191,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\raytracer\threading.hpp">
       <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\raytracer\vec2.hpp">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\raytracer\texture.hpp">
+      <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

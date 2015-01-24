@@ -42,10 +42,10 @@ void Generator::GenerateRectangle (Model& model, double xSize, double ySize, con
 	double x = xSize / 2.0;
 	double y = ySize / 2.0;
 
-	mesh.AddVertex (Vec3 (-x, -y, 0.0));
-	mesh.AddVertex (Vec3 (x, -y, 0.0));
-	mesh.AddVertex (Vec3 (x, y, 0.0));
-	mesh.AddVertex (Vec3 (-x, y, 0.0));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, 0.0), Vec2 (0.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, 0.0), Vec2 (1.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, 0.0), Vec2 (1.0, 1.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, 0.0), Vec2 (0.0, 1.0)));
 
 	AddPolygon (mesh, 0, 1, 2, 3, material, Mesh::NonCurved);
 
@@ -65,29 +65,50 @@ static void GenerateCuboidBase (Mesh& mesh, double xSize, double ySize, double z
 	double y = ySize / 2.0;
 	double z = zSize / 2.0;
 
-	mesh.AddVertex (Vec3 (-x, -y, -z));
-	mesh.AddVertex (Vec3 (x, -y, -z));
-	mesh.AddVertex (Vec3 (x, -y, z));
-	mesh.AddVertex (Vec3 (-x, -y, z));
-	mesh.AddVertex (Vec3 (-x, y, -z));
-	mesh.AddVertex (Vec3 (x, y, -z));
-	mesh.AddVertex (Vec3 (x, y, z));
-	mesh.AddVertex (Vec3 (-x, y, z));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z), Vec2 (0.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z), Vec2 (1.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z), Vec2 (1.0, 1.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z), Vec2 (0.0, 1.0)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z), Vec2 (0.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z), Vec2 (1.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z), Vec2 (1.0, 1.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z), Vec2 (0.0, 1.0)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z), Vec2 (0.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z), Vec2 (1.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z), Vec2 (1.0, 1.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z), Vec2 (0.0, 1.0)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z), Vec2 (0.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z), Vec2 (1.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z), Vec2 (1.0, 1.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z), Vec2 (0.0, 1.0)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z), Vec2 (0.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z), Vec2 (1.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z), Vec2 (1.0, 1.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z), Vec2 (0.0, 1.0)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z), Vec2 (0.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z), Vec2 (1.0, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z), Vec2 (1.0, 1.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z), Vec2 (0.0, 1.0)));
 
 	if (facing == Generator::Inside) {
 		AddPolygon (mesh, 0, 1, 2, 3, materials[0], Mesh::NonCurved);
-		AddPolygon (mesh, 1, 5, 6, 2, materials[1], Mesh::NonCurved);
-		AddPolygon (mesh, 5, 4, 7, 6, materials[2], Mesh::NonCurved);
-		AddPolygon (mesh, 4, 0, 3, 7, materials[3], Mesh::NonCurved);
-		AddPolygon (mesh, 0, 4, 5, 1, materials[4], Mesh::NonCurved);
-		AddPolygon (mesh, 3, 2, 6, 7, materials[5], Mesh::NonCurved);
+		AddPolygon (mesh, 4, 5, 6, 7, materials[1], Mesh::NonCurved);
+		AddPolygon (mesh, 8, 9, 10, 11, materials[2], Mesh::NonCurved);
+		AddPolygon (mesh, 12, 13, 14, 15, materials[3], Mesh::NonCurved);
+		AddPolygon (mesh, 16, 17, 18, 19, materials[4], Mesh::NonCurved);
+		AddPolygon (mesh, 20, 21, 22, 23, materials[5], Mesh::NonCurved);
 	} else if (facing == Generator::Outside) {
 		AddPolygon (mesh, 0, 3, 2, 1, materials[0], Mesh::NonCurved);
-		AddPolygon (mesh, 1, 2, 6, 5, materials[1], Mesh::NonCurved);
-		AddPolygon (mesh, 5, 6, 7, 4, materials[2], Mesh::NonCurved);
-		AddPolygon (mesh, 4, 7, 3, 0, materials[3], Mesh::NonCurved);
-		AddPolygon (mesh, 0, 1, 5, 4, materials[4], Mesh::NonCurved);
-		AddPolygon (mesh, 3, 7, 6, 2, materials[5], Mesh::NonCurved);
+		AddPolygon (mesh, 4, 7, 6, 5, materials[1], Mesh::NonCurved);
+		AddPolygon (mesh, 8, 11, 10, 9, materials[2], Mesh::NonCurved);
+		AddPolygon (mesh, 12, 15, 14, 13, materials[3], Mesh::NonCurved);
+		AddPolygon (mesh, 16, 19, 18, 17, materials[4], Mesh::NonCurved);
+		AddPolygon (mesh, 20, 23, 22, 21, materials[5], Mesh::NonCurved);
 	} else {
 		DBGERROR (true);
 	}
@@ -427,14 +448,14 @@ void Generator::GenerateSolid (Model& model, SolidType type, double radius, cons
 		return;
 	}
 
-	double currentRadius = Distance (Vec3 (0.0, 0.0, 0.0), mesh.GetVertex (0));
+	double currentRadius = Distance (Vec3 (0.0, 0.0, 0.0), mesh.GetVertex (0).pos);
 	if (DBGERROR (IsZero (currentRadius))) {
 		return;
 	}
 
 	double scale = radius / currentRadius;
 	for (UIndex i = 0; i < mesh.VertexCount (); i++) {
-		mesh.SetVertex (i, mesh.GetVertex (i) * scale);
+		mesh.SetVertex (i, mesh.GetVertex (i).pos * scale);
 	}
 
 	Transformation tr;

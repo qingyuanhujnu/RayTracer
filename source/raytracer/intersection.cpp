@@ -81,6 +81,8 @@ bool Intersection::RaySphere (const Ray& ray, const Sphere& sphere, ShapeInterse
 	if (intersection != NULL) {
 		intersection->position = rayOrigin + distance * rayDirection;
 		intersection->distance = distance;
+		// TODO calculate texCoord
+		intersection->texCoord = Vec2 ();
 	}
 	return true;
 }
@@ -145,6 +147,8 @@ bool Intersection::RayBox (const Ray& ray, const Box& box, ShapeIntersection* in
 		if (intersection != NULL) {
 			intersection->position = rayOriginVec;
 			intersection->distance = 0.0;
+			// TODO calculate texcoord
+			intersection->texCoord = Vec2 ();
 		}
 		return true;
 	}
@@ -191,8 +195,29 @@ bool Intersection::RayBox (const Ray& ray, const Box& box, ShapeIntersection* in
 	if (intersection != NULL) {
 		intersection->position = intersectionCoord;
 		intersection->distance = distance;
+		// TODO calculate texcoord
+		intersection->texCoord = Vec2 ();
 	}
 	return true;
+}
+
+// Only works if p is inside triangle.
+static Vec2 CalculateTexCoord (const Vec3& p, const Triangle& triangle)
+{
+	Vec3 f1, f2, f3;
+	FastVecSub (triangle.v0, p, f1);
+	FastVecSub (triangle.v1, p, f2);
+	FastVecSub (triangle.v2, p, f3);
+
+	double triangleArea = Length ((triangle.v0 - triangle.v1) ^ (triangle.v0 - triangle.v2));
+	double a1 = Length (f2 ^ f3) / triangleArea;
+	double a2 = Length (f3 ^ f1) / triangleArea;
+	double a3 = Length (f1 ^ f2) / triangleArea;
+
+	double u = triangle.tex0.x * a1 + triangle.tex1.x * a2 + triangle.tex2.x * a3;
+	double v = triangle.tex0.y * a1 + triangle.tex1.y * a2 + triangle.tex2.y * a3;
+
+	return Vec2 (u, v);
 }
 
 bool Intersection::RayTriangle (const Ray& ray, const Triangle& triangle, FacingMode facing, ShapeIntersection* intersection)
@@ -242,6 +267,7 @@ bool Intersection::RayTriangle (const Ray& ray, const Triangle& triangle, Facing
 		intersection->position = rayOrigin + rayDirection * distance;
 		intersection->distance = distance;
 		intersection->facing = isFrontFacing ? Intersection::ShapeIntersection::Front : Intersection::ShapeIntersection::Back;
+		intersection->texCoord = CalculateTexCoord (intersection->position, triangle);
 	}
 
 	return true;
@@ -306,12 +332,12 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* 
 		for (auto triangleIt = triangles.begin (); triangleIt != triangles.end (); ++triangleIt) {
 			UIndex triangleIndex = *triangleIt;
 			const Mesh::Triangle& triangle = mesh.GetTriangle (triangleIndex);
-			const Vec3& vertex0 = mesh.GetVertex (triangle.vertex0);
-			const Vec3& vertex1 = mesh.GetVertex (triangle.vertex1);
-			const Vec3& vertex2 = mesh.GetVertex (triangle.vertex2);
+			const Mesh::Vertex& v0 = mesh.GetVertex (triangle.vertex0);
+			const Mesh::Vertex& v1 = mesh.GetVertex (triangle.vertex1);
+			const Mesh::Vertex& v2 = mesh.GetVertex (triangle.vertex2);
 
 			Intersection::MeshIntersection currentIntersection;
-			if (Intersection::RayTriangle (ray, Triangle (vertex0, vertex1, vertex2), facingMode, &currentIntersection)) {
+			if (Intersection::RayTriangle (ray, Triangle (v0.pos, v1.pos, v2.pos, v0.texCoord, v1.texCoord, v2.texCoord), facingMode, &currentIntersection)) {
 				if (intersection == NULL) {
 					return true;
 				}

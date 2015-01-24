@@ -2,6 +2,7 @@
 #include "common.hpp"
 
 Material::Material () :
+	texture (nullptr),
 	ambient (0.0),
 	diffuse (0.0),
 	specular (0.0),
@@ -12,18 +13,18 @@ Material::Material () :
 {
 }
 
-Material::Material (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency, double refractionIndex)
+Material::Material (std::shared_ptr<Texture> texture, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency, double refractionIndex)
 {
-	Set (color, ambient, diffuse, specular, shininess, reflection, transparency, refractionIndex);
+	Set (texture, ambient, diffuse, specular, shininess, reflection, transparency, refractionIndex);
 }
 
 Material::~Material ()
 {
 }
 
-void Material::Set (const Color& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency, double refractionIndex)
+void Material::Set (std::shared_ptr<Texture> texture, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency, double refractionIndex)
 {
-	this->color = color;
+	this->texture = texture;
 	this->ambient = ambient;
 	this->diffuse = diffuse;
 	this->specular = specular;
@@ -31,11 +32,6 @@ void Material::Set (const Color& color, double ambient, double diffuse, double s
 	this->reflection = reflection;
 	this->transparency = transparency;
 	this->refractionIndex = refractionIndex;
-}
-
-const Color& Material::GetColor () const
-{
-	return color;
 }
 
 double Material::GetAmbient () const
@@ -83,17 +79,22 @@ double Material::GetRefractionIndex () const
 	return refractionIndex;
 }
 
-Color Material::GetAmbientColor () const
+Color Material::GetAmbientColor (const Vec2& texCoord) const
 {
-	return color * ambient;
+	return GetColor (texCoord) * ambient;
 }
 
-Color Material::GetDiffuseColor () const
+Color Material::GetDiffuseColor (const Vec2& texCoord) const
 {
-	return color * diffuse;
+	return GetColor (texCoord) * diffuse;
 }
 
-Color Material::GetSpecularColor () const
+Color Material::GetSpecularColor (const Vec2& texCoord) const
 {
-	return color * specular;
+	return GetColor (texCoord) * specular;
+}
+
+Color Material::GetColor (const Vec2& texCoord) const
+{
+	return texture->Sample (texCoord);
 }

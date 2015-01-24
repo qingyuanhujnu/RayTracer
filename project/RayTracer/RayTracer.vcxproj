@@ -23,10 +23,12 @@
     <ClCompile Include="..\..\source\raytracer\pathtracer2.cpp" />
     <ClCompile Include="..\..\source\raytracer\random.cpp" />
     <ClCompile Include="..\..\source\raytracer\renderer.cpp" />
+    <ClCompile Include="..\..\source\raytracer\texture.cpp" />
     <ClCompile Include="..\..\source\raytracer\threading.cpp" />
     <ClCompile Include="..\..\source\raytracer\transformation.cpp" />
     <ClCompile Include="..\..\source\raytracer\sphere.cpp" />
     <ClCompile Include="..\..\source\raytracer\triangle.cpp" />
+    <ClCompile Include="..\..\source\raytracer\vec2.cpp" />
     <ClCompile Include="..\..\source\raytracer\vec3.cpp" />
     <ClCompile Include="..\..\source\raytracer\export.cpp" />
     <ClCompile Include="..\..\source\raytracer\generator.cpp" />
@@ -54,10 +56,12 @@
     <ClInclude Include="..\..\source\raytracer\pathtracer2.hpp" />
     <ClInclude Include="..\..\source\raytracer\random.hpp" />
     <ClInclude Include="..\..\source\raytracer\renderer.hpp" />
+    <ClInclude Include="..\..\source\raytracer\texture.hpp" />
     <ClInclude Include="..\..\source\raytracer\threading.hpp" />
     <ClInclude Include="..\..\source\raytracer\transformation.hpp" />
     <ClInclude Include="..\..\source\raytracer\sphere.hpp" />
     <ClInclude Include="..\..\source\raytracer\triangle.hpp" />
+    <ClInclude Include="..\..\source\raytracer\vec2.hpp" />
     <ClInclude Include="..\..\source\raytracer\vec3.hpp" />
     <ClInclude Include="..\..\source\raytracer\export.hpp" />
     <ClInclude Include="..\..\source\raytracer\generator.hpp" />

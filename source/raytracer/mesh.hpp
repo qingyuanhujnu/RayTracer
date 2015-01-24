@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 #include "vec3.hpp"
+#include "vec2.hpp"
 #include "transformation.hpp"
 #include "box.hpp"
 #include "sphere.hpp"
@@ -13,6 +14,15 @@ class Mesh
 {
 public:
 	static const UIndex NonCurved = (UIndex) -1;
+
+	class Vertex {
+	public:
+		Vec3 pos;
+		Vec2 texCoord;
+
+		// TODO remove default parameter
+		Vertex (const Vec3& pos, const Vec2& texCoord = Vec2 ());
+	};
 
 	class Triangle
 	{
@@ -46,8 +56,8 @@ public:
 	Mesh ();
 	~Mesh ();
 
-	UIndex					AddVertex (const Vec3& position);
-	void					SetVertex (UIndex index, const Vec3& position);
+	UIndex					AddVertex (const Vertex& vertex);
+	void					SetVertex (UIndex index, const Mesh::Vertex& vertex);
 	UIndex					AddNormal (const Vec3& normal);
 	UIndex					AddTriangle (const Triangle& triangle);
 
@@ -59,7 +69,7 @@ public:
 	UIndex					VertexCount () const;
 	UIndex					TriangleCount () const;
 
-	const Vec3&				GetVertex (UIndex index) const;
+	const Vertex&			GetVertex (UIndex index) const;
 	const Triangle&			GetTriangle (UIndex index) const;
 
 	bool					IsDoubleSided () const;
@@ -76,7 +86,7 @@ private:
 	void					CalculateBoundingShapes ();
 	void					CalculateOctree ();
 
-	std::vector<Vec3>		vertices;
+	std::vector<Vertex>		vertices;
 	std::vector<Triangle>	triangles;
 
 	std::vector<Vec3>		userDefinedVertexNormals;

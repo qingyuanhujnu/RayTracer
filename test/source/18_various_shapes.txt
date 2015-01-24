@@ -17,7 +17,8 @@ light
 	color 1.0 1.0 1.0
 	attenuation 1.0 0.1 0.01
 material
-	color 1.0 0.4 0.4
+	texture mono
+		color 1.0 0.4 0.4
 	ambient 0.2
 	diffuse 0.8
 	specular 0.0
@@ -26,7 +27,8 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 0.35 0.8 0.68
+	texture mono
+		color 0.35 0.8 0.68
 	ambient 0.2
 	diffuse 0.8
 	specular 0.0
@@ -35,7 +37,8 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 0.0 0.0 1.0
+	texture mono
+		color 0.0 0.0 1.0
 	ambient 0.2
 	diffuse 0.8
 	specular 0.0
@@ -44,7 +47,8 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 1.0 1.0 1.0
+	texture mono
+		color 1.0 1.0 1.0
 	ambient 0.2
 	diffuse 0.8
 	specular 0.0
@@ -53,7 +57,8 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 0.0 0.54 0.72
+	texture mono
+		color 0.0 0.54 0.72
 	ambient 0.2
 	diffuse 0.8
 	specular 0.0
@@ -62,7 +67,8 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 1.0 0.4 0.0
+	texture mono
+		color 1.0 0.4 0.0
 	ambient 0.2
 	diffuse 0.8
 	specular 0.0
@@ -71,7 +77,8 @@ material
 	transparency 0.0
 	refraction_index 1.0
 material
-	color 0.8 0.4 0.6
+	texture mono
+		color 0.8 0.4 0.6
 	ambient 0.2
 	diffuse 0.8
 	specular 0.0

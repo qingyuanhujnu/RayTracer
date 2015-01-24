@@ -11,6 +11,7 @@ Color GetPhongShading (const Material& material,
 					   const Vec3& photonOrigin,
 					   const Vec3& shadedPoint,
 					   const Vec3& shadedPointNormal,
-					   const Vec3& viewDirection);
+					   const Vec3& viewDirection,
+					   const Vec2& texCoord);
 
 #endif

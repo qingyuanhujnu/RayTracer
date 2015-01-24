@@ -196,9 +196,39 @@ static bool ReadLight (std::wifstream& inputStream, Model& model)
 	return true;
 }
 
+static bool ReadTexture (std::wifstream& inputStream, std::shared_ptr<Texture>& outTexture)
+{
+	std::wstring type;
+
+	if (!ReadNamedString (inputStream, L"texture", type)) { return false; }
+	if (type == L"mono") {
+		Color color;
+		if (!ReadNamedColor (inputStream, L"color", color)) { return false; }
+		outTexture.reset (new MonoTexture (color));
+		return true;
+	}
+	else if (type == L"checkerboard") {
+		int horiz = 0;
+		int vert = 0;
+		if (!ReadNamedInteger (inputStream, L"horiz", horiz)) { return false; }
+		if (!ReadNamedInteger (inputStream, L"vert", vert)) { return false; }
+		outTexture.reset (new CheckBoardTexture (horiz, vert));
+		return true;
+	}
+	else if (type == L"image") {
+		std::wstring texture;
+		if (!ReadNamedString (inputStream, L"texture", texture)) { return false; }
+		// TODO 
+		return false;
+	}
+	else {
+		return false;
+	}
+}
+
 static bool ReadMaterial (std::wifstream& inputStream, Model& model)
 {
-	Color color;
+	std::shared_ptr<Texture> texture;
 	double ambient;
 	double diffuse;
 	double specular;
@@ -207,7 +237,7 @@ static bool ReadMaterial (std::wifstream& inputStream, Model& model)
 	double transparency;
 	double refractionIndex;
 
-	if (!ReadNamedColor (inputStream, L"color", color)) { return false; }
+	if (!ReadTexture (inputStream, texture)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"ambient", ambient)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"diffuse", diffuse)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"specular", specular)) { return false; }
@@ -216,8 +246,7 @@ static bool ReadMaterial (std::wifstream& inputStream, Model& model)
 	if (!ReadNamedDouble (inputStream, L"transparency", transparency)) { return false; }
 	if (!ReadNamedDouble (inputStream, L"refraction_index", refractionIndex)) { return false; }
 
-	Material material;
-	material.Set (color, ambient, diffuse, specular, shininess, reflection, transparency, refractionIndex);
+	Material material (texture, ambient, diffuse, specular, shininess, reflection, transparency, refractionIndex);
 	model.AddMaterial (material);
 	return true;
 }

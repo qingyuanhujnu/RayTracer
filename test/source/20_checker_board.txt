@@ -1,0 +1,81 @@
+version 1
+parameters
+	xresolution 200
+	yresolution 200
+	imagedistance 1.0
+camera
+	eye 5.0 3.0 4.0
+	center 0.0 0.0 0.5
+	up 0.0 0.0 1.0
+	xfov 60.0
+	yfov 60.0
+	focal_length 0.0
+	aperture_radius 0.0
+light
+	shape sphere 0.5
+	position 3.0 3.5 5.5
+	color 1.0 1.0 1.0
+	attenuation 1.0 0.1 0.01
+material
+	texture mono
+		color 1.0 0.0 0.0
+	ambient 0.2
+	diffuse 0.8
+	specular 1.0
+	shininess 20.0
+	reflection 0.5
+	transparency 0.0
+	refraction_index 1.0
+material
+	texture mono
+		color 0.0 1.0 0.0
+	ambient 0.2
+	diffuse 0.8
+	specular 0.0
+	shininess 1.0
+	reflection 0.0
+	transparency 0.0
+	refraction_index 1.0
+material
+	texture checkerboard
+		horiz 8
+		vert 8
+	ambient 0.2
+	diffuse 0.8
+	specular 0.0
+	shininess 1.0
+	reflection 0.0
+	transparency 0.0
+	refraction_index 1.0
+material
+	texture checkerboard
+		horiz 64
+		vert 64
+	ambient 0.2
+	diffuse 0.8
+	specular 0.0
+	shininess 1.0
+	reflection 0.0
+	transparency 0.0
+	refraction_index 1.0
+sphere
+	radius 1.5
+	segmentation 25
+	offset 0.5 -1.0 1.5
+	rotation 0.0 0.0 0.0
+	material 0
+cuboid
+	size 1.2 1.2 1.8
+	offset -1.0 1.5 0.9
+	rotation 0.0 0.0 0.0
+	material 1
+cuboid
+	size 1.2 1.2 1.2
+	offset 1.0 2.2 0.6
+	rotation 0.0 0.0 0.0
+	material 2
+roombox
+	size 12.0 12.0 12.0
+	offset 0.0 0.0 6.0
+	rotation 0.0 0.0 0.0
+	materials 3 3 3 3 3 3

@@ -6,6 +6,7 @@
 #include "average.hpp"
 #include "shading.hpp"
 
+#include "texture.hpp"
 RayTracer::RayTracer (const Model& model, const Camera& camera, int sampleNum) :
 	Renderer (model, camera, sampleNum)
 {
@@ -47,12 +48,12 @@ Color RayTracer::Trace (const Ray& ray, int depth) const
 			rayDirectedNormal = rayDirectedNormal * -1.0;
 		}
 
-		color += material.GetAmbientColor ();
+		color += material.GetAmbientColor (intersection.texCoord);
 		for (UIndex i = 0; i < model.LightCount (); i++) {
 			const Light& light = model.GetLight (i);
 			if (!IsInShadow (intersection.position, light)) {
 				const Vec3& photonOrigin = light.GetPosition ();
-				color += GetPhongShading (material, light, photonOrigin, intersection.position, rayDirectedNormal, ray.GetDirection ());
+				color += GetPhongShading (material, light, photonOrigin, intersection.position, rayDirectedNormal, ray.GetDirection (), intersection.texCoord);
 			} 			
 		}
 

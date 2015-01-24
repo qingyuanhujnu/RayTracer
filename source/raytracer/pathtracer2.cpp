@@ -72,13 +72,13 @@ Color PathTracer2::TraceGeometry (const Intersection::GeometryIntersection& inte
 		rayDirectedNormal = rayDirectedNormal * -1.0;
 	}
 
-	color += material.GetAmbientColor ();
+	color += material.GetAmbientColor (intersection.texCoord);
 
 	const double lightSampleProbability = 0.5;
 	if (Random () < lightSampleProbability) {
-		color += SampleLights (material, intersection.position, rayDirectedNormal, rayDirection, depth);
+		color += SampleLights (material, intersection.position, rayDirectedNormal, intersection.texCoord, rayDirection, depth);
 	} else {
-		Color diffuseColor = material.GetDiffuseColor ();
+		Color diffuseColor = material.GetDiffuseColor (intersection.texCoord);
 		double diffuseCompensation = 0.6;
 		double diffuseIntensity = ((diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0) * diffuseCompensation;
 		color += SampleGeometry (intersection.position, rayDirectedNormal, depth) * diffuseIntensity;
@@ -111,7 +111,7 @@ Color PathTracer2::TraceLight (const Intersection::LightIntersection& intersecti
 	return light.GetColor ();
 }
 
-Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection, int depth) const
+Color PathTracer2::SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec2& texCoord, const Vec3& viewDirection, int depth) const
 {
 	Color color;
 	for (UIndex i = 0; i < model.LightCount (); i++) {
@@ -122,7 +122,7 @@ Color PathTracer2::SampleLights (const Material& material, const Vec3& point, co
 		if (hasTransparency) {
 			Intersection::GeometryIntersection intersection;
 			if (!Intersection::RayGeometry (lightRay, model, &intersection)) {
-				color += GetPhongShading (material, light, randomLightPoint, point, normal, viewDirection);
+				color += GetPhongShading (material, light, randomLightPoint, point, normal, viewDirection, texCoord);
 			} else {
 				const Mesh& mesh = model.GetMesh (intersection.mesh);
 				const Mesh::Triangle& triangle = mesh.GetTriangle (intersection.triangle);
@@ -133,7 +133,7 @@ Color PathTracer2::SampleLights (const Material& material, const Vec3& point, co
 			}
 		} else {
 			if (!Intersection::RayGeometry (lightRay, model, NULL)) {
-				color += GetPhongShading (material, light, randomLightPoint, point, normal, viewDirection);
+				color += GetPhongShading (material, light, randomLightPoint, point, normal, viewDirection, texCoord);
 			}
 		}
 	}

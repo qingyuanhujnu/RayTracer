@@ -17,7 +17,7 @@ private:
 	Color			TraceGeometry (const Intersection::GeometryIntersection& intersection, const Vec3& rayDirection, int depth) const;
 	Color			TraceLight (const Intersection::LightIntersection& intersection) const;
 
-	Color			SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec3& viewDirection, int depth) const;
+	Color			SampleLights (const Material& material, const Vec3& point, const Vec3& normal, const Vec2& texCoord, const Vec3& viewDirection, int depth) const;
 	Color			SampleGeometry (const Vec3& point, const Vec3& normal, int depth) const;
 
 	bool			hasTransparency;
