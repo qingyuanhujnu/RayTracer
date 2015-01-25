@@ -148,8 +148,8 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 	double step = 2.0 * PI / segmentation;
 	
 	for (int i = 0; i < segmentation; i++) {
-		mesh.AddVertex (CylindricalToCartesian (radius, height / 2.0, theta));
-		mesh.AddVertex (CylindricalToCartesian (radius, -height / 2.0, theta));
+		mesh.AddVertex (Mesh::Vertex (CylindricalToCartesian (radius, height / 2.0, theta), Vec2 (theta, height / 2.0)));
+		mesh.AddVertex (Mesh::Vertex (CylindricalToCartesian (radius, -height / 2.0, theta), Vec2 (theta, -height / 2.0)));
 		theta -= step;
 	}
 
@@ -189,16 +189,16 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 	double step = PI / segmentation;
 	double theta = step;
 
-	UIndex topIndex = mesh.AddVertex (SphericalToCartesian (radius, 0.0, 0.0));
+	UIndex topIndex = mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (radius, 0.0, 0.0), Vec2 (0, 0)));
 	for (int i = 1; i < segmentation; i++) {
 		double phi = 0;
 		for (int j = 0; j < circle; j++) {
-			mesh.AddVertex (SphericalToCartesian (radius, theta, phi));
+			mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (radius, theta, phi), Vec2 (theta, phi)));
 			phi += step;
 		}
 		theta += step;
 	}
-	UIndex bottomIndex = mesh.AddVertex (SphericalToCartesian (-radius, 0.0, 0.0));
+	UIndex bottomIndex = mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (-radius, 0.0, 0.0), Vec2 (1, 1)));
 
 	for (int i = 1; i <= segmentation; i++) {
 		if (i == 1) {

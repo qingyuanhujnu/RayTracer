@@ -104,7 +104,8 @@ def Main ():
 		['17_depth_of_field.txt', 'raytrace', 9],
 		['18_various_shapes.txt', 'raytrace', 9],
 		['19_not_square.txt', 'raytrace', 9],
-		['20_checker_board.txt', 'raytrace', 9]
+		['20_checker_board.txt', 'raytrace', 9],
+		['21_checker_board_everything.txt', 'raytrace', 9]
 	]
 	
 	maxFileNameLength = 0
