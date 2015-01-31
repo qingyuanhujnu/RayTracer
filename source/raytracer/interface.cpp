@@ -3,6 +3,7 @@
 #include "configfile.hpp"
 #include "raytracer.hpp"
 #include "pathtracer.hpp"
+#include "gputracer.hpp"
 #include "pathtracer2.hpp"
 #include "export.hpp"
 #include <memory>
@@ -39,7 +40,7 @@ private:
 enum RenderMode
 {
 	RayTraceMode,
-	PathTraceMode,
+	OpenCLTraceMode,
 	PathTrace2Mode
 };
 
@@ -56,7 +57,7 @@ int Render (
 	RenderMode renderMode = RayTraceMode;
 	switch (algorithm) {
 		case 0: renderMode = RayTraceMode; break;
-		case 1: renderMode = PathTraceMode; break;
+		case 1: renderMode = OpenCLTraceMode; break;
 		case 2: renderMode = PathTrace2Mode; break;
 	}
 
@@ -78,8 +79,10 @@ int Render (
 	std::unique_ptr<Renderer> renderer = nullptr;
 	if (renderMode == RayTraceMode) {
 		renderer.reset (new RayTracer (model, camera, sampleNum));
-	} else if (renderMode == PathTraceMode) {
-		renderer.reset (new PathTracer (model, camera, sampleNum));
+	} else if (renderMode == OpenCLTraceMode) {
+#ifdef OPENCL
+		renderer.reset (new GPUTracer (model, camera, sampleNum));
+#endif
 	} else if (renderMode == PathTrace2Mode) {
 		renderer.reset (new PathTracer2 (model, camera, sampleNum));
 	}

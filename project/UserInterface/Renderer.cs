@@ -49,7 +49,7 @@ namespace UserInterface {
         public enum RenderMode
         {
             RayTraceMode,
-            PathTraceMode,
+            OpenCLTraceMode,
             PathTrace2Mode
         };
 
@@ -201,7 +201,7 @@ namespace UserInterface {
                 Int32 algorithm = 0;
                 switch (renderMode) {
                     case RenderMode.RayTraceMode: algorithm = 0; break;
-                    case RenderMode.PathTraceMode: algorithm = 1; break;
+                    case RenderMode.OpenCLTraceMode: algorithm = 1; break;
                     case RenderMode.PathTrace2Mode: algorithm = 2; break;
                 }
                 result = Win32Functions.Render (

@@ -106,7 +106,7 @@ namespace UserInterface {
 
         private void pathTraceMenu_Click (object sender, EventArgs e)
         {
-            Renderer rayTracer = new Renderer (this, Renderer.RenderMode.PathTraceMode);
+            Renderer rayTracer = new Renderer (this, Renderer.RenderMode.OpenCLTraceMode);
             rayTracer.Start (configTextBox.Text, settings);
         }
 

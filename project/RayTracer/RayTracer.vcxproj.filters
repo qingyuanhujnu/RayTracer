@@ -14,6 +14,9 @@
     <Filter Include="Model">
       <UniqueIdentifier>{3a80260c-fac7-4a48-aad1-05ec8af78324}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GPUTracer">
+      <UniqueIdentifier>{bc365926-7182-4c9b-8470-5ed9295cc7d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\raytracer\main.cpp">
@@ -105,6 +108,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\raytracer\texture.cpp">
       <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\raytracer\gputracer.cpp">
+      <Filter>RayTracer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -198,5 +204,13 @@
     <ClInclude Include="..\..\source\raytracer\texture.hpp">
       <Filter>Model</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\raytracer\gputracer.hpp">
+      <Filter>RayTracer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\source\raytracer\RayTrace.cl">
+      <Filter>GPUTracer</Filter>
+    </Text>
   </ItemGroup>
 </Project>

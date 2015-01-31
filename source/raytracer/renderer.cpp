@@ -1,5 +1,4 @@
 #include "renderer.hpp"
-#include "threading.hpp"
 #include <omp.h>
 
 Renderer::IProgress::IProgress ()
@@ -112,39 +111,6 @@ Renderer::Renderer (const Model& model, const Camera& camera, int sampleNum) :
 Renderer::~Renderer ()
 {
 }
-
-class ProgressReport
-{
-public:
-	ProgressReport (const Renderer::IProgress* progress) :
-		progress (progress),
-		reportInterval (1000),
-		finishedPixels (0),
-		lastFinishedPixels (0)
-	{
-	
-	}
-
-	void Report (int x, int y, double r, double g, double b, int picWidth, int picHeight)
-	{
-		progress->OnPixelReady (x, y, r, g, b, picWidth, picHeight);
-
-		lock.Enter ();
-		finishedPixels++;
-		if (finishedPixels == lastFinishedPixels + reportInterval) {
-			progress->OnProgress ((double) finishedPixels / (double) (picWidth * picHeight));
-			lastFinishedPixels = finishedPixels;
-		}
-		lock.Leave ();
-	}
-
-private:
-	const Renderer::IProgress*	progress;
-	int							reportInterval;
-	int							finishedPixels;
-	int							lastFinishedPixels;
-	Lock						lock;
-};
 
 class RenderThread : public Thread
 {
