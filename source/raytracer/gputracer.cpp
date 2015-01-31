@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include "intersection.hpp"
+#include "average.hpp"
 
 GPUTracer::GPUTracer (const Model& model, const Camera& camera, int sampleNum) :
 	Renderer (model, camera, sampleNum),
@@ -178,6 +179,7 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 
 	std::vector<CL_Ray> cl_rays;
 
+	int sampleRes = (int)sqrt ((double)sampleNum);
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
 	for (int pix = 0; pix < (resX * resY); ++pix) {
@@ -185,8 +187,11 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 		int y = resY - (pix / resX) - 1;
 
 		Image::Field field = image.GetField (x, y);
-		CL_Ray clRay (camera.GetEye (), (field.GetFixSample (1, 0) - camera.GetEye ()));
-		cl_rays.push_back (clRay);
+
+		for (int i = 0; i < sampleRes * sampleRes; i++) {
+			CL_Ray cameraRay (camera.GetEye (), field.GetFixSample (sampleRes, i) - camera.GetEye ());
+			cl_rays.push_back (cameraRay);
+		}
 	}
 
 	std::vector<Color> pixmap;
@@ -196,7 +201,11 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 		int x = pix % resX;
 		int y = resY - (pix / resX) - 1;
 
-		const Color& pixel = pixmap[pix];
+		Average<Color> averageColor;
+		for (int i = 0; i < sampleRes * sampleRes; i++) {
+			averageColor.Add (pixmap[(pix * sampleRes * sampleRes) + i]);
+		}
+		const Color pixel = averageColor.Get ();
 		result.SetColor (x, y, pixel);
 		progressReport.Report (x, y, pixel.r, pixel.g, pixel.b, resX, resY);
 	}
