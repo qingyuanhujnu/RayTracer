@@ -257,7 +257,7 @@ GPUTracer::~GPUTracer ()
 
 Color GPUTracer::GetFieldColor (const Image::Field& /*field*/) const
 {
-	throw "Don't peak, while the gremlins are painting!";
+	throw "Don't peak while the gremlins are painting!";
 }
 
 #endif

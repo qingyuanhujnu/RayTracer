@@ -76,9 +76,6 @@
     <ClCompile Include="..\..\source\raytracer\renderer.cpp">
       <Filter>RayTracer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\raytracer\pathtracer.cpp">
-      <Filter>RayTracer</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\raytracer\random.cpp">
       <Filter>Common</Filter>
     </ClCompile>
@@ -169,9 +166,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\raytracer\renderer.hpp">
-      <Filter>RayTracer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\raytracer\pathtracer.hpp">
       <Filter>RayTracer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\raytracer\random.hpp">

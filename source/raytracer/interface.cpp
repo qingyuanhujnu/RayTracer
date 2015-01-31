@@ -2,7 +2,6 @@
 #include "random.hpp"
 #include "configfile.hpp"
 #include "raytracer.hpp"
-#include "pathtracer.hpp"
 #include "gputracer.hpp"
 #include "pathtracer2.hpp"
 #include "export.hpp"
