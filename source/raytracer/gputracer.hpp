@@ -1,7 +1,7 @@
 #ifndef GPUTRACER_HPP
 #define GPUTRACER_HPP
 
-//#define OPENCL
+#define OPENCL
 #ifdef OPENCL
 
 #include "CL/cl.h"
@@ -51,7 +51,7 @@ public:
 	GPUTracer (const Model& model, const Camera& camera, int sampleNum);
 
 	bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress) override;
-	bool	RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Color>& result);
+	bool	RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Color>& result) const;
 	Color	GetFieldColor (const Image::Field& field) const override;
 
 	~GPUTracer () override;

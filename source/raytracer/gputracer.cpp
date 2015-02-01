@@ -195,7 +195,9 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 	}
 
 	std::vector<Color> pixmap;
-	RenderOnTheGPU (cl_rays, pixmap);
+	if (!RenderOnTheGPU (cl_rays, pixmap)) {
+		return false;
+	}
 
 	for (int pix = 0; pix < (resX * resY); ++pix) {
 		int x = pix % resX;
@@ -215,34 +217,42 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 	return true;
 }
 
-bool GPUTracer::RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Color>& result)
+bool GPUTracer::RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Color>& result) const
 {
 	if (!initialized) {
 		throw "Uninitialized OpenCL";
 	}
 
 	cl_int error = 0;
+
+	// Create ray and result buffers on the device.
 	cl_mem ray_d = clCreateBuffer (context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, rays.size () * sizeof (CL_Ray), (void *)&rays[0], &error);
 	cl_mem result_d = clCreateBuffer (context, CL_MEM_WRITE_ONLY, rays.size () * sizeof (CL_Vec4), nullptr, &error);
 	cl_int ray_count = rays.size ();
 
-	error = clSetKernelArg (kernel, 0, sizeof (cl_mem), &ray_d);
-	error = clSetKernelArg (kernel, 1, sizeof (cl_int), &ray_count);
-	error = clSetKernelArg (kernel, 4, sizeof (cl_mem), &result_d);
+	// Set kernel arguments.
+	error |= clSetKernelArg (kernel, 0, sizeof (cl_mem), &ray_d);
+	error |= clSetKernelArg (kernel, 1, sizeof (cl_int), &ray_count);
+	error |= clSetKernelArg (kernel, 4, sizeof (cl_mem), &result_d);
 
+	// Run the ray trace and read back the result.
 	const size_t ws = 256;
 	const size_t gs = rays.size ();
-	error = clEnqueueNDRangeKernel (command_queue, kernel, 1, nullptr, &gs, &ws, 0, nullptr, nullptr);
-
-	clFinish (command_queue);
+	error |= clEnqueueNDRangeKernel (command_queue, kernel, 1, nullptr, &gs, &ws, 0, nullptr, nullptr);
+	error |= clFinish (command_queue);
 
 	std::vector<CL_Vec4> color_result;
 	color_result.resize (rays.size ());
-	error = clEnqueueReadBuffer (command_queue, result_d, CL_TRUE, 0, rays.size () * sizeof (CL_Vec4), &color_result[0], 0, nullptr, nullptr);
+	error |= clEnqueueReadBuffer (command_queue, result_d, CL_TRUE, 0, rays.size () * sizeof (CL_Vec4), &color_result[0], 0, nullptr, nullptr);
+	
+	// Clean up.
+	error |= clReleaseMemObject (ray_d);
+	error |= clReleaseMemObject (result_d);
 
-	clReleaseMemObject (ray_d);
-	clReleaseMemObject (result_d);
+	if (error != CL_SUCCESS)
+		return false;
 
+	// Convert the result to the format used on the host.
 	result.clear ();
 	result.reserve (rays.size ());
 	for (size_t i = 0; i < color_result.size (); ++i) {
@@ -266,7 +276,7 @@ GPUTracer::~GPUTracer ()
 
 Color GPUTracer::GetFieldColor (const Image::Field& /*field*/) const
 {
-	throw "Don't peak while the gremlins are painting!";
+	throw "Don't peek while the gremlins are painting!";
 }
 
 #endif
