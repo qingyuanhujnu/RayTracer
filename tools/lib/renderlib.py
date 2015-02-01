@@ -14,6 +14,7 @@ def Render (binaryPath, configFile, resultFile, algorithm, samples, verbose):
 	command += ' --result "' + resultFile + '"'
 	command += ' --algorithm ' + algorithm
 	command += ' --samples ' + str (samples)
+	print command
 	if verbose:
 		command += ' --verbose'
 	return os.system (command)
@@ -45,6 +46,11 @@ def ModifyResolution (configFile, resolution):
 	content = GetFileContent (configFile)
 	content = re.sub ('xresolution \d+', 'xresolution ' + str (resolution), content)
 	content = re.sub ('yresolution \d+', 'yresolution ' + str (resolution), content)
+	SetFileContent (configFile, content)
+
+def ModifyRotation (configFile, rotation):
+	content = GetFileContent (configFile)
+	content = re.sub ('rotation \d+ \d+ \d+', 'rotation 0 0 ' + str (rotation), content, 1)
 	SetFileContent (configFile, content)
 
 def GetCameraParameters (configFile):

@@ -12,7 +12,7 @@ def Render (binaryPath, configFile, resolution, algorithm, samples):
 	print 'rendering: ' + configFileName + ' (' + algorithm + ')'
 	tempConfigFile = 'temp.txt'
 	renderlib.CopyFile (configFile, tempConfigFile)
-	if resolution != 0:
+	if resolution != None:
 		renderlib.ModifyResolution (tempConfigFile, resolution)
 	
 	tempResultFile = 'temp.png'
@@ -29,10 +29,10 @@ def Main ():
 
 	binaryPath = os.path.abspath ('../project/Release/CommandLine.exe')
 
-	algorithm = 'pathtrace2'
+	algorithm = 'raytrace'
 	resolution = 400
-	samples = 512
-	#Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)
+	samples = 1
+	Render (binaryPath, '../test/source/01_simple.txt', resolution, algorithm, samples)
 	#Render (binaryPath, '../test/source/02_cylinder.txt', resolution, algorithm, samples)
 	#Render (binaryPath, '../test/source/08_sphere_and_cylinder.txt', resolution, algorithm, samples)
 	#Render (binaryPath, '../test/source/11_teapot.txt', resolution, algorithm, samples)
@@ -42,11 +42,11 @@ def Main ():
 	#Render (binaryPath, '../test/source/16_dragon.txt', resolution, algorithm, samples)
 	#Render (binaryPath, 'testfiles/cornell.txt', resolution, algorithm, samples)
 	
-	resolution = 0
-	Render (binaryPath, 'testfiles/shapes.txt', resolution, algorithm, samples)
-	Render (binaryPath, 'testfiles/teapot.txt', resolution, algorithm, samples)
-	Render (binaryPath, 'testfiles/bunny.txt', resolution, algorithm, samples)
-	Render (binaryPath, 'testfiles/dragon.txt', resolution, algorithm, samples)
+	resolution = None
+	#Render (binaryPath, 'testfiles/shapes.txt', resolution, algorithm, samples)
+	#Render (binaryPath, 'testfiles/teapot.txt', resolution, algorithm, samples)
+	#Render (binaryPath, 'testfiles/bunny.txt', resolution, algorithm, samples)
+	#Render (binaryPath, 'testfiles/dragon.txt', resolution, algorithm, samples)
 	return
 	
 Main ()

@@ -60,8 +60,8 @@ public:
 
 	bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress) override;
 	Color	GetFieldColor (const Image::Field& field) const override;
-	
-	~GPUTracer () override;
+
+	~GPUTracer () /*override*/;
 };
 
 #endif
