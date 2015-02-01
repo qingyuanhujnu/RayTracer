@@ -16,6 +16,7 @@
     <ClCompile Include="..\..\source\raytracer\color.cpp" />
     <ClCompile Include="..\..\source\raytracer\common.cpp" />
     <ClCompile Include="..\..\source\raytracer\configfile.cpp" />
+    <ClCompile Include="..\..\source\raytracer\gpumodel.cpp" />
     <ClCompile Include="..\..\source\raytracer\gputracer.cpp" />
     <ClCompile Include="..\..\source\raytracer\interface.cpp" />
     <ClCompile Include="..\..\source\raytracer\intersection.cpp" />
@@ -49,6 +50,7 @@
     <ClInclude Include="..\..\source\raytracer\color.hpp" />
     <ClInclude Include="..\..\source\raytracer\common.hpp" />
     <ClInclude Include="..\..\source\raytracer\configfile.hpp" />
+    <ClInclude Include="..\..\source\raytracer\gpumodel.hpp" />
     <ClInclude Include="..\..\source\raytracer\gputracer.hpp" />
     <ClInclude Include="..\..\source\raytracer\interface.hpp" />
     <ClInclude Include="..\..\source\raytracer\intersection.hpp" />

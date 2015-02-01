@@ -109,6 +109,9 @@
     <ClCompile Include="..\..\source\raytracer\gputracer.cpp">
       <Filter>RayTracer</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\raytracer\gpumodel.cpp">
+      <Filter>GPUTracer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\raytracer\raytracer.hpp">
@@ -200,6 +203,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\raytracer\gputracer.hpp">
       <Filter>RayTracer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\raytracer\gpumodel.hpp">
+      <Filter>GPUTracer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

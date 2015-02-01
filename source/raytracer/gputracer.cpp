@@ -124,6 +124,17 @@ bool GPUTracer::InitOpenCL ()
 
 bool GPUTracer::SerializeModel ()
 {
+	if (!SerializeGeometry ())
+		return false;
+
+	if (!SerializeLights ())
+		return false;
+
+	return true;
+}
+
+bool GPUTracer::SerializeGeometry ()
+{
 	if (DBGERROR (!initialized)) {
 		return false;
 	}
@@ -138,25 +149,57 @@ bool GPUTracer::SerializeModel ()
 			const Mesh::Vertex& v1 = mesh.GetVertex (triangle.vertex1);
 			const Mesh::Vertex& v2 = mesh.GetVertex (triangle.vertex2);
 
-			CL_Vec4 a ((float)v0.pos.x, (float)v0.pos.y, (float)v0.pos.z);
-			CL_Vec4 b ((float)v1.pos.x, (float)v1.pos.y, (float)v1.pos.z);
-			CL_Vec4 c ((float)v2.pos.x, (float)v2.pos.y, (float)v2.pos.z);
-
 			CL_Triangle clTriangle;
-			clTriangle.a = a;
-			clTriangle.b = b;
-			clTriangle.c = c;
+			clTriangle.a = CL_Vec4 (v0.pos);
+			clTriangle.b = CL_Vec4 (v1.pos);
+			clTriangle.c = CL_Vec4 (v2.pos);
 
-			serializedModel.push_back (clTriangle);
+			const Vec3 n0 = mesh.GetNormal (triidx, v0.pos);
+			clTriangle.na = CL_Vec4 (n0);
+			const Vec3 n1 = mesh.GetNormal (triidx, v1.pos);
+			clTriangle.nb = CL_Vec4 (n1);
+			const Vec3 n2 = mesh.GetNormal (triidx, v2.pos);
+			clTriangle.nc = CL_Vec4 (n2);
+
+			serializedGeometry.push_back (clTriangle);
 		}
 	}
 
 	cl_int error = 0;
-	cl_int triangle_count = serializedModel.size ();
-	serializedModel_device = clCreateBuffer (context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, triangle_count * sizeof (CL_Triangle), (void*)&serializedModel[0], &error);
+	// Upload geometry to device.
+	cl_int triangle_count = serializedGeometry.size ();
+	serializedGeometry_device = clCreateBuffer (context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, triangle_count * sizeof (CL_Triangle), (void*)&serializedGeometry[0], &error);
 
-	error |= clSetKernelArg (kernel, 2, sizeof (cl_mem), &serializedModel_device);
+	error |= clSetKernelArg (kernel, 2, sizeof (cl_mem), &serializedGeometry_device);
 	error |= clSetKernelArg (kernel, 3, sizeof (cl_int), &triangle_count);
+
+	return error == CL_SUCCESS;
+}
+
+bool GPUTracer::SerializeLights ()
+{
+	if (DBGERROR (!initialized)) {
+		return false;
+	}
+
+	for (UIndex lightidx = 0; lightidx < model.LightCount (); ++lightidx) {
+		const Light& light = model.GetLight (lightidx);
+
+		CL_Light clLight;
+		clLight.pos = CL_Vec4 (light.GetPosition ());
+		const Color& color = light.GetColor ();
+		clLight.color = CL_Vec4 ((float)color.r, (float)color.g, (float)color.b);
+
+		serializedLights.push_back (clLight);
+	}
+
+	cl_int error = 0;
+	// Upload lights to device.
+	cl_int light_count = serializedLights.size ();
+	serializedLights_device = clCreateBuffer (context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, light_count * sizeof (CL_Light), (void*)&serializedLights[0], &error);
+
+	error |= clSetKernelArg (kernel, 4, sizeof (cl_mem), &serializedLights_device);
+	error |= clSetKernelArg (kernel, 5, sizeof (cl_int), &light_count);
 
 	return error == CL_SUCCESS;
 }
@@ -274,7 +317,7 @@ bool GPUTracer::RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Col
 	// Set kernel arguments.
 	error |= clSetKernelArg (kernel, 0, sizeof (cl_mem), &ray_d);
 	error |= clSetKernelArg (kernel, 1, sizeof (cl_int), &ray_count);
-	error |= clSetKernelArg (kernel, 4, sizeof (cl_mem), &result_d);
+	error |= clSetKernelArg (kernel, 6, sizeof (cl_mem), &result_d);
 
 	// Run the ray trace and read back the result.
 	//const size_t ws = 256;
@@ -311,7 +354,8 @@ GPUTracer::~GPUTracer ()
 		clReleaseCommandQueue (command_queue);
 		clReleaseContext (context);
 
-		clReleaseMemObject (serializedModel_device);
+		clReleaseMemObject (serializedGeometry_device);
+		clReleaseMemObject (serializedLights_device);
 	}
 }
 
