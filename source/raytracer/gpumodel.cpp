@@ -12,12 +12,12 @@ CL_Ray::CL_Ray (const Vec3& orig, const Vec3& dir) {
 
 CL_Material::CL_Material (const CL_Vec4& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency, double refractionIndex) :
 	color (color),
-	ambient (ambient),
-	diffuse (diffuse),
-	specular (specular),
-	shininess (shininess),
-	reflection (reflection),
-	transparency (transparency),
-	refractionIndex (refractionIndex)
+	ambient ((cl_float) ambient),
+	diffuse ((cl_float) diffuse),
+	specular ((cl_float) specular),
+	shininess ((cl_float) shininess),
+	reflection ((cl_float) reflection),
+	transparency ((cl_float) transparency),
+	refractionIndex ((cl_float) refractionIndex)
 {
 }
