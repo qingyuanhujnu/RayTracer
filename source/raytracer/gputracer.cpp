@@ -105,10 +105,12 @@ bool GPUTracer::InitOpenCL ()
 	error = clBuildProgram (program, 1, &device_ids[0], nullptr, nullptr, nullptr);
 	if (error != CL_SUCCESS) {
 		std::cout << "Program Build failed\n";
-		size_t length;
-		char buffer[2048];
-		clGetProgramBuildInfo (program, device_ids[0], CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &length);
+		size_t logLength = 0;
+		clGetProgramBuildInfo (program, device_ids[0], CL_PROGRAM_BUILD_LOG, 0, nullptr, &logLength);
+		char* buffer = new char[logLength];
+		clGetProgramBuildInfo (program, device_ids[0], CL_PROGRAM_BUILD_LOG, logLength, buffer, &logLength);
 		std::cout << "--- Build log ---\n " << buffer << std::endl;
+		delete[] buffer;
 		return false;
 	}
 
