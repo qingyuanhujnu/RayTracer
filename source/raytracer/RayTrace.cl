@@ -19,6 +19,7 @@ typedef struct {
 typedef struct {
 	float4 pos;
 	float4 color;
+	float4 attenuation;
 } light;
 
 typedef struct {
@@ -132,18 +133,40 @@ bool isPointLit (float4 pos,
 	return lightDist < minIsect.dist;
 }
 
-float4 phongShading (__global const light* light,
+float4 getReflectedDirection (const float4 direction, const float4 normal)
+{
+	double dotProduct = dotProd (normal, direction);
+	return direction - (2.0 * normal * dotProduct);
+}
+
+float4 phongShading (const ray* ray,
+						__global const light* light,
 						__global const material* mat, 
 						const intersection* isect, 
 						const float4 normal)
 {
 	float4 lightDir = normalize3 (light->pos - isect->pos);
-	float lightNormalProduct = dotProd (lightDir, normal);
-	
-	float diffuseCoeff = max (lightNormalProduct, 0.0f);
-	float4 diffuseColor = light->color * mat->color;
+	float4 reflectionVector = getReflectedDirection (lightDir, normal);
 
-	return diffuseCoeff * diffuseColor;
+	float lightNormalProduct = dotProd (lightDir, normal);	
+	float diffuseCoeff = max (lightNormalProduct, 0.0f);
+
+	double specularCoeff = pow (max (dotProd (reflectionVector, ray->dir), 0.0f), mat->shininess);
+
+	float4 diffuseColor = light->color * mat->color;
+	float4 color = diffuseColor * diffuseCoeff + mat->color * specularCoeff;		// TODO: mat.color should be the materials specular color
+	
+	// attenuation
+	double intensity = 0.0f;
+	double distance = length3 (isect->pos - light->pos);
+	double denom = (light->attenuation.x + distance * light->attenuation.y + distance * light->attenuation.z * light->attenuation.z);
+	if (denom < EPS) {
+		intensity = 1.0f;
+	}
+	intensity = 1.0f / denom;
+	color = color * intensity;
+
+	return clamp (color, 0.0f, 1.0f);
 }
 
 double getTriangleArea (double a, double b, double c)
@@ -222,7 +245,7 @@ __kernel void get_field_color (__global const ray* rays,
 														minIsect.tri->na, minIsect.tri->nb, minIsect.tri->nc,
 														minIsect.pos);
 			
-			color[idx] += phongShading (&lights[i], &materials[minIsect.tri->matIdx], &minIsect, normal);
+			color[idx] += phongShading (&r, &lights[i], &materials[minIsect.tri->matIdx], &minIsect, normal);
 		}
 	}
 

@@ -33,6 +33,7 @@ struct CL_Triangle {
 struct CL_Light {
 	CL_Vec4 pos;
 	CL_Vec4 color;
+	CL_Vec4 attenuation;
 };
 
 struct CL_Material {

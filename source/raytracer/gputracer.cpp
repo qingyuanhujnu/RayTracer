@@ -196,6 +196,7 @@ bool GPUTracer::SerializeLights ()
 		clLight.pos = CL_Vec4 (light.GetPosition ());
 		const Color& color = light.GetColor ();
 		clLight.color = CL_Vec4 ((float)color.r, (float)color.g, (float)color.b);
+		clLight.attenuation = CL_Vec4 (light.GetAttenuation ());
 
 		serializedLights.push_back (clLight);
 	}
