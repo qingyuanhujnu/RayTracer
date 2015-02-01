@@ -44,8 +44,8 @@ private:
 	std::vector<CL_Triangle> serializedModel;
 	cl_mem serializedModel_device;
 
-	void InitOpenCL ();
-	void SerializeModel ();
+	bool InitOpenCL ();
+	bool SerializeModel ();
 
 public:
 	GPUTracer (const Model& model, const Camera& camera, int sampleNum);

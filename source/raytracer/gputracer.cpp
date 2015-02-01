@@ -11,8 +11,11 @@ GPUTracer::GPUTracer (const Model& model, const Camera& camera, int sampleNum) :
 	Renderer (model, camera, sampleNum),
 	initialized (false)
 {
-	InitOpenCL ();
-	SerializeModel ();
+	bool success;	
+	success = InitOpenCL ();
+	
+	if (success)
+		SerializeModel ();
 }
 
 // Shamelessly stolen from AMD samples
@@ -47,11 +50,10 @@ static bool convertToString (const std::wstring& filename , std::string& s)
 	return false;
 }
 
-void GPUTracer::InitOpenCL ()
+bool GPUTracer::InitOpenCL ()
 {
-	if (initialized) {
-		DBGERROR (true);
-		return;
+	if (DBGERROR (initialized)) {
+		return false;
 	}
 
 	cl_int error = 0;
@@ -82,7 +84,7 @@ void GPUTracer::InitOpenCL ()
 	// TODO: int this case we could just work on the CPU (if the machine has one ;))
 	if (device_ids.size () < 1) {
 		std::cout << "Couldn't find GPU" << std::endl;
-		throw "Your machine sucks!";
+		return false;
 	}
 
 	// Create the context, command queue, and build the kernel.
@@ -93,6 +95,7 @@ void GPUTracer::InitOpenCL ()
 	if (!convertToString (L"RayTrace.cl", sourceStr))
 	{
 		std::cout << "Failed to read OpenCL program" << std::endl;
+		return false;
 	}
 	const char *source = sourceStr.c_str ();
 	size_t sourceSize[] = { strlen (source) };
@@ -105,21 +108,23 @@ void GPUTracer::InitOpenCL ()
 		char buffer[2048];
 		clGetProgramBuildInfo (program, device_ids[0], CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &length);
 		std::cout << "--- Build log ---\n " << buffer << std::endl;
+		return false;
 	}
 
 	kernel = clCreateKernel (program, "get_field_color", &error);
 	if (error != CL_SUCCESS) {
 		std::cout << "Failed to create kernel" << std::endl;
-		throw "failed to create the kernel";
+		return false;
 	}
 
 	initialized = true;
+	return true;
 }
 
-void GPUTracer::SerializeModel ()
+bool GPUTracer::SerializeModel ()
 {
-	if (!initialized) {
-		throw "Uninitialized OpenCL";
+	if (DBGERROR (!initialized)) {
+		return false;
 	}
 
 	for (UIndex meshidx = 0; meshidx < model.MeshCount (); ++meshidx) {
@@ -149,14 +154,16 @@ void GPUTracer::SerializeModel ()
 	cl_int triangle_count = serializedModel.size ();
 	serializedModel_device = clCreateBuffer (context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, triangle_count * sizeof (CL_Triangle), (void*)&serializedModel[0], &error);
 
-	error = clSetKernelArg (kernel, 2, sizeof (cl_mem), &serializedModel_device);
-	error = clSetKernelArg (kernel, 3, sizeof (cl_int), &triangle_count);
+	error |= clSetKernelArg (kernel, 2, sizeof (cl_mem), &serializedModel_device);
+	error |= clSetKernelArg (kernel, 3, sizeof (cl_int), &triangle_count);
+
+	return error == CL_SUCCESS;
 }
 
 bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const IProgress& progress)
 {
-	if (!initialized) {
-		throw "Uninitialized OpenCL";
+	if (DBGERROR (!initialized)) {
+		return false;
 	}
 
 	if (DBGERROR (!parameters.Check ())) {
@@ -219,15 +226,18 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 
 bool GPUTracer::RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Color>& result) const
 {
-	if (!initialized) {
-		throw "Uninitialized OpenCL";
+	if (DBGERROR (!initialized)) {
+		return false;
 	}
 
 	cl_int error = 0;
 
 	// Create ray and result buffers on the device.
 	cl_mem ray_d = clCreateBuffer (context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, rays.size () * sizeof (CL_Ray), (void *)&rays[0], &error);
+	if (error != CL_SUCCESS) return false;
 	cl_mem result_d = clCreateBuffer (context, CL_MEM_WRITE_ONLY, rays.size () * sizeof (CL_Vec4), nullptr, &error);
+	if (error != CL_SUCCESS) return false;
+
 	cl_int ray_count = rays.size ();
 
 	// Set kernel arguments.
