@@ -12,7 +12,7 @@ typedef struct {
 	float4 a, b, c;
 	float4 na, nb, nc;
 	int matIdx;
-	char doubleSided;
+	int doubleSided;
 	int filler[2];		// 16 byte alignment
 } triangle;
 

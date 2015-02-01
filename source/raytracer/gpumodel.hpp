@@ -26,7 +26,7 @@ struct CL_Triangle {
 	CL_Vec4 a, b, c;	// vertices
 	CL_Vec4 na, nb, nc;		// normals
 	cl_int matIdx;
-	cl_char doubleSided;
+	cl_int doubleSided;
 	cl_int filler[2];	// 16 byte alignment
 };
 
