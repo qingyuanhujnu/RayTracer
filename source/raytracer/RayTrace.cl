@@ -48,10 +48,6 @@ typedef struct {
 	__global const triangle* tri;
 } intersection;
 
-void printfloat4 (float4 a) {
-	printf ("(%f, %f, %f, %f)\n", a.x, a.y, a.z, a.w);
-}
-
 bool intersects (const ray* r, __global const triangle* tri, intersection* outIsect)
 {
 	float4 edge1Dir = tri->b - tri->a;
@@ -68,13 +64,13 @@ bool intersects (const ray* r, __global const triangle* tri, intersection* outIs
 	float4 tVector = r->orig - tri->a;
 	float u = dot (tVector, pVec) * invDet;
 	
-	if (u < 0.f || u > 1.0f) {
+	if (u < 0.0f || u > 1.0f) {
 		return false;
 	}
 
 	float4 qVector = cross (tVector, edge1Dir);
 	float v = dot (r->dir, qVector) * invDet;
-	if (v < 0.0f || (u + v) > 1.0) {
+	if (v < 0.0f || (u + v) > 1.0f) {
 		return false;
 	}
 
@@ -120,7 +116,7 @@ bool isPointLit (float4 pos,
 float4 getReflectedDirection (const float4 direction, const float4 normal)
 {
 	float dotProduct = dot (normal, direction);
-	return direction - (2.0 * normal * dotProduct);
+	return direction - (2.0f * normal * dotProduct);
 }
 
 float4 phongShading (const ray* ray,
@@ -155,10 +151,10 @@ float4 phongShading (const ray* ray,
 
 float getTriangleArea (float a, float b, float c)
 {
-	float s = (a + b + c) / 2.0;
+	float s = (a + b + c) / 2.0f;
 	float areaSquare = s * (s - a) * (s - b) * (s - c);
-	if (areaSquare < 0.0) {
-		return 0.0;
+	if (areaSquare < 0.0f) {
+		return 0.0f;
 	}
 	return sqrt (areaSquare);
 }
