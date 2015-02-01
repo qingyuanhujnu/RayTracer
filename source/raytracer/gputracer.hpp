@@ -54,7 +54,7 @@ public:
 	bool	RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Color>& result) const;
 	Color	GetFieldColor (const Image::Field& field) const override;
 
-	~GPUTracer () override;
+	~GPUTracer () /*override*/;
 };
 
 #endif
