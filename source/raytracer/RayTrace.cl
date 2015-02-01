@@ -135,7 +135,7 @@ bool isPointLit (float4 pos,
 
 float4 getReflectedDirection (const float4 direction, const float4 normal)
 {
-	double dotProduct = dotProd (normal, direction);
+	float dotProduct = dotProd (normal, direction);
 	return direction - (2.0 * normal * dotProduct);
 }
 
@@ -169,10 +169,10 @@ float4 phongShading (const ray* ray,
 	return clamp (color, 0.0f, 1.0f);
 }
 
-double getTriangleArea (double a, double b, double c)
+float getTriangleArea (float a, float b, float c)
 {
-	double s = (a + b + c) / 2.0;
-	double areaSquare = s * (s - a) * (s - b) * (s - c);
+	float s = (a + b + c) / 2.0;
+	float areaSquare = s * (s - a) * (s - b) * (s - c);
 	if (areaSquare < 0.0) {
 		return 0.0;
 	}
@@ -183,22 +183,22 @@ float4 barycentricInterpolation (float4 vertex0, float4 vertex1, float4 vertex2,
 								float4 value0, float4 value1, float4 value2,
 									   float4 interpolationVertex)
 {
-	double edge0 = length3 (vertex0 - vertex1);
-	double edge1 = length3 (vertex1 - vertex2);
-	double edge2 = length3 (vertex2 - vertex0);
+	float edge0 = length3 (vertex0 - vertex1);
+	float edge1 = length3 (vertex1 - vertex2);
+	float edge2 = length3 (vertex2 - vertex0);
 
-	double distance0 = length3 (vertex0 - interpolationVertex);
-	double distance1 = length3 (vertex1 - interpolationVertex);
-	double distance2 = length3 (vertex2 - interpolationVertex);
+	float distance0 = length3 (vertex0 - interpolationVertex);
+	float distance1 = length3 (vertex1 - interpolationVertex);
+	float distance2 = length3 (vertex2 - interpolationVertex);
 
-	double area = getTriangleArea (edge0, edge1, edge2);
+	float area = getTriangleArea (edge0, edge1, edge2);
 	if (area < EPS) {
 		return value0;
 	}
 
-	double area0 = getTriangleArea (edge0, distance0, distance1);
-	double area1 = getTriangleArea (edge1, distance1, distance2);
-	double area2 = getTriangleArea (edge2, distance0, distance2);
+	float area0 = getTriangleArea (edge0, distance0, distance1);
+	float area1 = getTriangleArea (edge1, distance1, distance2);
+	float area2 = getTriangleArea (edge2, distance0, distance2);
 
 	float4 interpolated = (value0 * area1 + value1 * area2 + value2 * area0) / area;
 	return interpolated;
