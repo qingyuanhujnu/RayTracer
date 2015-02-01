@@ -11,12 +11,30 @@ typedef struct {
 typedef struct {
 	float4 a, b, c;
 	float4 na, nb, nc;
+	int matIdx;
+
+	int filler[3];		// 16 byte alignment
 } triangle;
 
 typedef struct {
 	float4 pos;
 	float4 color;
 } light;
+
+typedef struct {
+	float4	color;
+
+	float ambient;
+	float diffuse;
+	float specular;
+	float shininess;
+
+	float reflection;
+	float transparency;
+	float refractionIndex;
+
+	int filler;			// 8 byte alignment
+} material;
 
 // ------------------------------------------------------------------------------------------------
 
@@ -26,7 +44,7 @@ typedef struct {
 typedef struct {
 	float4 pos;
 	float dist;
-	const triangle* tri;
+	__global const triangle* tri;
 } intersection;
 
 float dotProd (float4 a, float4 b) 
@@ -51,7 +69,7 @@ void printfloat4 (float4 a) {
 	printf ("(%f, %f, %f, %f)\n", a.x, a.y, a.z, a.w);
 }
 
-bool intersects (const ray* r, const triangle* tri, intersection* outIsect)
+bool intersects (const ray* r, __global const triangle* tri, intersection* outIsect)
 {
 	float4 edge1Dir = tri->b - tri->a;
 	float4 edge2Dir = tri->c - tri->a;
@@ -101,10 +119,10 @@ bool isPointLit (float4 pos,
 	intersection minIsect;
 	minIsect.dist = FLT_MAX;
 	for (int j = 0; j < triangle_count; ++j) {
-		triangle tri = triangles[j];
+		__global const triangle* tri = &triangles[j];
 		
 		intersection isect;
-		if (intersects (&r, &tri, &isect)) {
+		if (intersects (&r, tri, &isect)) {
 			if (isect.dist < minIsect.dist)
 				minIsect = isect;
 		}
@@ -114,13 +132,16 @@ bool isPointLit (float4 pos,
 	return lightDist < minIsect.dist;
 }
 
-float4 phongShading (__global const light* l, const intersection* isect, const float4 normal)
+float4 phongShading (__global const light* light,
+						__global const material* mat, 
+						const intersection* isect, 
+						const float4 normal)
 {
-	float4 lightDir = normalize3 (l->pos - isect->pos);
+	float4 lightDir = normalize3 (light->pos - isect->pos);
 	float lightNormalProduct = dotProd (lightDir, normal);
 	
 	float diffuseCoeff = max (lightNormalProduct, 0.0f);
-	float4 diffuseColor = l->color * (float4) (1.0, 1.0, 1.0, 0.0) /* material diffuse color */;
+	float4 diffuseColor = light->color * mat->color;
 
 	return diffuseCoeff * diffuseColor;
 }
@@ -169,6 +190,8 @@ __kernel void get_field_color (__global const ray* rays,
 								__global const light* lights,
 								const int light_count,
 
+								__global const material* materials,		// This is an array but there is no need to know it's size, since we don't want to iterate over it.
+
 								__global float4* color)
 {
 	const int idx = get_global_id (0);
@@ -179,10 +202,10 @@ __kernel void get_field_color (__global const ray* rays,
 	intersection minIsect;
 	minIsect.dist = FLT_MAX;
 	for (int i = 0; i < triangle_count; ++i) {
-		triangle tri = triangles[i];
+		__global const triangle* tri = &triangles[i];
 		
 		intersection isect;
-		if (intersects (&r, &tri, &isect)) {
+		if (intersects (&r, tri, &isect)) {
 			if (isect.dist < minIsect.dist)
 				minIsect = isect;
 		}
@@ -198,8 +221,8 @@ __kernel void get_field_color (__global const ray* rays,
 			float4 normal = barycentricInterpolation (minIsect.tri->a, minIsect.tri->b, minIsect.tri->c,
 														minIsect.tri->na, minIsect.tri->nb, minIsect.tri->nc,
 														minIsect.pos);
-
-			color[idx] += phongShading (&lights[i], &minIsect, normal);
+			
+			color[idx] += phongShading (&lights[i], &materials[minIsect.tri->matIdx], &minIsect, normal);
 		}
 	}
 

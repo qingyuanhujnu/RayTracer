@@ -132,6 +132,9 @@ bool GPUTracer::SerializeModel ()
 	if (!SerializeLights ())
 		return false;
 
+	if (!SerializeMaterials ())
+		return false;
+
 	return true;
 }
 
@@ -162,6 +165,8 @@ bool GPUTracer::SerializeGeometry ()
 			clTriangle.nb = CL_Vec4 (n1);
 			const Vec3 n2 = mesh.GetNormal (triidx, v2.pos);
 			clTriangle.nc = CL_Vec4 (n2);
+
+			clTriangle.matIdx = triangle.material;
 
 			serializedGeometry.push_back (clTriangle);
 		}
@@ -202,6 +207,38 @@ bool GPUTracer::SerializeLights ()
 
 	error |= clSetKernelArg (kernel, 4, sizeof (cl_mem), &serializedLights_device);
 	error |= clSetKernelArg (kernel, 5, sizeof (cl_int), &light_count);
+
+	return error == CL_SUCCESS;
+}
+
+bool GPUTracer::SerializeMaterials ()
+{
+	if (DBGERROR (!initialized)) {
+		return false;
+	}
+
+	for (UIndex matidx = 0; matidx < model.MaterialCount (); ++matidx) {
+		const Material& mat = model.GetMaterial (matidx);
+		
+		Color color = mat.GetDiffuseColor (Vec2 (0.0, 0.0));
+		CL_Material clMat (CL_Vec4 ((float)color.r, (float)color.g, (float)color.b),
+			mat.GetAmbient (),
+			mat.GetDiffuse (),
+			mat.GetSpecular (),
+			mat.GetShininess (),
+			mat.GetReflection (),
+			mat.GetTransparency (),
+			mat.GetRefractionIndex ());
+
+		serializedMaterials.push_back (clMat);
+	}
+
+	cl_int error = 0;
+	// Upload materials to device.
+	cl_int mat_count = serializedMaterials.size ();
+	serializedMaterials_device = clCreateBuffer (context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, mat_count * sizeof (CL_Material), (void*)&serializedMaterials[0], &error);
+
+	error |= clSetKernelArg (kernel, 6, sizeof (cl_mem), &serializedMaterials_device);
 
 	return error == CL_SUCCESS;
 }
@@ -319,7 +356,7 @@ bool GPUTracer::RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Col
 	// Set kernel arguments.
 	error |= clSetKernelArg (kernel, 0, sizeof (cl_mem), &ray_d);
 	error |= clSetKernelArg (kernel, 1, sizeof (cl_int), &ray_count);
-	error |= clSetKernelArg (kernel, 6, sizeof (cl_mem), &result_d);
+	error |= clSetKernelArg (kernel, 7, sizeof (cl_mem), &result_d);
 
 	// Run the ray trace and read back the result.
 	//const size_t ws = 256;
@@ -358,6 +395,7 @@ GPUTracer::~GPUTracer ()
 
 		clReleaseMemObject (serializedGeometry_device);
 		clReleaseMemObject (serializedLights_device);
+		clReleaseMemObject (serializedMaterials_device);
 	}
 }
 

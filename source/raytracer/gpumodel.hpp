@@ -25,11 +25,31 @@ struct CL_Ray {
 struct CL_Triangle {
 	CL_Vec4 a, b, c;	// vertices
 	CL_Vec4 na, nb, nc;		// normals
+	cl_int matIdx;
+
+	cl_int filler[3];	// 16 byte alignment
 };
 
 struct CL_Light {
 	CL_Vec4 pos;
 	CL_Vec4 color;
+};
+
+struct CL_Material {
+	CL_Vec4 color;
+
+	cl_float ambient;
+	cl_float diffuse;
+	cl_float specular;
+	cl_float  shininess;
+	
+	cl_float reflection;
+	cl_float transparency;
+	cl_float refractionIndex;
+
+	cl_int filler;	// 8 byte alignment
+
+	CL_Material (const CL_Vec4& color, double ambient, double diffuse, double specular, double shininess, double reflection, double transparency, double refractionIndex);
 };
 
 

@@ -22,10 +22,14 @@ private:
 	std::vector<CL_Light> serializedLights;
 	cl_mem serializedLights_device;
 
+	std::vector<CL_Material> serializedMaterials;
+	cl_mem serializedMaterials_device;
+
 	bool InitOpenCL ();
 	bool SerializeModel ();
 	bool SerializeGeometry ();
 	bool SerializeLights ();
+	bool SerializeMaterials ();
 
 	struct Rect {
 		int x, y;
