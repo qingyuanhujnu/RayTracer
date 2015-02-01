@@ -62,7 +62,7 @@ def Main ():
 	
 	rotation = 0
 	while rotation < 360:
-		Render (binaryPath, 'testfiles/teapot.txt', resolution, algorithm, samples, cameraOffset, rotation, '_' + str (rotation))
+		Render (binaryPath, 'testfiles/rotation.txt', resolution, algorithm, samples, cameraOffset, rotation, '_' + str (rotation))
 		rotation += 1
 	
 	#Render (binaryPath, 'testfiles/dragon.txt', resolution, algorithm, samples, cameraOffset)
