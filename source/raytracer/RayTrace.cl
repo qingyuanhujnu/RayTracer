@@ -48,24 +48,6 @@ typedef struct {
 	__global const triangle* tri;
 } intersection;
 
-float dotProd (float4 a, float4 b) 
-{
-	return (a.x * b.x + a.y * b.y + a.z * b.z);
-}
-
-float length3 (float4 v)
-{
-	return sqrt (v.x * v.x + v.y * v.y + v.z * v.z);
-}
-
-float4 normalize3 (float4 v)
-{
-	float invLen = 1.0 / length3 (v);
-	float4 ret = (float4) (v.x*invLen, v.y*invLen, v.z*invLen, 1.0);
-
-	return ret;
-}
-
 void printfloat4 (float4 a) {
 	printf ("(%f, %f, %f, %f)\n", a.x, a.y, a.z, a.w);
 }
@@ -76,25 +58,25 @@ bool intersects (const ray* r, __global const triangle* tri, intersection* outIs
 	float4 edge2Dir = tri->c - tri->a;
 	float4 pVec = cross (r->dir, edge2Dir);
 
-	float det = dotProd (edge1Dir, pVec);
+	float det = dot (edge1Dir, pVec);
 	// TODO: front facing check (do I really want this?)
 
 	float invDet = 1.0f / det;
 
 	float4 tVector = r->orig - tri->a;
-	float u = dotProd (tVector, pVec) * invDet;
+	float u = dot (tVector, pVec) * invDet;
 	
 	if (u < 0.f || u > 1.0f) {
 		return false;
 	}
 
 	float4 qVector = cross (tVector, edge1Dir);
-	float v = dotProd (r->dir, qVector) * invDet;
+	float v = dot (r->dir, qVector) * invDet;
 	if (v < 0.0f || (u + v) > 1.0) {
 		return false;
 	}
 
-	float distance = dotProd (edge2Dir, qVector) * invDet;
+	float distance = dot (edge2Dir, qVector) * invDet;
 	if (distance < 0.0f) {
 		return false;
 	}
@@ -113,7 +95,7 @@ bool isPointLit (float4 pos,
 {
 	// Get ray from point to light
 	ray r;
-	r.dir = normalize3 (l->pos - pos);
+	r.dir = normalize (l->pos - pos);
 	r.orig = pos + EPS * r.dir;
 
 	// Find the closest intersection.
@@ -129,13 +111,13 @@ bool isPointLit (float4 pos,
 		}
 	}
 
-	float lightDist = length3 (l->pos - pos);
+	float lightDist = length (l->pos - pos);
 	return lightDist < minIsect.dist;
 }
 
 float4 getReflectedDirection (const float4 direction, const float4 normal)
 {
-	float dotProduct = dotProd (normal, direction);
+	float dotProduct = dot (normal, direction);
 	return direction - (2.0 * normal * dotProduct);
 }
 
@@ -145,20 +127,20 @@ float4 phongShading (const ray* ray,
 						const intersection* isect, 
 						const float4 normal)
 {
-	float4 lightDir = normalize3 (light->pos - isect->pos);
+	float4 lightDir = normalize (light->pos - isect->pos);
 	float4 reflectionVector = getReflectedDirection (lightDir, normal);
 
-	float lightNormalProduct = dotProd (lightDir, normal);	
+	float lightNormalProduct = dot (lightDir, normal);	
 	float diffuseCoeff = max (lightNormalProduct, 0.0f);
 
-	float specularCoeff = pow (max (dotProd (reflectionVector, ray->dir), 0.0f), mat->shininess);
+	float specularCoeff = pow (max (dot (reflectionVector, ray->dir), 0.0f), mat->shininess);
 
 	float4 diffuseColor = light->color * mat->color;
 	float4 color = diffuseColor * diffuseCoeff + mat->color * specularCoeff;		// TODO: mat.color should be the materials specular color
 	
 	// attenuation
 	float intensity = 0.0f;
-	float distance = length3 (isect->pos - light->pos);
+	float distance = length (isect->pos - light->pos);
 	float denom = (light->attenuation.x + distance * light->attenuation.y + distance * light->attenuation.z * light->attenuation.z);
 	if (denom < EPS) {
 		intensity = 1.0f;
@@ -183,13 +165,13 @@ float4 barycentricInterpolation (float4 vertex0, float4 vertex1, float4 vertex2,
 								float4 value0, float4 value1, float4 value2,
 									   float4 interpolationVertex)
 {
-	float edge0 = length3 (vertex0 - vertex1);
-	float edge1 = length3 (vertex1 - vertex2);
-	float edge2 = length3 (vertex2 - vertex0);
+	float edge0 = length (vertex0 - vertex1);
+	float edge1 = length (vertex1 - vertex2);
+	float edge2 = length (vertex2 - vertex0);
 
-	float distance0 = length3 (vertex0 - interpolationVertex);
-	float distance1 = length3 (vertex1 - interpolationVertex);
-	float distance2 = length3 (vertex2 - interpolationVertex);
+	float distance0 = length (vertex0 - interpolationVertex);
+	float distance1 = length (vertex1 - interpolationVertex);
+	float distance2 = length (vertex2 - interpolationVertex);
 
 	float area = getTriangleArea (edge0, edge1, edge2);
 	if (area < EPS) {

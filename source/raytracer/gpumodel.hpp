@@ -10,9 +10,9 @@
 struct CL_Vec4 {
 	cl_float x, y, z, w;
 
-	CL_Vec4 () : x (0.f), y (0.f), z (0.f), w (1.0f) {}
-	CL_Vec4 (float x, float y, float z) : x (x), y (y), z (z), w (1.0f) {}
-	explicit CL_Vec4 (const Vec3& v) : x ((float)v.x), y ((float)v.y), z ((float) v.z), w (1.0f) {}
+	CL_Vec4 () : x (0.f), y (0.f), z (0.f), w (0.0f) {}
+	CL_Vec4 (float x, float y, float z) : x (x), y (y), z (z), w (0.0f) {}
+	explicit CL_Vec4 (const Vec3& v) : x ((float)v.x), y ((float)v.y), z ((float) v.z), w (0.0f) {}
 };
 
 struct CL_Ray {
