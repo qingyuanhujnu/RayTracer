@@ -47,13 +47,20 @@ private:
 	bool InitOpenCL ();
 	bool SerializeModel ();
 
+	struct Rect {
+		int x, y;
+		int width, height;
+	};
+
+	bool	RenderImageRect (const Parameters& parameters, ResultImage& result, const Image& image, ProgressReport& progressReport, const Rect& rect) const;
+	bool	RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Color>& result) const;
+
 public:
 	GPUTracer (const Model& model, const Camera& camera, int sampleNum);
 
 	bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress) override;
-	bool	RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Color>& result) const;
 	Color	GetFieldColor (const Image::Field& field) const override;
-
+	
 	~GPUTracer () override;
 };
 

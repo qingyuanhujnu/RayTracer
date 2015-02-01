@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include "intersection.hpp"
 #include "average.hpp"
 
@@ -186,18 +187,46 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 
 	std::vector<CL_Ray> cl_rays;
 
-	int sampleRes = (int)sqrt ((double)sampleNum);
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
-	for (int pix = 0; pix < (resX * resY); ++pix) {
-		int x = pix % resX;
-		int y = resY - (pix / resX) - 1;
+	
+	const int renderRectWidth = 128;
+	const int renderRectHeight = 128;
 
-		Image::Field field = image.GetField (x, y);
+	for (int x = 0; x < resX; x += renderRectWidth) {
+		for (int y = 0; y < resY; y += renderRectHeight) {
+			GPUTracer::Rect rect;
+			rect.x = x;
+			rect.y = y;
+			rect.width = std::min (resX - x, renderRectWidth);
+			rect.height = std::min (resY - y, renderRectHeight);
 
-		for (int i = 0; i < sampleRes * sampleRes; i++) {
-			CL_Ray cameraRay (camera.GetEye (), field.GetFixSample (sampleRes, i) - camera.GetEye ());
-			cl_rays.push_back (cameraRay);
+			RenderImageRect (parameters, result, image, progressReport, rect);
+		}
+	}
+
+	progress.OnProgress (1.0);
+
+	return true;
+}
+
+bool GPUTracer::RenderImageRect (const Parameters& parameters, ResultImage& result, const Image& image, ProgressReport& progressReport, const GPUTracer::Rect& rect) const
+{
+	std::vector<CL_Ray> cl_rays;
+	const int sampleRes = (int)sqrt ((double)sampleNum);
+	const int resX = parameters.GetResolutionX ();
+	const int resY = parameters.GetResolutionY ();
+
+	for (int i = 0; i < rect.height; ++i) {
+		for (int j = 0; j < rect.width; ++j) {
+			int x = rect.x + j;
+			int y = rect.y + i;
+			
+			Image::Field field = image.GetField (x, y);
+			for (int s = 0; s < sampleRes * sampleRes; s++) {
+				CL_Ray cameraRay (camera.GetEye (), field.GetFixSample (sampleRes, s) - camera.GetEye ());
+				cl_rays.push_back (cameraRay);
+			}
 		}
 	}
 
@@ -206,20 +235,22 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 		return false;
 	}
 
-	for (int pix = 0; pix < (resX * resY); ++pix) {
-		int x = pix % resX;
-		int y = resY - (pix / resX) - 1;
+	int pix = 0;
+	for (int y = rect.y; y < rect.y + rect.height; ++y) {
+		for (int x = rect.x; x < rect.x + rect.width; ++x) {
 
-		Average<Color> averageColor;
-		for (int i = 0; i < sampleRes * sampleRes; i++) {
-			averageColor.Add (pixmap[(pix * sampleRes * sampleRes) + i]);
+			Average<Color> averageColor;
+			for (int i = 0; i < sampleRes * sampleRes; i++) {
+				averageColor.Add (pixmap[(pix * sampleRes * sampleRes) + i]);
+			}
+
+			const Color pixel = averageColor.Get ();
+			result.SetColor (x, y, pixel);
+			progressReport.Report (x, y, pixel.r, pixel.g, pixel.b, resX, resY);
+
+			pix++;
 		}
-		const Color pixel = averageColor.Get ();
-		result.SetColor (x, y, pixel);
-		progressReport.Report (x, y, pixel.r, pixel.g, pixel.b, resX, resY);
 	}
-
-	progress.OnProgress (1.0);
 
 	return true;
 }
@@ -246,9 +277,9 @@ bool GPUTracer::RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Col
 	error |= clSetKernelArg (kernel, 4, sizeof (cl_mem), &result_d);
 
 	// Run the ray trace and read back the result.
-	const size_t ws = 256;
+	//const size_t ws = 256;
 	const size_t gs = rays.size ();
-	error |= clEnqueueNDRangeKernel (command_queue, kernel, 1, nullptr, &gs, &ws, 0, nullptr, nullptr);
+	error |= clEnqueueNDRangeKernel (command_queue, kernel, 1, nullptr, &gs, nullptr /* &ws */, 0, nullptr, nullptr);
 	error |= clFinish (command_queue);
 
 	std::vector<CL_Vec4> color_result;
