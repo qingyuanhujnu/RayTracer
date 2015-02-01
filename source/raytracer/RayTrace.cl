@@ -151,15 +151,15 @@ float4 phongShading (const ray* ray,
 	float lightNormalProduct = dotProd (lightDir, normal);	
 	float diffuseCoeff = max (lightNormalProduct, 0.0f);
 
-	double specularCoeff = pow (max (dotProd (reflectionVector, ray->dir), 0.0f), mat->shininess);
+	float specularCoeff = pow (max (dotProd (reflectionVector, ray->dir), 0.0f), mat->shininess);
 
 	float4 diffuseColor = light->color * mat->color;
 	float4 color = diffuseColor * diffuseCoeff + mat->color * specularCoeff;		// TODO: mat.color should be the materials specular color
 	
 	// attenuation
-	double intensity = 0.0f;
-	double distance = length3 (isect->pos - light->pos);
-	double denom = (light->attenuation.x + distance * light->attenuation.y + distance * light->attenuation.z * light->attenuation.z);
+	float intensity = 0.0f;
+	float distance = length3 (isect->pos - light->pos);
+	float denom = (light->attenuation.x + distance * light->attenuation.y + distance * light->attenuation.z * light->attenuation.z);
 	if (denom < EPS) {
 		intensity = 1.0f;
 	}
