@@ -32,6 +32,14 @@ namespace UserInterface
             collection.Insert (index, item);
         }
 
+		public String GetLastItem ()
+		{
+			if (history.Count == 0) {
+				return null;
+			}
+			return history[history.Count - 1]; 
+		}
+
         public void AddAllMenuItems (ToolStripItemCollection collection, int index, EventHandler handler)
         {
             for (int i = 0; i < history.Count; i++) {

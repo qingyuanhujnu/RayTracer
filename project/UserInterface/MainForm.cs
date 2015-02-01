@@ -32,6 +32,11 @@ namespace UserInterface {
 
             settings.Read ();
             UpdateControlsForEdit ();
+
+			String lastHistoryItem = history.GetLastItem ();
+			if (lastHistoryItem != null) {
+				OpenFile (lastHistoryItem);
+			}
 		}
 
         public void UpdateControlsForRender ()
