@@ -268,6 +268,12 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 		return false;
 	}
 
+	static_assert (sizeof (CL_Vec4) % 16 == 0, "CL_Vec4: No 16 byte alignment.");
+	static_assert (sizeof (CL_Ray) % 16 == 0, "CL_Ray: No 16 byte alignment.");
+	static_assert (sizeof (CL_Triangle) % 16 == 0, "CL_Triangle: No 16 byte alignment.");
+	static_assert (sizeof (CL_Light) % 16 == 0, "CL_Light: No 16 byte alignment.");
+	static_assert (sizeof (CL_Material) % 16 == 0, "CL_Material: No 16 byte alignment.");
+
 	Image image (camera, parameters.GetResolutionX (), parameters.GetResolutionY (), parameters.GetImageDistance ());
 	result.SetResolution (parameters.GetResolutionX (), parameters.GetResolutionY ());
 
@@ -349,12 +355,6 @@ bool GPUTracer::RenderOnTheGPU (const std::vector<CL_Ray>& rays, std::vector<Col
 	if (DBGERROR (!initialized)) {
 		return false;
 	}
-
-	static_assert (sizeof (CL_Vec4) % 16 == 0, "CL_Vec4: No 16 byte alignment.");
-	static_assert (sizeof (CL_Ray) % 16 == 0, "CL_Ray: No 16 byte alignment.");
-	static_assert (sizeof (CL_Triangle) % 16 == 0, "CL_Triangle: No 16 byte alignment.");
-	static_assert (sizeof (CL_Light) % 16 == 0, "CL_Light: No 16 byte alignment.");
-	static_assert (sizeof (CL_Material) % 16 == 0, "CL_Material: No 16 byte alignment.");
 
 	cl_int error = 0;
 
