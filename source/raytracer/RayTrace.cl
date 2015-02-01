@@ -125,6 +125,41 @@ float4 phongShading (__global const light* l, const intersection* isect, const f
 	return diffuseCoeff * diffuseColor;
 }
 
+double getTriangleArea (double a, double b, double c)
+{
+	double s = (a + b + c) / 2.0;
+	double areaSquare = s * (s - a) * (s - b) * (s - c);
+	if (areaSquare < 0.0) {
+		return 0.0;
+	}
+	return sqrt (areaSquare);
+}
+
+float4 barycentricInterpolation (float4 vertex0, float4 vertex1, float4 vertex2,
+								float4 value0, float4 value1, float4 value2,
+									   float4 interpolationVertex)
+{
+	double edge0 = length3 (vertex0 - vertex1);
+	double edge1 = length3 (vertex1 - vertex2);
+	double edge2 = length3 (vertex2 - vertex0);
+
+	double distance0 = length3 (vertex0 - interpolationVertex);
+	double distance1 = length3 (vertex1 - interpolationVertex);
+	double distance2 = length3 (vertex2 - interpolationVertex);
+
+	double area = getTriangleArea (edge0, edge1, edge2);
+	if (area < EPS) {
+		return value0;
+	}
+
+	double area0 = getTriangleArea (edge0, distance0, distance1);
+	double area1 = getTriangleArea (edge1, distance1, distance2);
+	double area2 = getTriangleArea (edge2, distance0, distance2);
+
+	float4 interpolated = (value0 * area1 + value1 * area2 + value2 * area0) / area;
+	return interpolated;
+}
+
 __kernel void get_field_color (__global const ray* rays,
 								const int ray_count,
 
@@ -160,7 +195,11 @@ __kernel void get_field_color (__global const ray* rays,
 	// Light the point.
 	for (int i = 0; i < light_count; ++i) {
 		if (isPointLit (minIsect.pos, &lights[i], triangles, triangle_count)) {
-			color[idx] += phongShading (&lights[i], &minIsect, minIsect.tri->na);
+			float4 normal = barycentricInterpolation (minIsect.tri->a, minIsect.tri->b, minIsect.tri->c,
+														minIsect.tri->na, minIsect.tri->nb, minIsect.tri->nc,
+														minIsect.pos);
+
+			color[idx] += phongShading (&lights[i], &minIsect, normal);
 		}
 	}
 
