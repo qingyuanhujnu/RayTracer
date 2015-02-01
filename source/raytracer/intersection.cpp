@@ -234,7 +234,7 @@ bool Intersection::RayTriangle (const Ray& ray, const Triangle& triangle, Facing
 
 	double determinant = edgeDir1 * pVector;
 	bool isFrontFacing = IsPositive (determinant);
-	if ((isFrontFacing && facing == OnlyBackFacing) || (!isFrontFacing && facing == OnlyFrontFacing)) {
+	if (!isFrontFacing && facing == OnlyFrontFacing) {
 		return false;
 	}
 

@@ -67,7 +67,6 @@ public:
 	enum FacingMode
 	{
 		OnlyFrontFacing,
-		OnlyBackFacing,
 		BothFacing
 	};
 

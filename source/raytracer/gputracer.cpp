@@ -158,6 +158,7 @@ bool GPUTracer::SerializeGeometry ()
 			clTriangle.a = CL_Vec4 (v0.pos);
 			clTriangle.b = CL_Vec4 (v1.pos);
 			clTriangle.c = CL_Vec4 (v2.pos);
+			clTriangle.doubleSided = (cl_char) mesh.IsDoubleSided ();
 
 			const Vec3 n0 = mesh.GetNormal (triidx, v0.pos);
 			clTriangle.na = CL_Vec4 (n0);

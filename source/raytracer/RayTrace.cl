@@ -12,8 +12,8 @@ typedef struct {
 	float4 a, b, c;
 	float4 na, nb, nc;
 	int matIdx;
-
-	int filler[3];		// 16 byte alignment
+	char doubleSided;
+	int filler[2];		// 16 byte alignment
 } triangle;
 
 typedef struct {
@@ -59,7 +59,9 @@ bool intersects (const ray* r, __global const triangle* tri, intersection* outIs
 	float4 pVec = cross (r->dir, edge2Dir);
 
 	float det = dot (edge1Dir, pVec);
-	// TODO: front facing check (do I really want this?)
+	if (det < EPS && !tri->doubleSided) {
+		return false;
+	}
 
 	float invDet = 1.0f / det;
 
