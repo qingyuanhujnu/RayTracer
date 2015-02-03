@@ -184,6 +184,44 @@ float4 barycentricInterpolation (float4 vertex0, float4 vertex1, float4 vertex2,
 	return interpolated;
 }
 
+float4 trace_ray (const ray* ray,
+				__global const triangle* triangles,
+				const int triangle_count,
+				__global const light* lights,
+				const int light_count,
+				__global const material* materials)		// This is an array but there is no need to know it's size, since we don't want to iterate over it.)
+{
+	float4 color = (float4) (0.0, 0.0, 0.0, 0.0);
+
+	// Find the closest intersection.
+	intersection minIsect;
+	minIsect.dist = FLT_MAX;
+	for (int i = 0; i < triangle_count; ++i) {
+		__global const triangle* tri = &triangles[i];
+		
+		intersection isect;
+		if (intersects (ray, tri, &isect)) {
+			if (isect.dist < minIsect.dist)
+				minIsect = isect;
+		}
+	}
+
+	if (minIsect.dist < MAX_DIST) {		// no intersection
+		// Light the point.
+		for (int i = 0; i < light_count; ++i) {
+			if (isPointLit (minIsect.pos, &lights[i], triangles, triangle_count)) {
+				float4 normal = barycentricInterpolation (minIsect.tri->a, minIsect.tri->b, minIsect.tri->c,
+															minIsect.tri->na, minIsect.tri->nb, minIsect.tri->nc,
+															minIsect.pos);
+			
+				color += phongShading (ray, &lights[i], &materials[minIsect.tri->matIdx], &minIsect, normal);
+			}
+		}
+	}
+
+	return color;
+}
+
 __kernel void get_field_color (__global const ray* rays,
 								const int ray_count,
 
@@ -198,36 +236,9 @@ __kernel void get_field_color (__global const ray* rays,
 								__global float4* color)
 {
 	const int idx = get_global_id (0);
-	color[idx].xyz = (0.0f);
 	ray r = rays[idx];
 		
-	// Find the closest intersection.
-	intersection minIsect;
-	minIsect.dist = FLT_MAX;
-	for (int i = 0; i < triangle_count; ++i) {
-		__global const triangle* tri = &triangles[i];
-		
-		intersection isect;
-		if (intersects (&r, tri, &isect)) {
-			if (isect.dist < minIsect.dist)
-				minIsect = isect;
-		}
-	}
+	float4 col = trace_ray (&r, triangles, triangle_count, lights, light_count, materials);
 
-	if (minIsect.dist > MAX_DIST) {		// no intersection
-		return;
-	}
-
-	// Light the point.
-	for (int i = 0; i < light_count; ++i) {
-		if (isPointLit (minIsect.pos, &lights[i], triangles, triangle_count)) {
-			float4 normal = barycentricInterpolation (minIsect.tri->a, minIsect.tri->b, minIsect.tri->c,
-														minIsect.tri->na, minIsect.tri->nb, minIsect.tri->nc,
-														minIsect.pos);
-			
-			color[idx] += phongShading (&r, &lights[i], &materials[minIsect.tri->matIdx], &minIsect, normal);
-		}
-	}
-
-	color[idx] = clamp (color[idx], 0.0f, 1.0f);
+	color[idx] = clamp (col, 0.0f, 1.0f);
 }
