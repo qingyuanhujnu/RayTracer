@@ -207,6 +207,9 @@ float4 trace_ray (const ray* ray,
 	}
 
 	if (minIsect.dist < MAX_DIST) {		// no intersection
+		__global const material* mat = &materials[minIsect.tri->matIdx];
+		color += mat->ambient;
+
 		// Light the point.
 		for (int i = 0; i < light_count; ++i) {
 			if (isPointLit (minIsect.pos, &lights[i], triangles, triangle_count)) {
@@ -214,7 +217,7 @@ float4 trace_ray (const ray* ray,
 															minIsect.tri->na, minIsect.tri->nb, minIsect.tri->nc,
 															minIsect.pos);
 			
-				color += phongShading (ray, &lights[i], &materials[minIsect.tri->matIdx], &minIsect, normal);
+				color += phongShading (ray, &lights[i], mat, &minIsect, normal);
 			}
 		}
 	}
