@@ -191,7 +191,7 @@ float4 trace_ray (const ray* ray,
 				const int light_count,
 				__global const material* materials)		// This is an array but there is no need to know it's size, since we don't want to iterate over it.)
 {
-	float4 color = (float4) (0.0, 0.0, 0.0, 0.0);
+	float4 color = (float4) (0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Find the closest intersection.
 	intersection minIsect;
