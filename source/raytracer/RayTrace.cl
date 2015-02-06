@@ -86,7 +86,7 @@ bool intersects (const ray* r, __global const triangle* tri, intersection* outIs
 	return true;
 }
 
-bool isPointLit (float4 pos, 
+bool isPointInShadow (float4 pos, 
 				__global const light* l, 
 				__global const triangle* triangles, 
 				const int triangle_count) 
@@ -110,7 +110,7 @@ bool isPointLit (float4 pos,
 	}
 
 	float lightDist = length (l->pos - pos);
-	return lightDist < minIsect.dist;
+	return lightDist > minIsect.dist;
 }
 
 float4 getReflectedDirection (const float4 direction, const float4 normal)
@@ -133,8 +133,8 @@ float4 phongShading (const ray* ray,
 
 	float specularCoeff = pow (max (dot (reflectionVector, ray->dir), 0.0f), mat->shininess);
 
-	float4 diffuseColor = light->color * mat->color;
-	float4 color = diffuseColor * diffuseCoeff + mat->color * specularCoeff;		// TODO: mat.color should be the materials specular color
+	float4 diffuseColor = light->color * mat->color * mat->diffuse;
+	float4 color = diffuseColor * diffuseCoeff + mat->color * mat->specular * specularCoeff;		// TODO: mat.color should be the materials specular color
 	
 	// attenuation
 	float intensity = 0.0f;
@@ -208,11 +208,11 @@ float4 trace_ray (const ray* ray,
 
 	if (minIsect.dist < MAX_DIST) {		// no intersection
 		__global const material* mat = &materials[minIsect.tri->matIdx];
-		color += mat->ambient;
+		color += mat->color * mat->ambient;
 
 		// Light the point.
 		for (int i = 0; i < light_count; ++i) {
-			if (isPointLit (minIsect.pos, &lights[i], triangles, triangle_count)) {
+			if (!isPointInShadow (minIsect.pos, &lights[i], triangles, triangle_count)) {
 				float4 normal = barycentricInterpolation (minIsect.tri->a, minIsect.tri->b, minIsect.tri->c,
 															minIsect.tri->na, minIsect.tri->nb, minIsect.tri->nc,
 															minIsect.pos);

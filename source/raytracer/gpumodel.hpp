@@ -42,7 +42,7 @@ struct CL_Material {
 	cl_float ambient;
 	cl_float diffuse;
 	cl_float specular;
-	cl_float  shininess;
+	cl_float shininess;
 	
 	cl_float reflection;
 	cl_float transparency;
