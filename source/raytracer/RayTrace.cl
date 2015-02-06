@@ -42,10 +42,14 @@ typedef struct {
 #define MAX_DIST FLT_MAX / 16.0f
 #define EPS 0.0001f
 
+#define FRONT_FACING 0
+#define BACK_FACING 1
+
 typedef struct {
 	float4 pos;
 	float dist;
 	__global const triangle* tri;
+	int facing;
 } intersection;
 
 bool intersects (const ray* r, __global const triangle* tri, intersection* outIsect)
@@ -82,6 +86,7 @@ bool intersects (const ray* r, __global const triangle* tri, intersection* outIs
 	outIsect->dist = distance;
 	outIsect->pos = r->orig + (distance * r->dir);
 	outIsect->tri = tri;
+	outIsect->facing = det > 0.0f ? FRONT_FACING : BACK_FACING;
 
 	return true;
 }
@@ -184,7 +189,106 @@ float4 barycentricInterpolation (float4 vertex0, float4 vertex1, float4 vertex2,
 	return interpolated;
 }
 
-float4 trace_ray (const ray* ray,
+// Find the closest intersection.
+void intersect_ray_model (const ray* r,
+						__global const triangle* triangles,
+						const int triangle_count,
+						intersection* minIsect)
+{
+	minIsect->dist = FLT_MAX;
+	for (int i = 0; i < triangle_count; ++i) {
+		__global const triangle* tri = &triangles[i];
+		
+		intersection isect;
+		if (intersects (r, tri, &isect)) {
+			if (isect.dist < minIsect->dist)
+				*minIsect = isect;
+		}
+	}
+}
+
+float4 get_direct_light_color (const ray* r,
+								const intersection* isect,
+								__global const triangle* triangles,
+								const int triangle_count,
+								__global const light* lights,
+								const int light_count,
+								__global const material* materials) 
+{
+	float4 color = (float4) (0.0f, 0.0f, 0.0f, 0.0f);
+
+	if (isect->dist < MAX_DIST) {		// no intersection
+		__global const material* mat = &materials[isect->tri->matIdx];
+		color += mat->color * mat->ambient;
+
+		// TODO: this should be precalculated
+		// calculate normal where ray intersects the model
+		float4 normal = barycentricInterpolation (isect->tri->a, isect->tri->b, isect->tri->c,
+													isect->tri->na, isect->tri->nb, isect->tri->nc,
+													isect->pos);
+
+		//float4 rayDirectedNormal = isect->facing == FRONT_FACING ? normal : -1.0f * normal;
+
+		// Light the point.
+		for (int i = 0; i < light_count; ++i) {
+			if (!isPointInShadow (isect->pos, &lights[i], triangles, triangle_count)) {			
+				color += phongShading (r, &lights[i], mat, isect, normal);
+			}
+		}
+	}
+
+	return color;
+}
+
+float4 get_reflection_color (const ray* r,
+								const intersection* isect,
+								__global const triangle* triangles,
+								const int triangle_count,
+								__global const light* lights,
+								const int light_count,
+								__global const material* materials) 
+{
+	float4 color = (float4) (0.0f, 0.0f, 0.0f, 0.0f);
+
+	intersection currIsect = *isect;
+	ray currRay = *r;
+	float color_attenuation = 1.0f;
+
+	for (int i = 0; i < 10; i++) {
+
+		// TODO: this should be precalculated
+		float4 normal = barycentricInterpolation (currIsect.tri->a, currIsect.tri->b, currIsect.tri->c,
+													currIsect.tri->na, currIsect.tri->nb, currIsect.tri->nc,
+													currIsect.pos);
+		float4 rayDirectedNormal = currIsect.facing == FRONT_FACING ? normal : -1.0f * normal;
+
+		__global const material* mat = &materials[currIsect.tri->matIdx];
+		if (mat->reflection > 0.0f) {
+				float4 reflDir = getReflectedDirection (currRay.dir, rayDirectedNormal);
+				ray reflRay;
+				reflRay.orig = currIsect.pos + reflDir * EPS;		// offset origin a bit to avoid self intersection
+				reflRay.dir = reflDir;
+
+				intersection minIsect;
+				intersect_ray_model (&reflRay, triangles, triangle_count, &minIsect);
+
+				if (minIsect.dist > MAX_DIST) {
+					break;
+				}
+
+				float4 reflColor = get_direct_light_color (&reflRay, &minIsect, triangles, triangle_count, lights, light_count, materials);
+				color += reflColor * color_attenuation * mat->reflection;
+
+				currIsect = minIsect;
+				currRay = reflRay;
+				color_attenuation *= mat->reflection;
+		}
+	}
+
+	return color;
+}
+
+float4 trace_ray (const ray* r,
 				__global const triangle* triangles,
 				const int triangle_count,
 				__global const light* lights,
@@ -193,33 +297,13 @@ float4 trace_ray (const ray* ray,
 {
 	float4 color = (float4) (0.0f, 0.0f, 0.0f, 0.0f);
 
-	// Find the closest intersection.
 	intersection minIsect;
-	minIsect.dist = FLT_MAX;
-	for (int i = 0; i < triangle_count; ++i) {
-		__global const triangle* tri = &triangles[i];
-		
-		intersection isect;
-		if (intersects (ray, tri, &isect)) {
-			if (isect.dist < minIsect.dist)
-				minIsect = isect;
-		}
-	}
+	intersect_ray_model (r, triangles, triangle_count, &minIsect);
 
-	if (minIsect.dist < MAX_DIST) {		// no intersection
-		__global const material* mat = &materials[minIsect.tri->matIdx];
-		color += mat->color * mat->ambient;
+	if (minIsect.dist < MAX_DIST) {
+		color += get_direct_light_color (r, &minIsect, triangles, triangle_count, lights, light_count, materials);
 
-		// Light the point.
-		for (int i = 0; i < light_count; ++i) {
-			if (!isPointInShadow (minIsect.pos, &lights[i], triangles, triangle_count)) {
-				float4 normal = barycentricInterpolation (minIsect.tri->a, minIsect.tri->b, minIsect.tri->c,
-															minIsect.tri->na, minIsect.tri->nb, minIsect.tri->nc,
-															minIsect.pos);
-			
-				color += phongShading (ray, &lights[i], mat, &minIsect, normal);
-			}
-		}
+		color += get_reflection_color (r, &minIsect, triangles, triangle_count, lights, light_count, materials);
 	}
 
 	return color;

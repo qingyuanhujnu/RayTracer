@@ -43,10 +43,7 @@ Color RayTracer::Trace (const Ray& ray, int depth) const
 		const Material& material = model.GetMaterial (triangle.material);
 
 		Vec3 originalNormal = mesh.GetNormal (intersection.triangle, intersection.position);
-		Vec3 rayDirectedNormal = originalNormal;
-		if (intersection.facing == Intersection::ShapeIntersection::Back) {
-			rayDirectedNormal = rayDirectedNormal * -1.0;
-		}
+		Vec3 rayDirectedNormal = intersection.facing == Intersection::ShapeIntersection::Back ? originalNormal * -1.0 : originalNormal;
 
 		color += material.GetAmbientColor (intersection.texCoord);
 		for (UIndex i = 0; i < model.LightCount (); i++) {

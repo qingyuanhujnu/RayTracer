@@ -285,8 +285,8 @@ bool GPUTracer::Render (const Parameters& parameters, ResultImage& result, const
 	const int resX = parameters.GetResolutionX ();
 	const int resY = parameters.GetResolutionY ();
 	
-	const int renderRectWidth = 128;
-	const int renderRectHeight = 128;
+	const int renderRectWidth = 64;
+	const int renderRectHeight = 64;
 
 	for (int x = 0; x < resX; x += renderRectWidth) {
 		for (int y = 0; y < resY; y += renderRectHeight) {
