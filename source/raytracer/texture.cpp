@@ -98,7 +98,7 @@ BitMapTexture::BitMapTexture (const std::wstring& texturePath) :
 
 BitMapTexture::~BitMapTexture ()
 {
-	delete pixbuff;
+	delete[] pixbuff;
 	pixbuff = nullptr;
 }
 
