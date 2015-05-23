@@ -215,6 +215,12 @@ static bool ReadTexture (std::wifstream& inputStream, std::shared_ptr<Texture>& 
 		outTexture.reset (new CheckBoardTexture (horiz, vert));
 		return true;
 	}
+	else if (type == L"bitmap") {
+		std::wstring texture;
+		if (!ReadNamedString (inputStream, L"path", texture)) { return false; }
+		outTexture.reset (new BitMapTexture (texture));
+		return true;
+	}
 	else if (type == L"image") {
 		std::wstring texture;
 		if (!ReadNamedString (inputStream, L"texture", texture)) { return false; }

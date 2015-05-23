@@ -23,8 +23,15 @@ public:
 };
 
 class BitMapTexture : public Texture {
+	char* pixbuff;
+	size_t width;
+	size_t height;
+	unsigned short bitsPerPixel;
+	bool initialized;
+
 public:
 	BitMapTexture (const std::wstring& texturePath);
+	~BitMapTexture ();
 
 	Color Sample (const Vec2& texCoord) const override;
 };
