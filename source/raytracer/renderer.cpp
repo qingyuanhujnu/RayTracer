@@ -104,7 +104,8 @@ const Color& Renderer::ResultImage::GetColor (int x, int y) const
 Renderer::Renderer (const Model& model, const Camera& camera, int sampleNum) :
 	model (model),
 	camera (camera),
-	sampleNum (sampleNum)
+	sampleNum (sampleNum),
+	canceled (false)
 {
 }
 
@@ -139,6 +140,10 @@ public:
 		const int resX = parameters->GetResolutionX ();
 		const int resY = parameters->GetResolutionY ();
 		for (int pix = threadIndex; pix < (resX * resY); pix += threadNum) {
+			if (renderer->IsCanceled ()) {
+				return 0;
+			}
+
 			int x = pix % resX;
 			int y = resY - (pix / resX) - 1;
 
@@ -224,4 +229,14 @@ bool Renderer::Render (const Parameters& parameters, ResultImage& result, const 
 	progress.OnProgress (1.0);
 
 	return true;
+}
+
+void Renderer::Cancel ()
+{
+	canceled = true;
+}
+
+bool Renderer::IsCanceled () const
+{
+	return canceled;
 }

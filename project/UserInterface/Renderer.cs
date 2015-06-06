@@ -8,6 +8,7 @@ using System.IO;
 using System.Drawing;
 using System.ComponentModel;
 using System.Collections;
+using System.Threading;
 
 namespace UserInterface {
 	static class Win32Functions
@@ -34,6 +35,9 @@ namespace UserInterface {
             EndRenderCallback endRenderCallback,
             ProgressCallback progressCallback,
             SetPixelCallback setPixelCallback);
+
+        [DllImport("RayTracer.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void CancelRender();
     }
 
 	class Renderer
@@ -41,6 +45,7 @@ namespace UserInterface {
         private MainForm mainForm;
         private RenderMode renderMode;
         private String tempFileName;
+        RenderWorker worker = null;
 
         private volatile Bitmap renderImage;
 		private volatile ArrayList pixelTable;
@@ -72,10 +77,18 @@ namespace UserInterface {
                 writer.Write (configString);
                 writer.Close ();
 
-                RenderWorker worker = new RenderWorker ();
+                worker = new RenderWorker ();
                 worker.Start (renderMode, settings, tempFileName, StartRender, EndRender, Progress, Finish, SetPixel);
             } catch {
 
+            }
+        }
+        
+        public void Cancel ()
+        {
+            if (worker != null)
+            {
+                worker.Cancel();
             }
         }
 
@@ -92,6 +105,7 @@ namespace UserInterface {
 
         private void EndRender ()
         {
+            worker = null;
         }
 
         private void Progress (int progress)
@@ -146,10 +160,12 @@ namespace UserInterface {
             private Action<int, int, double, double, double> setPixelCallback;
 
             int result = -1;
+            AutoResetEvent finishedEvent = new AutoResetEvent(true);
 
             public RenderWorker ()
             {
                 backgroundWorker.WorkerReportsProgress = true;
+                backgroundWorker.WorkerSupportsCancellation = true;
                 backgroundWorker.DoWork += new DoWorkEventHandler (DoRayTrace);
                 backgroundWorker.ProgressChanged += new ProgressChangedEventHandler (RayTraceProgressChanged);
                 backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler (RayTraceCompleted);
@@ -164,6 +180,7 @@ namespace UserInterface {
                                 Action<int> finishedCallback,
                                 Action<int, int, double, double, double> setPixelCallback)
             {
+                finishedEvent.Reset();
                 this.renderMode = renderMode;
                 this.settings = settings;
                 this.tempFileName = tempFileName;
@@ -172,7 +189,14 @@ namespace UserInterface {
                 this.progressCallback = progressCallback;
                 this.finishedCallback = finishedCallback;
                 this.setPixelCallback = setPixelCallback;
-                backgroundWorker.RunWorkerAsync ();
+                backgroundWorker.RunWorkerAsync ();                
+            }
+
+            public void Cancel ()
+            {
+                backgroundWorker.CancelAsync();  
+                Win32Functions.CancelRender();
+                finishedEvent.WaitOne();
             }
 
             private void NativeRayTracerStartRenderCallback (int picWidth, int picHeight, int vertexCount, int triangleCount)
@@ -182,7 +206,11 @@ namespace UserInterface {
 
             private void NativeRayTracerEndRenderCallback ()
             {
-                
+                backgroundWorker.DoWork -= new DoWorkEventHandler(DoRayTrace);
+                backgroundWorker.ProgressChanged -= new ProgressChangedEventHandler(RayTraceProgressChanged);
+                backgroundWorker.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(RayTraceCompleted);
+                endRenderCallback();
+                finishedEvent.Set();
             }
             
             private void NativeRayTracerProgressCallback (double progress)

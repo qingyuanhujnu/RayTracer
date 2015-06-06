@@ -63,12 +63,19 @@ public:
 	virtual ~Renderer ();
 
 	virtual bool	Render (const Parameters& parameters, ResultImage& result, const IProgress& progress);
+	void	Cancel ();
+	bool	IsCanceled () const;
 	virtual Color	GetFieldColor (const Image::Field& field) const = 0;
 
 protected:
 	Model			model;
 	Camera			camera;
 	int				sampleNum;
+
+private:
+	// Note that canceled is read/write from multiple threads but since there is only one state change (false -> true) in the objects lifetime
+	// it doesn't need to be atomic.
+	bool canceled;
 };
 
 class ProgressReport

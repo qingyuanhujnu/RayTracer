@@ -43,6 +43,14 @@ enum RenderMode
 	PathTrace2Mode
 };
 
+std::unique_ptr<Renderer> renderer = nullptr;
+
+struct ScopeExitResetRenderer {
+	~ScopeExitResetRenderer () {
+		renderer = nullptr;
+	}
+};
+
 int Render (
 	int algorithm,
 	const wchar_t* configFile,
@@ -75,7 +83,6 @@ int Render (
 		startRenderCallback (parameters.GetResolutionX (), parameters.GetResolutionY (), model.VertexCount (), model.TriangleCount ());
 	}
 
-	std::unique_ptr<Renderer> renderer = nullptr;
 	if (renderMode == RayTraceMode) {
 		renderer.reset (new RayTracer (model, camera, sampleNum));
 	} else if (renderMode == OpenCLTraceMode) {
@@ -88,6 +95,7 @@ int Render (
 	if (DBGERROR (renderer == nullptr)) {
 		return 3;
 	}
+	ScopeExitResetRenderer resetRenderGuard;
 
 	Progress progress (progressCallback, setPixelCallback);
 	Renderer::ResultImage resultImage;
@@ -106,4 +114,11 @@ int Render (
 	}
 
 	return 0;
+}
+
+void CancelRender ()
+{
+	if (renderer != nullptr) {
+		renderer->Cancel ();
+	}
 }

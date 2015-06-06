@@ -15,4 +15,6 @@ extern "C"
 		EndRenderCallback endRenderCallback,
 		ProgressCallback progressCallback,
 		SetPixelCallback setPixelCallback);
+
+	DLLEXPORT void CancelRender ();
 }

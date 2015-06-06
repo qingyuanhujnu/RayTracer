@@ -19,6 +19,7 @@ namespace UserInterface {
         private Settings settings = new Settings ();
         private String openedFile = null;
         private int menuItemCount = 0;
+        private Renderer renderer = null;
 
 		public MainForm ()
 		{
@@ -105,20 +106,20 @@ namespace UserInterface {
 
         private void rayTraceMenu_Click (object sender, EventArgs e)
         {
-            Renderer rayTracer = new Renderer (this, Renderer.RenderMode.RayTraceMode);
-            rayTracer.Start (configTextBox.Text, settings);
+            renderer = new Renderer (this, Renderer.RenderMode.RayTraceMode);
+            renderer.Start(configTextBox.Text, settings);
         }
 
         private void pathTraceMenu_Click (object sender, EventArgs e)
         {
-            Renderer rayTracer = new Renderer (this, Renderer.RenderMode.OpenCLTraceMode);
-            rayTracer.Start (configTextBox.Text, settings);
+            renderer = new Renderer(this, Renderer.RenderMode.OpenCLTraceMode);
+            renderer.Start(configTextBox.Text, settings);
         }
 
         private void pathTrace2Menu_Click (object sender, EventArgs e)
         {
-            Renderer rayTracer = new Renderer (this, Renderer.RenderMode.PathTrace2Mode);
-            rayTracer.Start (configTextBox.Text, settings);
+            renderer = new Renderer(this, Renderer.RenderMode.PathTrace2Mode);
+            renderer.Start(configTextBox.Text, settings);
         }
         
         private void OpenFile (String fileName)
@@ -158,6 +159,14 @@ namespace UserInterface {
         {
             if (e.Data.GetDataPresent (DataFormats.FileDrop)) {
                 e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (renderer != null)
+            {
+                renderer.Cancel();
             }
         }
     }
