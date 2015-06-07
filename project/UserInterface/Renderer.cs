@@ -206,9 +206,6 @@ namespace UserInterface {
 
             private void NativeRayTracerEndRenderCallback ()
             {
-                backgroundWorker.DoWork -= new DoWorkEventHandler(DoRayTrace);
-                backgroundWorker.ProgressChanged -= new ProgressChangedEventHandler(RayTraceProgressChanged);
-                backgroundWorker.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(RayTraceCompleted);
                 endRenderCallback();
                 finishedEvent.Set();
             }
