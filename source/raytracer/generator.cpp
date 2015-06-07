@@ -92,35 +92,10 @@ static void GenerateCuboidBase (Mesh& mesh, double xSize, double ySize, double z
 	double y = ySize / 2.0;
 	double z = zSize / 2.0;
 
-	mesh.AddTexCoord (Vec2 (0.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 1.0));
-	mesh.AddTexCoord (Vec2 (0.0, 1.0));
-
-	mesh.AddTexCoord (Vec2 (0.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 1.0));
-	mesh.AddTexCoord (Vec2 (0.0, 1.0));
-
-	mesh.AddTexCoord (Vec2 (0.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 1.0));
-	mesh.AddTexCoord (Vec2 (0.0, 1.0));
-
-	mesh.AddTexCoord (Vec2 (0.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 1.0));
-	mesh.AddTexCoord (Vec2 (0.0, 1.0));
-
-	mesh.AddTexCoord (Vec2 (0.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 1.0));
-	mesh.AddTexCoord (Vec2 (0.0, 1.0));
-
-	mesh.AddTexCoord (Vec2 (0.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 0.0));
-	mesh.AddTexCoord (Vec2 (1.0, 1.0));
-	mesh.AddTexCoord (Vec2 (0.0, 1.0));
+	mesh.AddTexCoord (Vec2 (0.0, 0.0)); // 0
+	mesh.AddTexCoord (Vec2 (1.0, 0.0)); // 1
+	mesh.AddTexCoord (Vec2 (1.0, 1.0)); // 2
+	mesh.AddTexCoord (Vec2 (0.0, 1.0)); // 3
 
 	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z)));
 	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z)));
@@ -154,18 +129,18 @@ static void GenerateCuboidBase (Mesh& mesh, double xSize, double ySize, double z
 
 	if (facing == Generator::Inside) {
 		AddTexturedPolygon (mesh, 0, 1, 2, 3, 0, 1, 2, 3, materials[0], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 4, 5, 6, 7, 4, 5, 6, 7, materials[1], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 8, 9, 10, 11, 8, 9, 10, 11, materials[2], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 12, 13, 14, 15, 12, 13, 14, 15, materials[3], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 16, 17, 18, 19, 16, 17, 18, 19, materials[4], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 20, 21, 22, 23, 20, 21, 22, 23, materials[5], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 4, 5, 6, 7, 0, 1, 2, 3, materials[1], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 8, 9, 10, 11, 0, 1, 2, 3, materials[2], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 12, 13, 14, 15, 0, 1, 2, 3, materials[3], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 16, 17, 18, 19, 0, 1, 2, 3, materials[4], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 20, 21, 22, 23, 0, 1, 2, 3, materials[5], Mesh::NonCurved);
 	} else if (facing == Generator::Outside) {
-		AddTexturedPolygon (mesh, 0, 3, 2, 1, 0, 3, 2, 1, materials[0], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 4, 7, 6, 5, 4, 7, 6, 5, materials[1], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 8, 11, 10, 9, 8, 11, 10, 9, materials[2], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 12, 15, 14, 13, 12, 15, 14, 13, materials[3], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 16, 19, 18, 17, 16, 19, 18, 17, materials[4], Mesh::NonCurved);
-		AddTexturedPolygon (mesh, 20, 23, 22, 21, 20, 23, 22, 21, materials[5], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 0, 3, 2, 1, 0, 1, 2, 3, materials[0], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 4, 7, 6, 5, 0, 1, 2, 3, materials[1], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 8, 11, 10, 9, 0, 1, 2, 3, materials[2], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 12, 15, 14, 13, 0, 1, 2, 3, materials[3], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 16, 19, 18, 17, 0, 1, 2, 3, materials[4], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 20, 23, 22, 21, 0, 1, 2, 3, materials[5], Mesh::NonCurved);
 	} else {
 		DBGERROR (true);
 	}
