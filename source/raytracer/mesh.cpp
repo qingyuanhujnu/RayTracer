@@ -4,9 +4,8 @@
 
 #include <algorithm>
 
-Mesh::Vertex::Vertex (const Vec3& pos, const Vec2& texCoord) :
-	pos (pos),
-	texCoord (texCoord)
+Mesh::Vertex::Vertex (const Vec3& pos) :
+	pos (pos)
 {
 
 }
@@ -18,6 +17,26 @@ Mesh::Triangle::Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex
 	normal0 (InvalidIndex),
 	normal1 (InvalidIndex),
 	normal2 (InvalidIndex),
+	texCoord0 (InvalidIndex),
+	texCoord1 (InvalidIndex),
+	texCoord2 (InvalidIndex),
+	material (material),
+	curveGroup (curveGroup),
+	normalMode (Calculated)
+{
+
+}
+
+Mesh::Triangle::Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex texCoord0, UIndex texCoord1, UIndex texCoord2, UIndex material, UIndex curveGroup) :
+	vertex0 (vertex0),
+	vertex1 (vertex1),
+	vertex2 (vertex2),
+	normal0 (InvalidIndex),
+	normal1 (InvalidIndex),
+	normal2 (InvalidIndex),
+	texCoord0 (texCoord0),
+	texCoord1 (texCoord1),
+	texCoord2 (texCoord2),
 	material (material),
 	curveGroup (curveGroup),
 	normalMode (Calculated)
@@ -32,6 +51,9 @@ Mesh::Triangle::Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex
 	normal0 (normal1),
 	normal1 (normal2),
 	normal2 (normal3),
+	texCoord0 (InvalidIndex),
+	texCoord1 (InvalidIndex),
+	texCoord2 (InvalidIndex),
 	material (material),
 	curveGroup (Mesh::NonCurved),
 	normalMode (UserDefined)
@@ -44,13 +66,17 @@ Mesh::Triangle::~Triangle ()
 
 }
 
-bool Mesh::Triangle::Check (UIndex materialCount, UIndex vertexCount, UIndex userDefinedVertexNormalCount, UIndex calculatedVertexNormalCount) const
+bool Mesh::Triangle::Check (UIndex materialCount, UIndex vertexCount, UIndex texCoordCount, UIndex userDefinedVertexNormalCount, UIndex calculatedVertexNormalCount) const
 {
 	if (DBGERROR (material >= materialCount)) {
 		return false;
 	}
 
 	if (DBGERROR (vertex0 >= vertexCount || vertex1 >= vertexCount || vertex2 >= vertexCount)) {
+		return false;
+	}
+
+	if (DBGERROR (texCoord0 >= texCoordCount || texCoord1 >= texCoordCount || texCoord2 >= texCoordCount)) {
 		return false;
 	}
 
@@ -107,6 +133,15 @@ UIndex Mesh::AddNormal (const Vec3& normal)
 	return vertices.size () - 1;
 }
 
+UIndex Mesh::AddTexCoord (const Vec2& texCoord)
+{
+	if (DBGERROR (finalized)) {
+		return InvalidIndex;
+	}
+	texCoords.push_back (texCoord);
+	return texCoords.size () - 1;
+}
+
 UIndex Mesh::AddTriangle (const Triangle& triangle)
 {
 	if (DBGERROR (finalized)) {
@@ -148,9 +183,21 @@ void Mesh::Finalize ()
 
 	bool needVertexNormals = false;
 	for (UIndex i = 0; i < triangles.size (); i++) {
-		const Triangle& triangle = triangles[i];
+		Triangle& triangle = triangles[i];
 		if (triangle.curveGroup != Mesh::NonCurved) {
 			needVertexNormals = true;
+		}
+		if (triangle.texCoord0 == InvalidIndex) {
+			texCoords.push_back (Vec2 (0.0, 0.0));
+			triangle.texCoord0 = texCoords.size () - 1;
+		}
+		if (triangle.texCoord1 == InvalidIndex) {
+			texCoords.push_back (Vec2 (0.0, 0.0));
+			triangle.texCoord1 = texCoords.size () - 1;
+		}
+		if (triangle.texCoord2 == InvalidIndex) {
+			texCoords.push_back (Vec2 (0.0, 0.0));
+			triangle.texCoord2 = texCoords.size () - 1;
 		}
 		calculatedTriangleNormals.push_back (CalculateTriangleNormal (i));
 	}
@@ -170,6 +217,11 @@ UIndex Mesh::VertexCount () const
 	return vertices.size ();
 }
 
+UIndex Mesh::TexCoordCount () const
+{
+	return texCoords.size ();
+}
+
 UIndex Mesh::TriangleCount () const
 {
 	return triangles.size ();
@@ -178,6 +230,11 @@ UIndex Mesh::TriangleCount () const
 const Mesh::Vertex& Mesh::GetVertex (UIndex index) const
 {
 	return vertices[index];
+}
+
+const Vec2& Mesh::GetTexCoord (UIndex index) const
+{
+	return texCoords[index];
 }
 
 const Mesh::Triangle& Mesh::GetTriangle (UIndex index) const
@@ -274,11 +331,12 @@ bool Mesh::Check (UIndex materialCount) const
 	}
 
 	UIndex vertexCount = vertices.size ();
+	UIndex texCoordCount = texCoords.size ();
 	UIndex userDefinedVertexNormalCount = userDefinedVertexNormals.size ();
 	UIndex calculatedVertexNormalCount = calculatedVertexNormals.size ();
 	for (UIndex i = 0; i < triangles.size (); i++) {
 		const Triangle& triangle = triangles[i];
-		if (DBGERROR (!triangle.Check (materialCount, vertexCount, userDefinedVertexNormalCount, calculatedVertexNormalCount))) {
+		if (DBGERROR (!triangle.Check (materialCount, vertexCount, texCoordCount, userDefinedVertexNormalCount, calculatedVertexNormalCount))) {
 			return false;
 		}
 	}

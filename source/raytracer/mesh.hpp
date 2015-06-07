@@ -18,10 +18,8 @@ public:
 	class Vertex {
 	public:
 		Vec3 pos;
-		Vec2 texCoord;
 
-		// TODO remove default parameter
-		Vertex (const Vec3& pos, const Vec2& texCoord = Vec2 ());
+		Vertex (const Vec3& pos);
 	};
 
 	class Triangle
@@ -33,11 +31,13 @@ public:
 			Calculated
 		};
 
-		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex material, UIndex curveGroup = Mesh::NonCurved);
+		Triangle ();
+		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex material, UIndex curveGroup);
+		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex texCoord0, UIndex texCoord1, UIndex texCoord2, UIndex material, UIndex curveGroup);
 		Triangle (UIndex vertex0, UIndex vertex1, UIndex vertex2, UIndex normal1, UIndex normal2, UIndex normal3, UIndex material);
 		~Triangle ();
 
-		bool		Check (UIndex materialCount, UIndex vertexCount, UIndex userDefinedVertexNormalCount, UIndex calculatedVertexNormalCount) const;
+		bool		Check (UIndex materialCount, UIndex vertexCount, UIndex texCoordCount, UIndex userDefinedVertexNormalCount, UIndex calculatedVertexNormalCount) const;
 
 		UIndex		vertex0;
 		UIndex		vertex1;
@@ -46,6 +46,10 @@ public:
 		UIndex		normal0;
 		UIndex		normal1;
 		UIndex		normal2;
+
+		UIndex		texCoord0;
+		UIndex		texCoord1;
+		UIndex		texCoord2;
 
 		UIndex		material;
 		UIndex		curveGroup;
@@ -59,6 +63,7 @@ public:
 	UIndex					AddVertex (const Vertex& vertex);
 	void					SetVertex (UIndex index, const Mesh::Vertex& vertex);
 	UIndex					AddNormal (const Vec3& normal);
+	UIndex					AddTexCoord (const Vec2& texCoord);
 	UIndex					AddTriangle (const Triangle& triangle);
 
 	void					Transform (const Transformation& transformation);
@@ -67,9 +72,11 @@ public:
 	void					Finalize ();
 
 	UIndex					VertexCount () const;
+	UIndex					TexCoordCount () const;
 	UIndex					TriangleCount () const;
 
 	const Vertex&			GetVertex (UIndex index) const;
+	const Vec2&				GetTexCoord (UIndex index) const;
 	const Triangle&			GetTriangle (UIndex index) const;
 
 	bool					IsDoubleSided () const;
@@ -87,6 +94,7 @@ private:
 	void					CalculateOctree ();
 
 	std::vector<Vertex>		vertices;
+	std::vector<Vec2>		texCoords;
 	std::vector<Triangle>	triangles;
 
 	std::vector<Vec3>		userDefinedVertexNormals;

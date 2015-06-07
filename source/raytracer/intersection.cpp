@@ -335,9 +335,12 @@ bool Intersection::RayMesh (const Ray& ray, const Mesh& mesh, MeshIntersection* 
 			const Mesh::Vertex& v0 = mesh.GetVertex (triangle.vertex0);
 			const Mesh::Vertex& v1 = mesh.GetVertex (triangle.vertex1);
 			const Mesh::Vertex& v2 = mesh.GetVertex (triangle.vertex2);
+			const Vec2& texCoord0 = mesh.GetTexCoord (triangle.texCoord0);
+			const Vec2& texCoord1 = mesh.GetTexCoord (triangle.texCoord1);
+			const Vec2& texCoord2 = mesh.GetTexCoord (triangle.texCoord2);
 
 			Intersection::MeshIntersection currentIntersection;
-			if (Intersection::RayTriangle (ray, Triangle (v0.pos, v1.pos, v2.pos, v0.texCoord, v1.texCoord, v2.texCoord), facingMode, &currentIntersection)) {
+			if (Intersection::RayTriangle (ray, Triangle (v0.pos, v1.pos, v2.pos, texCoord0, texCoord1, texCoord2), facingMode, &currentIntersection)) {
 				if (intersection == NULL) {
 					return true;
 				}

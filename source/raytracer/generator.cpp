@@ -1,11 +1,16 @@
 #include "generator.hpp"
 #include "common.hpp"
 
-static void AddPolygon (Mesh& mesh, const std::vector<UIndex>& indices, UIndex material, UIndex curveGroup)
+static void AddPolygon (Mesh& mesh, const std::vector<UIndex>& vertexIndices, const std::vector<UIndex>& textureVertexIndices, UIndex material, UIndex curveGroup)
 {
-	UIndex count = indices.size ();
+	UIndex count = vertexIndices.size ();
 	for (unsigned int i = 0; i < count - 2; i++) {
-		mesh.AddTriangle (Mesh::Triangle (indices[0], indices[(i + 1) % count], indices[(i + 2) % count], material, curveGroup));
+		if (textureVertexIndices.empty ()) {
+			mesh.AddTriangle (Mesh::Triangle (vertexIndices[0], vertexIndices[(i + 1) % count], vertexIndices[(i + 2) % count], material, curveGroup));
+		} else {
+			DBGASSERT (vertexIndices.size () == textureVertexIndices.size ());
+			mesh.AddTriangle (Mesh::Triangle (vertexIndices[0], vertexIndices[(i + 1) % count], vertexIndices[(i + 2) % count], textureVertexIndices[0], textureVertexIndices[(i + 1) % count], textureVertexIndices[(i + 2) % count], material, curveGroup));
+		}
 	}
 }
 
@@ -14,25 +19,47 @@ static void AddPolygon (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex materia
 	mesh.AddTriangle (Mesh::Triangle (a, b, c, material, curveGroup));
 }
 
+static void AddTexturedPolygon (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex ta, UIndex tb, UIndex tc, UIndex material, UIndex curveGroup)
+{
+	mesh.AddTriangle (Mesh::Triangle (a, b, c, ta, tb, tc, material, curveGroup));
+}
+
 static void AddPolygon (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex d, UIndex material, UIndex curveGroup)
 {
-	std::vector<UIndex> indices;
-	indices.push_back (a);
-	indices.push_back (b);
-	indices.push_back (c);
-	indices.push_back (d);
-	AddPolygon (mesh, indices, material, curveGroup);
+	std::vector<UIndex> vertexIndices;
+	std::vector<UIndex> textureVertexIndices;
+	vertexIndices.push_back (a);
+	vertexIndices.push_back (b);
+	vertexIndices.push_back (c);
+	vertexIndices.push_back (d);
+	AddPolygon (mesh, vertexIndices, textureVertexIndices, material, curveGroup);
+}
+
+static void AddTexturedPolygon (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex d, UIndex ta, UIndex tb, UIndex tc, UIndex td, UIndex material, UIndex curveGroup)
+{
+	std::vector<UIndex> vertexIndices;
+	vertexIndices.push_back (a);
+	vertexIndices.push_back (b);
+	vertexIndices.push_back (c);
+	vertexIndices.push_back (d);
+	std::vector<UIndex> textureVertexIndices;
+	textureVertexIndices.push_back (ta);
+	textureVertexIndices.push_back (tb);
+	textureVertexIndices.push_back (tc);
+	textureVertexIndices.push_back (td);
+	AddPolygon (mesh, vertexIndices, textureVertexIndices, material, curveGroup);
 }
 
 static void AddPolygon (Mesh& mesh, UIndex a, UIndex b, UIndex c, UIndex d, UIndex e, UIndex material, UIndex curveGroup)
 {
-	std::vector<UIndex> indices;
-	indices.push_back (a);
-	indices.push_back (b);
-	indices.push_back (c);
-	indices.push_back (d);
-	indices.push_back (e);
-	AddPolygon (mesh, indices, material, curveGroup);
+	std::vector<UIndex> vertexIndices;
+	std::vector<UIndex> textureVertexIndices;
+	vertexIndices.push_back (a);
+	vertexIndices.push_back (b);
+	vertexIndices.push_back (c);
+	vertexIndices.push_back (d);
+	vertexIndices.push_back (e);
+	AddPolygon (mesh, vertexIndices, textureVertexIndices, material, curveGroup);
 }
 
 void Generator::GenerateRectangle (Model& model, double xSize, double ySize, const Vec3& offset, const Vec3& rotation, UIndex material)
@@ -42,10 +69,10 @@ void Generator::GenerateRectangle (Model& model, double xSize, double ySize, con
 	double x = xSize / 2.0;
 	double y = ySize / 2.0;
 
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, 0.0), Vec2 (0.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, 0.0), Vec2 (1.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, 0.0), Vec2 (1.0, 1.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, 0.0), Vec2 (0.0, 1.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, 0.0)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, 0.0)));
 
 	AddPolygon (mesh, 0, 1, 2, 3, material, Mesh::NonCurved);
 
@@ -65,50 +92,80 @@ static void GenerateCuboidBase (Mesh& mesh, double xSize, double ySize, double z
 	double y = ySize / 2.0;
 	double z = zSize / 2.0;
 
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z), Vec2 (0.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z), Vec2 (1.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z), Vec2 (1.0, 1.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z), Vec2 (0.0, 1.0)));
+	mesh.AddTexCoord (Vec2 (0.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 1.0));
+	mesh.AddTexCoord (Vec2 (0.0, 1.0));
 
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z), Vec2 (0.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z), Vec2 (1.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z), Vec2 (1.0, 1.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z), Vec2 (0.0, 1.0)));
+	mesh.AddTexCoord (Vec2 (0.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 1.0));
+	mesh.AddTexCoord (Vec2 (0.0, 1.0));
 
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z), Vec2 (0.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z), Vec2 (1.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z), Vec2 (1.0, 1.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z), Vec2 (0.0, 1.0)));
+	mesh.AddTexCoord (Vec2 (0.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 1.0));
+	mesh.AddTexCoord (Vec2 (0.0, 1.0));
 
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z), Vec2 (0.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z), Vec2 (1.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z), Vec2 (1.0, 1.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z), Vec2 (0.0, 1.0)));
+	mesh.AddTexCoord (Vec2 (0.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 1.0));
+	mesh.AddTexCoord (Vec2 (0.0, 1.0));
 
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z), Vec2 (0.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z), Vec2 (1.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z), Vec2 (1.0, 1.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z), Vec2 (0.0, 1.0)));
+	mesh.AddTexCoord (Vec2 (0.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 1.0));
+	mesh.AddTexCoord (Vec2 (0.0, 1.0));
 
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z), Vec2 (0.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z), Vec2 (1.0, 0.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z), Vec2 (1.0, 1.0)));
-	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z), Vec2 (0.0, 1.0)));
+	mesh.AddTexCoord (Vec2 (0.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 0.0));
+	mesh.AddTexCoord (Vec2 (1.0, 1.0));
+	mesh.AddTexCoord (Vec2 (0.0, 1.0));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, -y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (-x, y, -z)));
+
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, -z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, y, z)));
+	mesh.AddVertex (Mesh::Vertex (Vec3 (x, -y, z)));
 
 	if (facing == Generator::Inside) {
-		AddPolygon (mesh, 0, 1, 2, 3, materials[0], Mesh::NonCurved);
-		AddPolygon (mesh, 4, 5, 6, 7, materials[1], Mesh::NonCurved);
-		AddPolygon (mesh, 8, 9, 10, 11, materials[2], Mesh::NonCurved);
-		AddPolygon (mesh, 12, 13, 14, 15, materials[3], Mesh::NonCurved);
-		AddPolygon (mesh, 16, 17, 18, 19, materials[4], Mesh::NonCurved);
-		AddPolygon (mesh, 20, 21, 22, 23, materials[5], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 0, 1, 2, 3, 0, 1, 2, 3, materials[0], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 4, 5, 6, 7, 4, 5, 6, 7, materials[1], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 8, 9, 10, 11, 8, 9, 10, 11, materials[2], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 12, 13, 14, 15, 12, 13, 14, 15, materials[3], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 16, 17, 18, 19, 16, 17, 18, 19, materials[4], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 20, 21, 22, 23, 20, 21, 22, 23, materials[5], Mesh::NonCurved);
 	} else if (facing == Generator::Outside) {
-		AddPolygon (mesh, 0, 3, 2, 1, materials[0], Mesh::NonCurved);
-		AddPolygon (mesh, 4, 7, 6, 5, materials[1], Mesh::NonCurved);
-		AddPolygon (mesh, 8, 11, 10, 9, materials[2], Mesh::NonCurved);
-		AddPolygon (mesh, 12, 15, 14, 13, materials[3], Mesh::NonCurved);
-		AddPolygon (mesh, 16, 19, 18, 17, materials[4], Mesh::NonCurved);
-		AddPolygon (mesh, 20, 23, 22, 21, materials[5], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 0, 3, 2, 1, 0, 3, 2, 1, materials[0], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 4, 7, 6, 5, 4, 7, 6, 5, materials[1], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 8, 11, 10, 9, 8, 11, 10, 9, materials[2], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 12, 15, 14, 13, 12, 15, 14, 13, materials[3], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 16, 19, 18, 17, 16, 19, 18, 17, materials[4], Mesh::NonCurved);
+		AddTexturedPolygon (mesh, 20, 23, 22, 21, 20, 23, 22, 21, materials[5], Mesh::NonCurved);
 	} else {
 		DBGERROR (true);
 	}
@@ -148,29 +205,35 @@ void Generator::GenerateCylinder (Model& model, double radius, double height, in
 	double step = 2.0 * PI / segmentation;
 	
 	for (int i = 0; i < segmentation; i++) {
-		mesh.AddVertex (Mesh::Vertex (CylindricalToCartesian (radius, height / 2.0, theta), Vec2 (theta, height / 2.0)));
-		mesh.AddVertex (Mesh::Vertex (CylindricalToCartesian (radius, -height / 2.0, theta), Vec2 (theta, -height / 2.0)));
+		mesh.AddVertex (Mesh::Vertex (CylindricalToCartesian (radius, height / 2.0, theta)));
+		mesh.AddVertex (Mesh::Vertex (CylindricalToCartesian (radius, -height / 2.0, theta)));
+		mesh.AddTexCoord (Vec2 (theta, height / 2.0));
+		mesh.AddTexCoord (Vec2 (theta, -height / 2.0));
 		theta -= step;
 	}
-
+	
 	for (int i = 0; i < segmentation; i++) {
 		int current = 2 * i;
 		int next = current + 2;
 		if (i == segmentation - 1) {
 			next = 0;
 		}
-		AddPolygon (mesh, current, next, next + 1, current + 1, material, 0 /* curvedGroup */);
+		AddTexturedPolygon (mesh, current, next, next + 1, current + 1, current, next, next + 1, current + 1, material, 0 /* curvedGroup */);
 	}
 
 	std::vector<UIndex> topPolygon;
 	std::vector<UIndex> bottomPolygon;
+	std::vector<UIndex> topTextureVertices;
+	std::vector<UIndex> bottomTextureVertices;
 	for (int i = 0; i < segmentation; i++) {
 		topPolygon.push_back (2 * (segmentation - i - 1));
+		topTextureVertices.push_back (2 * (segmentation - i - 1));
 		bottomPolygon.push_back (2 * i + 1);
+		bottomTextureVertices.push_back (2 * i + 1);
 	}
 
-	AddPolygon (mesh, topPolygon, material, Mesh::NonCurved);
-	AddPolygon (mesh, bottomPolygon, material, Mesh::NonCurved);
+	AddPolygon (mesh, topPolygon, topTextureVertices, material, Mesh::NonCurved);
+	AddPolygon (mesh, bottomPolygon, bottomTextureVertices, material, Mesh::NonCurved);
 
 	Transformation tr;
 	tr.AppendRotationXYZ (rotation);
@@ -189,16 +252,19 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 	double step = PI / segmentation;
 	double theta = step;
 
-	UIndex topIndex = mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (radius, 0.0, 0.0), Vec2 (0, 0)));
+	UIndex topIndex = mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (radius, 0.0, 0.0)));
+	mesh.AddTexCoord (Vec2 (0.0, 0.0));
 	for (int i = 1; i < segmentation; i++) {
 		double phi = 0;
 		for (int j = 0; j < circle; j++) {
-			mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (radius, theta, phi), Vec2 (theta, phi)));
+			mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (radius, theta, phi)));
+			mesh.AddTexCoord (Vec2 (theta, phi));
 			phi += step;
 		}
 		theta += step;
 	}
-	UIndex bottomIndex = mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (-radius, 0.0, 0.0), Vec2 (1, 1)));
+	UIndex bottomIndex = mesh.AddVertex (Mesh::Vertex (SphericalToCartesian (-radius, 0.0, 0.0)));
+	mesh.AddTexCoord (Vec2 (1.0, 1.0));
 
 	for (int i = 1; i <= segmentation; i++) {
 		if (i == 1) {
@@ -209,7 +275,7 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 				if (j == circle - 1) {
 					next = offset;
 				}
-				AddPolygon (mesh, current, next, topIndex, material, 0);
+				AddTexturedPolygon (mesh, current, next, topIndex, current, next, topIndex, material, 0);
 			}
 		} else if (i < segmentation) {
 			int offset = (i - 1) * circle + 1;
@@ -222,7 +288,7 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 					next = offset;
 					ntop = offset - circle;
 				}
-				AddPolygon (mesh, current, next, ntop, top, material, 0);
+				AddTexturedPolygon (mesh, current, next, ntop, top, current, next, ntop, top, material, 0);
 			}
 		} else if (i == segmentation) {
 			int offset = (i - 2) * circle + 1;
@@ -232,7 +298,7 @@ void Generator::GenerateSphere (Model& model, double radius, int segmentation, c
 				if (j == circle - 1) {
 					next = offset;
 				}
-				AddPolygon (mesh, current, bottomIndex, next, material, 0);
+				AddTexturedPolygon (mesh, current, bottomIndex, next, current, bottomIndex, next, material, 0);
 			}
 		}
 	}
