@@ -164,8 +164,9 @@ namespace UserInterface {
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (renderer != null)
+            if (renderer != null && renderer.IsRendering ())
             {
+                e.Cancel = true;
                 renderer.Cancel();
             }
         }

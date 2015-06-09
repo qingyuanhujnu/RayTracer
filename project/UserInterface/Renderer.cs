@@ -92,6 +92,11 @@ namespace UserInterface {
             }
         }
 
+        public bool IsRendering ()
+        {
+            return worker != null;
+        }
+
         private void StartRender (int picWidth, int picHeight, int vertexCount, int triangleCount)
         {
             if (renderImage != null) {
@@ -160,7 +165,7 @@ namespace UserInterface {
             private Action<int, int, double, double, double> setPixelCallback;
 
             int result = -1;
-            AutoResetEvent finishedEvent = new AutoResetEvent(true);
+            bool exitAppWhenFinished = false;
 
             public RenderWorker ()
             {
@@ -180,7 +185,7 @@ namespace UserInterface {
                                 Action<int> finishedCallback,
                                 Action<int, int, double, double, double> setPixelCallback)
             {
-                finishedEvent.Reset();
+                exitAppWhenFinished = false;
                 this.renderMode = renderMode;
                 this.settings = settings;
                 this.tempFileName = tempFileName;
@@ -196,7 +201,7 @@ namespace UserInterface {
             {
                 backgroundWorker.CancelAsync();  
                 Win32Functions.CancelRender();
-                finishedEvent.WaitOne();
+                exitAppWhenFinished = true;
             }
 
             private void NativeRayTracerStartRenderCallback (int picWidth, int picHeight, int vertexCount, int triangleCount)
@@ -207,7 +212,6 @@ namespace UserInterface {
             private void NativeRayTracerEndRenderCallback ()
             {
                 endRenderCallback();
-                finishedEvent.Set();
             }
             
             private void NativeRayTracerProgressCallback (double progress)
@@ -248,6 +252,11 @@ namespace UserInterface {
             private void RayTraceCompleted (object sender, RunWorkerCompletedEventArgs e)
             {
                 finishedCallback (result);
+
+                if (exitAppWhenFinished)
+                {
+                    Application.Exit();
+                }
             }
         }    
     }
